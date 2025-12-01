@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { ActionPlan } from "@/lib/types";
+import type { ActionPlan } from "@/lib/types-cto";
 import { Calendar, Clock } from "lucide-react";
 
 interface ActionPlanTimelineProps {
@@ -50,7 +50,9 @@ export function ActionPlanTimeline({ actionPlan }: ActionPlanTimelineProps) {
                         {action.priority.toUpperCase()}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">{action.description}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {action.description}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -72,7 +74,9 @@ export function ActionPlanTimeline({ actionPlan }: ActionPlanTimelineProps) {
                         {action.priority.toUpperCase()}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">{action.description}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {action.description}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -94,7 +98,9 @@ export function ActionPlanTimeline({ actionPlan }: ActionPlanTimelineProps) {
                         {action.priority.toUpperCase()}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">{action.description}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {action.description}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -105,4 +111,3 @@ export function ActionPlanTimeline({ actionPlan }: ActionPlanTimelineProps) {
     </Card>
   );
 }
-

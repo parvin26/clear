@@ -3,6 +3,7 @@
 ## ✅ Fixed Issues
 
 The deployment errors have been fixed:
+
 - **Database URL conversion**: Automatically converts `postgresql://` to `postgresql+psycopg://` for psycopg3 compatibility
 - **CORS configuration**: Now accepts comma-separated strings from environment variables
 - **Python version**: Specified Python 3.12 in `runtime.txt`
@@ -28,6 +29,7 @@ The deployment errors have been fixed:
 1. Go to Render Dashboard → **New** → **Web Service**
 2. Connect your repository
 3. Configure:
+
    - **Name**: `exec-connect-backend`
    - **Root Directory**: `backend`
    - **Environment**: `Python 3`
@@ -35,6 +37,7 @@ The deployment errors have been fixed:
    - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 
 4. **Environment Variables** (add these):
+
    ```
    DATABASE_URL=<Internal Database URL from step 1>
    OPENAI_API_KEY=<your-openai-api-key>
@@ -52,6 +55,7 @@ The deployment errors have been fixed:
 1. Go to Render Dashboard → **New** → **Web Service**
 2. Connect the same repository
 3. Configure:
+
    - **Name**: `exec-connect-frontend`
    - **Root Directory**: `frontend`
    - **Environment**: `Node`
@@ -59,6 +63,7 @@ The deployment errors have been fixed:
    - **Start Command**: `npm start`
 
 4. **Environment Variables**:
+
    ```
    NEXT_PUBLIC_API_URL=https://exec-connect-backend.onrender.com
    NODE_ENV=production
@@ -69,6 +74,7 @@ The deployment errors have been fixed:
 ### 4. Update Backend CORS After Frontend Deployment
 
 Once the frontend is deployed, update the backend's `CORS_ORIGINS` environment variable:
+
 ```
 CORS_ORIGINS=https://exec-connect-frontend.onrender.com,https://your-custom-domain.com
 ```
@@ -78,13 +84,16 @@ Then manually redeploy the backend service.
 ## Files Changed for Deployment
 
 1. **`backend/app/config.py`**:
+
    - Added DATABASE_URL validator to convert `postgresql://` to `postgresql+psycopg://`
    - Updated CORS_ORIGINS to accept comma-separated strings
 
 2. **`backend/app/main.py`**:
+
    - Updated to use `settings.cors_origins_list` property
 
 3. **`backend/Procfile`**:
+
    - Added `release: alembic upgrade head` for automatic migrations
 
 4. **`backend/runtime.txt`**:
@@ -92,21 +101,60 @@ Then manually redeploy the backend service.
 
 ## Troubleshooting
 
+### Frontend Build Errors: "Module not found: Can't resolve '@/components/...'"
+
+**Symptoms**: Build fails with errors like:
+
+```
+Module not found: Can't resolve '@/components/layout/Shell'
+Module not found: Can't resolve '@/components/ui/card'
+```
+
+**Solution**:
+
+1. **Verify Root Directory is set correctly**:
+
+   - Go to your Frontend service settings on Render
+   - Under "Settings" → "Build & Deploy"
+   - Ensure **Root Directory** is set to: `frontend`
+   - NOT empty, NOT `/`, just `frontend`
+
+2. **Verify files are committed to git**:
+
+   ```bash
+   git ls-files | grep "frontend/src/components"
+   ```
+
+   All component files should be listed.
+
+3. **Check tsconfig.json path aliases**:
+
+   - Ensure `tsconfig.json` has: `"@/*": ["./src/*"]`
+   - This is already configured correctly in the repo
+
+4. **If Root Directory is correct but still failing**:
+   - Try manually redeploying: Go to Render dashboard → Your service → "Manual Deploy" → "Deploy latest commit"
+   - Clear build cache if available (Render dashboard → Settings → Clear Build Cache)
+
 ### Database Connection Errors
+
 - Verify DATABASE_URL uses the **Internal Database URL** from Render
 - Ensure pgvector extension is enabled in PostgreSQL
 - Check that migrations ran successfully (check logs)
 
 ### Build Errors
+
 - Check that all dependencies are in `requirements.txt`
 - Verify Python version in `runtime.txt` is compatible
 - Check build logs for specific errors
 
 ### CORS Errors
+
 - Ensure `CORS_ORIGINS` includes your frontend URL (with protocol: `https://`)
 - Update backend environment variable and redeploy
 
 ### Migration Errors
+
 - Check that DATABASE_URL is correct
 - Verify pgvector extension is enabled
 - Run migrations manually using Render Shell if needed
@@ -127,4 +175,3 @@ Then manually redeploy the backend service.
 - [ ] CORS_ORIGINS updated with frontend URL
 - [ ] Backend health check: `https://your-backend.onrender.com/api/health`
 - [ ] Frontend can communicate with backend API
-
