@@ -1,3 +1,11 @@
+databases:
+  # PostgreSQL Database
+  - name: exec-connect-db
+    plan: free
+    region: oregon
+    databaseName: exec_connect
+    postgresMajorVersion: 15
+
 services:
   # Frontend Web Service
   - type: web
@@ -38,11 +46,3 @@ services:
         value: 4
       - key: CORS_ORIGINS
         sync: false # Update after frontend deploys
-
-  # PostgreSQL Database
-  - type: pg
-    name: exec-connect-db
-    plan: free
-    region: oregon
-    databaseName: exec_connect
-    postgresMajorVersion: 15
