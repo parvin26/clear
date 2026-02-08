@@ -4,9 +4,11 @@ frontend/.next/
 frontend/.env.local
 
 # Python / FastAPI
+**/__pycache__/
 backend/__pycache__/
 backend/env/
-backend/exec/       # your virtual environment
+backend/venv/
+backend/exec/       # legacy / deploy virtual environment
 backend/.env
 
 # General

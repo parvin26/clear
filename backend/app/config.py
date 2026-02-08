@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     
     # CORS
-    CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
+    CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3003,http://127.0.0.1:3003"
     
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
@@ -48,7 +48,7 @@ class Settings(BaseSettings):
             origins = [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
             # Always include localhost for development
             if not origins:
-                origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
+                origins = ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:3003", "http://127.0.0.1:3003"]
             return origins
         return self.CORS_ORIGINS if isinstance(self.CORS_ORIGINS, list) else []
     

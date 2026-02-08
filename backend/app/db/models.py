@@ -175,7 +175,7 @@ class TechDocument(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(500), nullable=False)
     content = Column(Text, nullable=False)
-    embedding = Column(Text, nullable=True)  # Stored as JSON string of vector for compatibility
+    embedding = Column(Vector(1536), nullable=True)  # OpenAI embedding dimension
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
