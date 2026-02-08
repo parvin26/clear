@@ -8,6 +8,7 @@ frontend/.env.local
 backend/__pycache__/
 backend/env/
 backend/venv/
+backend/.venv/
 backend/exec/       # legacy / deploy virtual environment
 backend/.env
 
