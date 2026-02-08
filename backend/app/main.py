@@ -17,6 +17,7 @@ from app.routes import (
     coo_chat_routes,
     cto_routes,
     cto_chat_routes,
+    clear_routes,
 )
 from app.db.database import engine, init_db, init_pgvector_extension
 from app.utils.logging import setup_logging
@@ -139,6 +140,7 @@ app.include_router(coo_routes.router)
 app.include_router(coo_chat_routes.router)
 app.include_router(cto_routes.router)
 app.include_router(cto_chat_routes.router)
+app.include_router(clear_routes.router)
 
 
 @app.get("/")
