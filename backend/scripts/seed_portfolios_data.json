@@ -1,0 +1,117 @@
+[
+  {
+    "institution": { "name": "Apex Ventures", "type": "fund" },
+    "portfolio": { "name": "Frontier Growth 2025", "institution_name": "Apex Ventures" },
+    "enterprises": [
+      { "name": "Kibo Solar Logistics", "sector": "manufacturing", "geography": "Kenya", "size_band": "small-medium", "operating_model": "B2B", "last_decision": { "decision_statement": "Standardize procurement and reduce unit costs for core components.", "primary_domain": "coo", "readiness_band": "Emerging", "has_committed_plan": true, "last_review_date": "2025-11-18" } },
+      { "name": "NilePay", "sector": "fintech", "geography": "Egypt", "size_band": "small", "operating_model": "B2B", "last_decision": { "decision_statement": "Improve cash flow visibility and tighten payment terms with merchants.", "primary_domain": "cfo", "readiness_band": "Institutionalizing", "has_committed_plan": true, "last_review_date": "2025-12-05" } },
+      { "name": "MangoCart", "sector": "retail", "geography": "Nigeria", "size_band": "small", "operating_model": "marketplace", "last_decision": { "decision_statement": "Refocus acquisition on repeat buyers and reduce CAC in tier-2 cities.", "primary_domain": "cmo", "readiness_band": "Emerging", "has_committed_plan": false, "last_review_date": null } },
+      { "name": "BlueHarbor Health", "sector": "healthcare", "geography": "South Africa", "size_band": "medium", "operating_model": "B2B", "last_decision": { "decision_statement": "Implement role-based access controls and audit logging across patient systems.", "primary_domain": "cto", "readiness_band": "Institutionalizing", "has_committed_plan": true, "last_review_date": "2025-10-22" } },
+      { "name": "SahelFresh Foods", "sector": "agriculture", "geography": "Senegal", "size_band": "small", "operating_model": "B2B", "last_decision": { "decision_statement": "Scale cold-chain coverage while maintaining on-time delivery performance.", "primary_domain": "coo", "readiness_band": "Nascent", "has_committed_plan": false, "last_review_date": null } },
+      { "name": "LumenDesk", "sector": "technology", "geography": "India", "size_band": "small-medium", "operating_model": "SaaS", "last_decision": { "decision_statement": "Introduce annual plans with clearer packaging to stabilize revenue predictability.", "primary_domain": "cfo", "readiness_band": "Nascent", "has_committed_plan": true, "last_review_date": "2025-09-30" } }
+    ]
+  },
+  {
+    "institution": { "name": "First Growth Bank", "type": "bank" },
+    "portfolio": { "name": "SME Credit-Ready Pipeline", "institution_name": "First Growth Bank" },
+    "enterprises": [
+      { "name": "BatikRiver Textiles", "sector": "manufacturing", "geography": "Indonesia", "size_band": "medium", "operating_model": "B2B", "last_decision": { "decision_statement": "Establish monthly close discipline and basic management reporting pack.", "primary_domain": "cfo", "readiness_band": "Emerging", "has_committed_plan": true, "last_review_date": "2025-08-14" } },
+      { "name": "Cedar & Stone Furniture", "sector": "retail", "geography": "Malaysia", "size_band": "small-medium", "operating_model": "B2C", "last_decision": { "decision_statement": "Reposition premium collections and tighten showroom-to-order conversion.", "primary_domain": "cmo", "readiness_band": "Emerging", "has_committed_plan": false, "last_review_date": null } },
+      { "name": "MetroMend Clinics", "sector": "healthcare", "geography": "Philippines", "size_band": "small", "operating_model": "B2C", "last_decision": { "decision_statement": "Reduce patient wait time by redesigning intake and triage workflow.", "primary_domain": "coo", "readiness_band": "Nascent", "has_committed_plan": true, "last_review_date": "2025-07-02" } },
+      { "name": "SwiftSchool Learning", "sector": "education", "geography": "Vietnam", "size_band": "small", "operating_model": "SaaS", "last_decision": { "decision_statement": "Harden authentication and improve uptime for peak exam seasons.", "primary_domain": "cto", "readiness_band": "Institutionalizing", "has_committed_plan": true, "last_review_date": "2025-11-03" } },
+      { "name": "HarvestLink Co-op", "sector": "agriculture", "geography": "Thailand", "size_band": "small", "operating_model": "B2B", "last_decision": { "decision_statement": "Formalize supplier contracts and introduce quality grading at intake.", "primary_domain": "coo", "readiness_band": "Emerging", "has_committed_plan": false, "last_review_date": null } }
+    ]
+  },
+  {
+    "institution": { "name": "Catalyst Launchpad", "type": "accelerator" },
+    "portfolio": { "name": "Climate-Tech Sprint Cohort", "institution_name": "Catalyst Launchpad" },
+    "enterprises": [
+      { "name": "RainGrid Analytics", "sector": "technology", "geography": "Brazil", "size_band": "small", "operating_model": "SaaS", "last_decision": { "decision_statement": "Define the core ICP and tighten onboarding to improve activation rates.", "primary_domain": "cmo", "readiness_band": "Nascent", "has_committed_plan": true, "last_review_date": "2025-12-12" } },
+      { "name": "ColdSprout Produce", "sector": "agriculture", "geography": "Mexico", "size_band": "micro", "operating_model": "B2B", "last_decision": { "decision_statement": "Improve working capital discipline and reduce inventory spoilage.", "primary_domain": "cfo", "readiness_band": "Emerging", "has_committed_plan": false, "last_review_date": null } },
+      { "name": "TerraCycle Plastics", "sector": "manufacturing", "geography": "Colombia", "size_band": "small", "operating_model": "B2B", "last_decision": { "decision_statement": "Stabilize throughput by setting preventive maintenance and line targets.", "primary_domain": "coo", "readiness_band": "Institutionalizing", "has_committed_plan": true, "last_review_date": "2025-10-07" } },
+      { "name": "WattWise Home", "sector": "technology", "geography": "India", "size_band": "micro", "operating_model": "B2C", "last_decision": { "decision_statement": "Refactor billing and telemetry to reduce support tickets and data gaps.", "primary_domain": "cto", "readiness_band": "Emerging", "has_committed_plan": true, "last_review_date": null } },
+      { "name": "SaffronRoute", "sector": "services", "geography": "Morocco", "size_band": "small", "operating_model": "marketplace", "last_decision": { "decision_statement": "Create a reliable partner QA process and clear service-level standards.", "primary_domain": "coo", "readiness_band": "Nascent", "has_committed_plan": false, "last_review_date": null } }
+    ]
+  },
+  {
+    "institution": { "name": "Orchard Family Office", "type": "family_office" },
+    "portfolio": { "name": "Sustainable Income Portfolio", "institution_name": "Orchard Family Office" },
+    "enterprises": [
+      { "name": "Levant Artisan Foods", "sector": "retail", "geography": "Jordan", "size_band": "small-medium", "operating_model": "B2C", "last_decision": { "decision_statement": "Improve unit economics by restructuring SKUs and renegotiating key suppliers.", "primary_domain": "cfo", "readiness_band": "Institutionalizing", "has_committed_plan": true, "last_review_date": "2025-09-12" } },
+      { "name": "PearlCare Diagnostics", "sector": "healthcare", "geography": "United Arab Emirates", "size_band": "medium", "operating_model": "B2B", "last_decision": { "decision_statement": "Standardize patient sample workflows and reduce turnaround time variance.", "primary_domain": "coo", "readiness_band": "Emerging", "has_committed_plan": true, "last_review_date": "2025-11-26" } },
+      { "name": "RiyadhRoute Logistics", "sector": "services", "geography": "Saudi Arabia", "size_band": "small-medium", "operating_model": "B2B", "last_decision": { "decision_statement": "Roll out real-time delivery tracking and exception handling for key accounts.", "primary_domain": "cto", "readiness_band": "Emerging", "has_committed_plan": false, "last_review_date": null } },
+      { "name": "Caspian Learning Hub", "sector": "education", "geography": "Turkey", "size_band": "small", "operating_model": "B2C", "last_decision": { "decision_statement": "Build a referral engine and local partnerships to increase cohort fill rates.", "primary_domain": "cmo", "readiness_band": "Nascent", "has_committed_plan": true, "last_review_date": null } },
+      { "name": "Atlas Steelworks", "sector": "manufacturing", "geography": "Egypt", "size_band": "medium", "operating_model": "B2B", "last_decision": { "decision_statement": "Introduce KPI-based shift management and reduce rework in finishing lines.", "primary_domain": "coo", "readiness_band": "Institutionalizing", "has_committed_plan": true, "last_review_date": "2025-10-29" } },
+      { "name": "NouraPayroll", "sector": "fintech", "geography": "United Arab Emirates", "size_band": "small", "operating_model": "SaaS", "last_decision": { "decision_statement": "Strengthen compliance reporting and implement automated reconciliation.", "primary_domain": "cfo", "readiness_band": "Nascent", "has_committed_plan": false, "last_review_date": null } }
+    ]
+  },
+  {
+    "institution": { "name": "Horizon Development Agency", "type": "development_agency" },
+    "portfolio": { "name": "Inclusive Enterprise Upgrade Program", "institution_name": "Horizon Development Agency" },
+    "enterprises": [
+      { "name": "Kumasi Pharma Supplies", "sector": "healthcare", "geography": "Ghana", "size_band": "small-medium", "operating_model": "B2B", "last_decision": { "decision_statement": "Improve demand forecasting and reduce stockouts for essential medicines.", "primary_domain": "coo", "readiness_band": "Emerging", "has_committed_plan": true, "last_review_date": "2025-06-20" } },
+      { "name": "Lakeview Milling Co.", "sector": "agriculture", "geography": "Tanzania", "size_band": "medium", "operating_model": "B2B", "last_decision": { "decision_statement": "Implement basic cost accounting to price products with margin discipline.", "primary_domain": "cfo", "readiness_band": "Nascent", "has_committed_plan": true, "last_review_date": null } },
+      { "name": "SierraBright Tutors", "sector": "education", "geography": "Sierra Leone", "size_band": "micro", "operating_model": "B2C", "last_decision": { "decision_statement": "Clarify offering tiers and improve conversion from trial to paid plans.", "primary_domain": "cmo", "readiness_band": "Emerging", "has_committed_plan": false, "last_review_date": null } },
+      { "name": "Nyota Service Works", "sector": "services", "geography": "Kenya", "size_band": "small", "operating_model": "B2B", "last_decision": { "decision_statement": "Digitize field scheduling and reduce missed appointments for key clients.", "primary_domain": "cto", "readiness_band": "Institutionalizing", "has_committed_plan": true, "last_review_date": "2025-09-01" } },
+      { "name": "Savanna Retail Mart", "sector": "retail", "geography": "Uganda", "size_band": "small", "operating_model": "B2C", "last_decision": { "decision_statement": "Reduce shrinkage and improve stock accuracy with cycle counting.", "primary_domain": "coo", "readiness_band": "Nascent", "has_committed_plan": false, "last_review_date": null } }
+    ]
+  },
+  {
+    "institution": { "name": "BlueStone Capital", "type": "fund" },
+    "portfolio": { "name": "LatAm Value Creators", "institution_name": "BlueStone Capital" },
+    "enterprises": [
+      { "name": "AndesMed Telehealth", "sector": "healthcare", "geography": "Peru", "size_band": "small-medium", "operating_model": "B2C", "last_decision": { "decision_statement": "Improve retention by redesigning follow-up cadence and care pathways.", "primary_domain": "cmo", "readiness_band": "Emerging", "has_committed_plan": true, "last_review_date": "2025-10-15" } },
+      { "name": "RioLedger", "sector": "fintech", "geography": "Brazil", "size_band": "small", "operating_model": "SaaS", "last_decision": { "decision_statement": "Tighten revenue recognition and build monthly cohort margin reporting.", "primary_domain": "cfo", "readiness_band": "Institutionalizing", "has_committed_plan": true, "last_review_date": "2025-12-01" } },
+      { "name": "Pacifico Parts Manufacturing", "sector": "manufacturing", "geography": "Mexico", "size_band": "medium", "operating_model": "B2B", "last_decision": { "decision_statement": "Reduce downtime by introducing standardized maintenance and shift KPIs.", "primary_domain": "coo", "readiness_band": "Institutionalizing", "has_committed_plan": false, "last_review_date": "2025-09-19" } },
+      { "name": "Cartago Commerce", "sector": "retail", "geography": "Costa Rica", "size_band": "small", "operating_model": "marketplace", "last_decision": { "decision_statement": "Improve search relevance and checkout reliability for mobile users.", "primary_domain": "cto", "readiness_band": "Emerging", "has_committed_plan": true, "last_review_date": null } },
+      { "name": "Pampa Grain Exchange", "sector": "agriculture", "geography": "Argentina", "size_band": "small-medium", "operating_model": "B2B", "last_decision": { "decision_statement": "Formalize trade operations and reduce settlement delays with partners.", "primary_domain": "cfo", "readiness_band": "Nascent", "has_committed_plan": false, "last_review_date": null } },
+      { "name": "SantoEdu Services", "sector": "education", "geography": "Dominican Republic", "size_band": "micro", "operating_model": "B2C", "last_decision": { "decision_statement": "Strengthen lead-to-enrollment funnel with clearer messaging and pricing.", "primary_domain": "cmo", "readiness_band": "Nascent", "has_committed_plan": true, "last_review_date": null } }
+    ]
+  },
+  {
+    "institution": { "name": "Saffron Impact Partners", "type": "fund" },
+    "portfolio": { "name": "South Asia Inclusive Finance", "institution_name": "Saffron Impact Partners" },
+    "enterprises": [
+      { "name": "Kaveri Micro Retail", "sector": "retail", "geography": "India", "size_band": "small", "operating_model": "B2C", "last_decision": { "decision_statement": "Introduce category-level margin tracking and reduce cash leakage.", "primary_domain": "cfo", "readiness_band": "Emerging", "has_committed_plan": true, "last_review_date": "2025-08-28" } },
+      { "name": "DhakaWorks Services", "sector": "services", "geography": "Bangladesh", "size_band": "micro", "operating_model": "B2B", "last_decision": { "decision_statement": "Standardize service delivery checklists and reduce rework across teams.", "primary_domain": "coo", "readiness_band": "Nascent", "has_committed_plan": false, "last_review_date": null } },
+      { "name": "BorneoHarvest Co.", "sector": "agriculture", "geography": "Malaysia", "size_band": "small-medium", "operating_model": "B2B", "last_decision": { "decision_statement": "Improve traceability and supplier quality grading for export readiness.", "primary_domain": "cto", "readiness_band": "Institutionalizing", "has_committed_plan": true, "last_review_date": "2025-11-21" } },
+      { "name": "KolkataCare Clinics", "sector": "healthcare", "geography": "India", "size_band": "small", "operating_model": "B2C", "last_decision": { "decision_statement": "Reduce claims leakage and strengthen billing controls across branches.", "primary_domain": "cfo", "readiness_band": "Nascent", "has_committed_plan": true, "last_review_date": null } },
+      { "name": "LankaLearn Platforms", "sector": "education", "geography": "Sri Lanka", "size_band": "small", "operating_model": "SaaS", "last_decision": { "decision_statement": "Improve onboarding and drive referrals through teacher ambassador program.", "primary_domain": "cmo", "readiness_band": "Emerging", "has_committed_plan": false, "last_review_date": "2025-10-03" } }
+    ]
+  },
+  {
+    "institution": { "name": "NorthStar Accelerator Network", "type": "accelerator" },
+    "portfolio": { "name": "MENA Scale Readiness", "institution_name": "NorthStar Accelerator Network" },
+    "enterprises": [
+      { "name": "DesertCloud HR", "sector": "technology", "geography": "Saudi Arabia", "size_band": "small", "operating_model": "SaaS", "last_decision": { "decision_statement": "Strengthen security posture and formalize incident response runbooks.", "primary_domain": "cto", "readiness_band": "Institutionalizing", "has_committed_plan": true, "last_review_date": "2025-12-20" } },
+      { "name": "Amman Market Co.", "sector": "retail", "geography": "Jordan", "size_band": "micro", "operating_model": "marketplace", "last_decision": { "decision_statement": "Clarify positioning and improve seller onboarding to reduce churn.", "primary_domain": "cmo", "readiness_band": "Emerging", "has_committed_plan": true, "last_review_date": null } },
+      { "name": "CairoFab Components", "sector": "manufacturing", "geography": "Egypt", "size_band": "small-medium", "operating_model": "B2B", "last_decision": { "decision_statement": "Introduce weekly production planning and tighten quality checks at source.", "primary_domain": "coo", "readiness_band": "Emerging", "has_committed_plan": false, "last_review_date": "2025-09-08" } },
+      { "name": "Muscat Health Supply", "sector": "healthcare", "geography": "Oman", "size_band": "small", "operating_model": "B2B", "last_decision": { "decision_statement": "Improve receivables collection cycle and set credit limits by customer.", "primary_domain": "cfo", "readiness_band": "Nascent", "has_committed_plan": false, "last_review_date": null } },
+      { "name": "Cedars Learning Studio", "sector": "education", "geography": "Lebanon", "size_band": "micro", "operating_model": "B2C", "last_decision": { "decision_statement": "Launch a structured monthly cohort calendar and reduce no-show rates.", "primary_domain": "coo", "readiness_band": "Nascent", "has_committed_plan": true, "last_review_date": "2025-07-25" } },
+      { "name": "QatarServe Facilities", "sector": "services", "geography": "Qatar", "size_band": "small-medium", "operating_model": "B2B", "last_decision": { "decision_statement": "Implement margin-by-contract reporting and tighten bidding discipline.", "primary_domain": "cfo", "readiness_band": "Institutionalizing", "has_committed_plan": true, "last_review_date": null } }
+    ]
+  },
+  {
+    "institution": { "name": "Equator Development Bank", "type": "bank" },
+    "portfolio": { "name": "Trade Finance Readiness", "institution_name": "Equator Development Bank" },
+    "enterprises": [
+      { "name": "Zambezi Export Foods", "sector": "agriculture", "geography": "Zambia", "size_band": "small-medium", "operating_model": "B2B", "last_decision": { "decision_statement": "Introduce export documentation controls and reduce shipment exceptions.", "primary_domain": "coo", "readiness_band": "Emerging", "has_committed_plan": true, "last_review_date": "2025-10-11" } },
+      { "name": "AccraBuild Materials", "sector": "manufacturing", "geography": "Ghana", "size_band": "medium", "operating_model": "B2B", "last_decision": { "decision_statement": "Improve working capital planning and align inventory targets to sales.", "primary_domain": "cfo", "readiness_band": "Institutionalizing", "has_committed_plan": true, "last_review_date": "2025-11-07" } },
+      { "name": "KigaliCare Devices", "sector": "healthcare", "geography": "Rwanda", "size_band": "small", "operating_model": "B2B", "last_decision": { "decision_statement": "Implement CRM discipline and strengthen distributor channel performance.", "primary_domain": "cmo", "readiness_band": "Nascent", "has_committed_plan": false, "last_review_date": null } },
+      { "name": "LagosTech Repairs", "sector": "services", "geography": "Nigeria", "size_band": "small", "operating_model": "B2C", "last_decision": { "decision_statement": "Digitize job tracking and introduce SLA dashboards for repeat customers.", "primary_domain": "cto", "readiness_band": "Emerging", "has_committed_plan": true, "last_review_date": null } },
+      { "name": "CapeLearn Supplies", "sector": "education", "geography": "South Africa", "size_band": "micro", "operating_model": "B2B", "last_decision": { "decision_statement": "Set pricing rules and tighten procurement controls for tender contracts.", "primary_domain": "cfo", "readiness_band": "Nascent", "has_committed_plan": true, "last_review_date": "2025-06-03" } }
+    ]
+  },
+  {
+    "institution": { "name": "Beacon Inclusion Foundation", "type": "development_agency" },
+    "portfolio": { "name": "Women-Led Enterprise Portfolio", "institution_name": "Beacon Inclusion Foundation" },
+    "enterprises": [
+      { "name": "Sahara Stitchwear", "sector": "retail", "geography": "Morocco", "size_band": "micro", "operating_model": "B2C", "last_decision": { "decision_statement": "Improve brand consistency and launch a repeat-purchase loyalty program.", "primary_domain": "cmo", "readiness_band": "Emerging", "has_committed_plan": true, "last_review_date": "2025-09-27" } },
+      { "name": "Nairobi NutriCare", "sector": "healthcare", "geography": "Kenya", "size_band": "small", "operating_model": "B2C", "last_decision": { "decision_statement": "Introduce daily cash reconciliation and reduce leakage at outlets.", "primary_domain": "cfo", "readiness_band": "Nascent", "has_committed_plan": false, "last_review_date": null } },
+      { "name": "Kigali Fresh Kitchens", "sector": "services", "geography": "Rwanda", "size_band": "small", "operating_model": "B2B", "last_decision": { "decision_statement": "Standardize kitchen ops and delivery routing to improve on-time rate.", "primary_domain": "coo", "readiness_band": "Institutionalizing", "has_committed_plan": true, "last_review_date": "2025-12-08" } },
+      { "name": "Juba Learning Corner", "sector": "education", "geography": "South Sudan", "size_band": "micro", "operating_model": "B2C", "last_decision": { "decision_statement": "Strengthen enrollment funnel and reduce drop-offs after first month.", "primary_domain": "cmo", "readiness_band": "Nascent", "has_committed_plan": true, "last_review_date": null } },
+      { "name": "Addis Farm Inputs", "sector": "agriculture", "geography": "Ethiopia", "size_band": "small-medium", "operating_model": "B2B", "last_decision": { "decision_statement": "Introduce demand planning and reduce inventory expiry for inputs.", "primary_domain": "coo", "readiness_band": "Emerging", "has_committed_plan": false, "last_review_date": "2025-08-05" } },
+      { "name": "Kampala Craft Manufacturing", "sector": "manufacturing", "geography": "Uganda", "size_band": "small", "operating_model": "B2B", "last_decision": { "decision_statement": "Implement basic ERP-lite for orders, inventory and invoicing accuracy.", "primary_domain": "cto", "readiness_band": "Institutionalizing", "has_committed_plan": true, "last_review_date": null } }
+    ]
+  }
+]

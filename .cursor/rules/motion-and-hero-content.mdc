@@ -1,0 +1,28 @@
+---
+description: Avoid Motion/framer-motion hiding above-the-fold content; keep heroes and critical sections always visible
+globs: frontend/src/**/*.tsx
+alwaysApply: false
+---
+
+# Motion and above-the-fold content
+
+## Rule: Do not hide critical content with Motion's initial state
+
+**Problem:** Using `motion` (from `motion/react` or `framer-motion`) with `initial={{ opacity: 0 }}` (or similar) can leave hero sections and other above-the-fold content **invisible** if the animation never runs (e.g. hydration, reduced motion, or library load order). Users see a blank area instead of content.
+
+**Required:**
+
+1. **Hero sections and critical above-the-fold content**
+   - Do **not** wrap hero or main landing content in `motion.div` (or `motion.*`) with `initial={{ opacity: 0 }}` or any initial state that hides content.
+   - Use plain `div` (or other static elements) for hero text and primary CTAs so content is always visible on first paint.
+   - Optional: add `min-h-[...]` on the hero container so layout space is reserved even before assets load.
+
+2. **If you use Motion for entrance effects**
+   - Prefer `initial={{ opacity: 1 }}` (or omit `initial`) so content is visible even when animations don’t run.
+   - Or restrict motion to **below-the-fold** or non-critical elements (e.g. cards that appear on scroll).
+
+3. **Existing examples to follow**
+   - `frontend/src/components/landing/HeroSection.tsx` — hero uses static `div`s and `min-h-[480px]`.
+   - `frontend/src/components/about/AboutHero.tsx` — about hero uses static `div`s and `min-h-[320px]`.
+
+This prevents "missing hero" or blank sections on any page.

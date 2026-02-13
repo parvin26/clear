@@ -9,6 +9,8 @@ from app.schemas.cfo.cfo_analysis import CFOAnalysisOut, CFOAnalysisListItem
 from app.schemas.cfo.cfo_chat import CFOChatRequest, CFOChatResponse
 from app.db.models import CFOAnalysis, CFOChatMessage
 from app.agents.cfo_agent import run_ai_cfo_agent, run_ai_cfo_chat
+from app.governance_engine.rtco_service import create_decision_from_analysis
+from app.enterprise.decision_context_service import store_context
 from app.tools.financial_tools import compute_financial_summary
 from app.rag.vectorstore import search_finance_docs
 import logging
@@ -58,16 +60,36 @@ async def diagnose(
         )
         
         # Step 4: Save to database
+        payload = input_data.model_dump(exclude={"enterprise_id", "decision_context"})
         cfo_analysis = CFOAnalysis(
-            user_id=None,  # TODO: Add user authentication
-            input_payload=input_data.model_dump(),
+            user_id=None,
+            enterprise_id=getattr(input_data, "enterprise_id", None),
+            input_payload=payload,
             analysis_json=analysis_json,
             risk_level=analysis_json.get("risk_level", "yellow")
         )
         db.add(cfo_analysis)
         db.commit()
         db.refresh(cfo_analysis)
-        
+        try:
+            rec = create_decision_from_analysis(
+                analysis_id=cfo_analysis.id,
+                agent_domain="cfo",
+                analysis_table="cfo_analyses",
+                artifact_json=analysis_json,
+                db=db,
+            )
+            db.commit()
+            cfo_analysis.decision_id = rec.decision_id
+            if getattr(input_data, "enterprise_id", None) is not None:
+                cfo_analysis.enterprise_id = input_data.enterprise_id
+            if getattr(input_data, "decision_context", None) is not None:
+                store_context(rec.decision_id, input_data.decision_context, db, enterprise_id=input_data.enterprise_id)
+            db.commit()
+            db.refresh(cfo_analysis)
+        except Exception as e:
+            logger.warning("RTCO decision record creation failed: %s", e)
+            db.rollback()
         # Step 5: Return response
         return CFOAnalysisOut(
             id=cfo_analysis.id,

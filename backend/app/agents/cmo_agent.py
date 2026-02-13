@@ -5,7 +5,7 @@ from typing import Dict, Any, List, Optional
 from openai import OpenAI
 import json
 
-from app.config import settings
+from app.config import settings, model_supports_json_object
 from app.tools.marketing_tools import (
     calculate_CAC,
     LTV_estimate,
@@ -58,7 +58,8 @@ Guidelines:
 def run_ai_cmo_agent(
     input_data: Dict[str, Any],
     db: Session,
-    docs: Optional[List[MarketingDocument]] = None
+    docs: Optional[List[MarketingDocument]] = None,
+    onboarding_context: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Run the AI-CMO agent to generate marketing analysis.
@@ -115,17 +116,23 @@ Notes: {input_data.get('notes', 'None')}
 
 Provide a comprehensive analysis in the required JSON format."""
 
+    from app.diagnostic.mapping import format_onboarding_context_line
+    context_line = format_onboarding_context_line(onboarding_context or {})
+    system_prompt = (SYSTEM_PROMPT + "\n\n" + context_line) if context_line else SYSTEM_PROMPT
+
     try:
-        # Call OpenAI API
-        response = client.chat.completions.create(
-            model=settings.LLM_MODEL,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
+        # Call OpenAI API (only send response_format for models that support it)
+        kwargs = {
+            "model": settings.LLM_MODEL,
+            "messages": [
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            temperature=0.7,
-            response_format={"type": "json_object"}  # Force JSON output
-        )
+            "temperature": 0.7,
+        }
+        if model_supports_json_object(settings.LLM_MODEL):
+            kwargs["response_format"] = {"type": "json_object"}
+        response = client.chat.completions.create(**kwargs)
         
         # Parse the response
         content = response.choices[0].message.content

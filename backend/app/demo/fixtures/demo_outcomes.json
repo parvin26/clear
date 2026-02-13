@@ -1,0 +1,7 @@
+[
+  {"id":"out-1","decision_id":"dec-2","expected_metric":"Lead time visibility and weekly planning in place; on-time delivery improved by 15%.","achieved_metric":"Dashboard live; weekly reviews started. On-time delivery up 12% in first month.","lessons_learned":"Starting with one product line made rollout easier. Next: extend to full range.","review_date":"2025-03-10","next_review_date":"2025-06-10"},
+  {"id":"out-2","decision_id":"dec-1","expected_metric":"13-week forecast updated weekly; 90-day reserve policy documented and approved.","achieved_metric":null,"lessons_learned":null,"review_date":null,"next_review_date":"2025-07-01"},
+  {"id":"out-3","decision_id":"dec-3","expected_metric":"One ICP, clear attribution, one campaign per quarter with defined success criteria.","achieved_metric":null,"lessons_learned":null,"review_date":null,"next_review_date":"2025-06-15"},
+  {"id":"out-4","decision_id":"dec-6","expected_metric":"First-value moment within 10 minutes; week-1 activation improves by 20%.","achieved_metric":"Onboarding v1 shipped; early cohort shows 14% activation lift. Next: tighten prompts and reduce steps.","lessons_learned":"Users needed one clearer path not more options. A single guided route improved completion.","review_date":"2025-05-05","next_review_date":"2025-06-05"},
+  {"id":"out-5","decision_id":"dec-5","expected_metric":"More qualified calls with one ICP; outreach conversion improves measurably within 45 days.","achieved_metric":null,"lessons_learned":null,"review_date":null,"next_review_date":"2025-06-10"}
+]

@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { getDiagnosticPrefill, clearDiagnosticPrefill } from "@/lib/diagnostic-prefill";
 
 import { postCooDiagnostic } from "@/lib/api";
 import {
@@ -26,6 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { VoiceInputButton } from "@/components/ui/voice-input-button";
 
 const challengeOptions: { label: string; value: OperationalChallenge }[] = [
   { label: "Scaling operations to meet demand", value: "scaling_operations" },
@@ -123,6 +125,19 @@ export function DiagnosticForm() {
   const [formData, setFormData] = useState<COOInput>(defaultData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [prefillBanner, setPrefillBanner] = useState(false);
+
+  useEffect(() => {
+    const prefill = getDiagnosticPrefill();
+    if (prefill?.domain === "coo" && prefill.diagnosticData.situationDescription) {
+      setFormData((prev) => ({
+        ...prev,
+        notes: (prefill.diagnosticData.situationDescription || prev.notes) ?? null,
+      }));
+      setPrefillBanner(true);
+      clearDiagnosticPrefill();
+    }
+  }, []);
 
   const nextStep = () =>
     setStep((prev) => Math.min(prev + 1, steps.length - 1));
@@ -529,17 +544,31 @@ export function DiagnosticForm() {
             </div>
             <div>
               <Label>Additional context (optional)</Label>
-              <Textarea
-                placeholder="Any additional information about your operations, challenges, or context..."
-                value={formData.notes ?? ""}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    notes: e.target.value || null,
-                  }))
-                }
-                rows={4}
-              />
+              <p className="text-sm text-muted-foreground mb-1">Describe your challenges or context. You can type or use the mic to speak.</p>
+              <div className="flex gap-2 items-start">
+                <Textarea
+                  placeholder="Any additional information about your operations, challenges, or context..."
+                  value={formData.notes ?? ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      notes: e.target.value || null,
+                    }))
+                  }
+                  rows={4}
+                  className="flex-1"
+                />
+                <VoiceInputButton
+                  onTranscription={(text) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      notes: (prev.notes ?? "") + (prev.notes ? " " : "") + text,
+                    }))
+                  }
+                  beforeText={formData.notes ?? ""}
+                  aria-label="Speak to fill additional context"
+                />
+              </div>
             </div>
           </div>
         );
@@ -556,6 +585,11 @@ export function DiagnosticForm() {
           Step {step + 1} of {steps.length}: {steps[step]}
         </p>
       </CardHeader>
+      {prefillBanner && (
+        <div className="mx-6 mb-4 rounded-md border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-blue-800">
+          Your capability diagnostic answers have been used to prefill where possible.
+        </div>
+      )}
       <CardContent className="space-y-6">
         {stepContent}
         {error && (

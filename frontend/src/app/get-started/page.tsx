@@ -7,35 +7,92 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowRight, CheckCircle, Zap } from "lucide-react";
 import Link from "next/link";
+import { getOnboardingContext, setOnboardingContext } from "@/lib/onboarding-context";
+
+/** Map "Biggest Challenge" to the diagnostic page so user can proceed with diagnosis. */
+function getDiagnosticPath(challenge: string): { path: string; label: string } {
+  switch (challenge) {
+    case "finance":
+    case "fundraising":
+      return { path: "/cfo/diagnostic", label: "Finance" };
+    case "marketing":
+    case "scaling":
+      return { path: "/cmo/diagnostic", label: "Growth" };
+    case "operations":
+      return { path: "/coo/diagnostic", label: "Ops" };
+    case "technology":
+      return { path: "/cto/diagnostic", label: "Tech" };
+    default:
+      return { path: "/cfo/diagnostic", label: "Finance" };
+  }
+}
 
 export default function GetStartedPage() {
+  const router = useRouter();
   const [step, setStep] = useState(1);
+  const [submitted, setSubmitted] = useState(false);
+  const [countryError, setCountryError] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     company: "",
     industry: "",
+    country: "",
     employees: "",
     stage: "",
     challenge: "",
   });
 
+  // Pre-fill from localStorage (device storage) when available
+  useEffect(() => {
+    const ctx = getOnboardingContext();
+    if (!ctx) return;
+    setFormData((prev) => ({
+      ...prev,
+      name: ctx.name ?? prev.name,
+      email: ctx.email ?? prev.email,
+      phone: ctx.phone ?? prev.phone,
+      company: ctx.company_name ?? prev.company,
+      industry: ctx.industry ?? prev.industry,
+      country: ctx.country ?? prev.country,
+      employees: ctx.company_size_band ?? prev.employees,
+      stage: ctx.stage ?? prev.stage,
+      challenge: ctx.challenge ?? prev.challenge,
+    }));
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    alert("Thank you! We'll contact you within 24 hours to get started.");
+    if (!formData.country) {
+      setCountryError("Please select a country.");
+      return;
+    }
+    setCountryError("");
+    setOnboardingContext({
+      name: formData.name || undefined,
+      email: formData.email || undefined,
+      phone: formData.phone || undefined,
+      company_name: formData.company || undefined,
+      industry: formData.industry || undefined,
+      country: formData.country || undefined,
+      company_size_band: formData.employees || undefined,
+      stage: formData.stage || undefined,
+      challenge: formData.challenge || undefined,
+    });
+    setSubmitted(true);
   };
 
   return (
     <Shell>
       <div className="max-w-4xl mx-auto py-12 px-4">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Get Started</h1>
-          <p className="text-xl text-gray-600">
+          <h1 className="text-4xl font-bold text-ink mb-4">Get Started</h1>
+          <p className="text-xl text-ink-muted">
             Take the first step toward strategic leadership
           </p>
         </div>
@@ -43,12 +100,47 @@ export default function GetStartedPage() {
         {/* Quick Quiz */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Are You CXO-Ready? Quick Assessment</CardTitle>
+            <CardTitle>Quick assessment</CardTitle>
             <CardDescription>
               Answer a few questions to see if Exec Connect is right for you
             </CardDescription>
+            <p className="text-sm text-ink-muted mt-2">
+              Fill this in once.{" "}
+              <Link href="/signup" className="font-medium text-primary hover:underline">Sign up</Link>
+              {" or "}
+              <Link href="/login" className="font-medium text-primary hover:underline">log in</Link>
+              {" to save your information so you don&apos;t have to re-enter it every time you start a new diagnostic. Otherwise we&apos;ll remember it on this device for a while."}
+            </p>
           </CardHeader>
           <CardContent>
+            {submitted ? (
+              <div className="space-y-4 py-4">
+                <p className="text-ink">
+                  Thanks! Your information is saved on this device. Choose your diagnostic path below.
+                </p>
+                <Button
+                  size="lg"
+                  className="w-full"
+                  onClick={() => router.push("/diagnostic")}
+                >
+                  Continue to diagnostic (choose Founder or SME)
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+                <p className="text-sm text-ink-muted">
+                  Or go straight to a specific area:
+                </p>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => router.push(getDiagnosticPath(formData.challenge || "other").path)}
+                >
+                  {getDiagnosticPath(formData.challenge || "other").label} diagnostic
+                </Button>
+                <Button variant="ghost" className="w-full" onClick={() => setSubmitted(false)}>
+                  Back to form
+                </Button>
+              </div>
+            ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <Label>Company Name *</Label>
@@ -79,6 +171,39 @@ export default function GetStartedPage() {
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div>
+                <Label>Country *</Label>
+                <Select
+                  value={formData.country}
+                  onValueChange={(value) => {
+                    setFormData({ ...formData, country: value });
+                    setCountryError("");
+                  }}
+                >
+                  <SelectTrigger className={countryError ? "border-red-500" : ""}>
+                    <SelectValue placeholder="Select country" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="AU">Australia</SelectItem>
+                    <SelectItem value="CA">Canada</SelectItem>
+                    <SelectItem value="DE">Germany</SelectItem>
+                    <SelectItem value="IN">India</SelectItem>
+                    <SelectItem value="IE">Ireland</SelectItem>
+                    <SelectItem value="KE">Kenya</SelectItem>
+                    <SelectItem value="NG">Nigeria</SelectItem>
+                    <SelectItem value="SG">Singapore</SelectItem>
+                    <SelectItem value="ZA">South Africa</SelectItem>
+                    <SelectItem value="AE">United Arab Emirates</SelectItem>
+                    <SelectItem value="GB">United Kingdom</SelectItem>
+                    <SelectItem value="US">United States</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+                {countryError && (
+                  <p className="text-sm text-red-600 mt-1" role="alert">{countryError}</p>
+                )}
               </div>
 
               <div>
@@ -180,6 +305,7 @@ export default function GetStartedPage() {
                 Submit & Get Started <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </form>
+            )}
           </CardContent>
         </Card>
 
@@ -192,13 +318,13 @@ export default function GetStartedPage() {
               <CardDescription>Get instant insights for free</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-ink-muted mb-4">
                 Start with our AI-powered CXO agents to get immediate strategic insights. 
                 No commitment required.
               </p>
               <Link href="/">
                 <Button variant="outline" className="w-full">
-                  Explore AI Agents
+                  Explore decision areas
                 </Button>
               </Link>
             </CardContent>
@@ -207,14 +333,14 @@ export default function GetStartedPage() {
           <Card>
             <CardHeader>
               <CheckCircle className="w-12 h-12 text-green-600 mb-4" />
-              <CardTitle>Book a Discovery Call</CardTitle>
+              <CardTitle>Book Expert Review</CardTitle>
               <CardDescription>Talk to our team directly</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-ink-muted mb-4">
                 Schedule a free 30-minute call to discuss your needs and see how Exec Connect can help.
               </p>
-              <Link href="/book-call">
+              <Link href="/contact">
                 <Button variant="outline" className="w-full">
                   Book a Call
                 </Button>

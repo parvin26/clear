@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -64,4 +64,6 @@ class COOInput(BaseModel):
     ops_team_size: int = Field(default=5, ge=0)
     uses_kpi_tracking: Literal["yes_consistently", "sometimes", "not_at_all"] | None = None
     notes: str | None = None
+    enterprise_id: Optional[int] = Field(None, description="Link analysis to enterprise")
+    decision_context: Optional[dict[str, Any]] = Field(None, description="Context snapshot at decision initiation")
 

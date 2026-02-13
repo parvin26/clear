@@ -1,0 +1,24 @@
+CLEAR: governance, EMR, outcome review, readiness, decision-scoped chat, onboarding
+
+- Governance: artifact.canonical_json.governance (decision_type, risk_tier, required_approvers, approval_status); synthesis infers from domain/risk; UI cycle approval + PATCH artifact.
+- Capability gaps: synthesis + artifact; Execution tab soft "readiness to approve" warning.
+- EMR: artifact.emr (milestones, metrics, config); bootstrap in _synthesis_to_draft_artifact; Execution tab edit + PATCH.
+- OutcomeReview: model, migration, POST/GET endpoints; Execution "Add outcome review" when date >= next_review_date; form + list.
+- Readiness: readiness.py (band from reviews, EMR completion, approval); GET /readiness; workspace header band + tooltip.
+- Decision chat: POST .../chat/start (session + initial message), POST .../chat/message; Chat tab seeded first message + conversation.
+- Onboarding: used in synthesis narrative and artifact; included in chat context.
+
+Files touched:
+  backend/app/diagnostic/synthesis.py
+  backend/app/diagnostic/run_service.py
+  backend/app/diagnostic/decision_chat.py
+  backend/app/db/models.py
+  backend/app/schemas/clear/diagnostic_run.py
+  backend/app/governance/readiness.py
+  backend/app/routes/clear_routes.py
+  backend/alembic/versions/h5d6e7f8a9b0_outcome_reviews.py
+  frontend/src/lib/clear-api.ts
+  frontend/src/app/decisions/[id]/page.tsx
+  docs/CLEAR_IMPLEMENTATION_STATUS.md
+  docs/CLEAR_RUNBOOK.md (new)
+  docs/CLEAR_COMMIT_SUMMARY.txt (new)

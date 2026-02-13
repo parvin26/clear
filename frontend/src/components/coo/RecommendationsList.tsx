@@ -15,7 +15,7 @@ export function RecommendationsList({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <ul className="space-y-3 text-sm text-slate-700">
+        <ul className="space-y-3 text-sm text-ink-muted">
           {items.map((item, idx) => (
             <li key={idx} className="flex items-start gap-3">
               <span className="mt-1 h-2.5 w-2.5 rounded-full bg-brand" />

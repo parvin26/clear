@@ -9,6 +9,8 @@ from app.agents.coo_agent import run_ai_coo_agent
 from app.config import settings
 from app.db.database import get_db
 from app.db.models import COOAnalysis
+from app.governance_engine.rtco_service import create_decision_from_analysis
+from app.enterprise.decision_context_service import store_context
 from app.rag.vectorstore import search_ops_docs
 from app.schemas.coo.coo_analysis import COOAnalysisOut, COOAnalysisPage
 from app.schemas.coo.coo_input import COOInput
@@ -73,6 +75,7 @@ async def diagnose(
         except Exception as exc:
             logger.warning("RAG lookup failed: %s", exc)
 
+    payload = coo_input.model_dump(exclude={"enterprise_id", "decision_context"})
     ai_response = _normalize_ai_response(await run_ai_coo_agent(coo_input, docs=docs))
     logger.info(
         "coo_diagnose_response",
@@ -86,7 +89,8 @@ async def diagnose(
 
     analysis = COOAnalysis(
         user_id=None,
-        input_payload=coo_input.model_dump(),
+        enterprise_id=getattr(coo_input, "enterprise_id", None),
+        input_payload=payload,
         analysis_json=ai_response,
         priority_area=ai_response.get("priority_area", "operations"),
         risk_level=ai_response.get("risk_level", "yellow"),
@@ -94,7 +98,24 @@ async def diagnose(
     db.add(analysis)
     db.commit()
     db.refresh(analysis)
-
+    try:
+        rec = create_decision_from_analysis(
+            analysis_id=analysis.id,
+            agent_domain="coo",
+            analysis_table="coo_analyses",
+            artifact_json=ai_response,
+            db=db,
+        )
+        db.commit()
+        analysis.decision_id = rec.decision_id
+        if getattr(coo_input, "enterprise_id", None) is not None:
+            analysis.enterprise_id = coo_input.enterprise_id
+        if getattr(coo_input, "decision_context", None) is not None:
+            store_context(rec.decision_id, coo_input.decision_context, db, enterprise_id=coo_input.enterprise_id)
+        db.commit()
+        db.refresh(analysis)
+    except Exception:
+        db.rollback()
     return _serialize_analysis(analysis)
 
 

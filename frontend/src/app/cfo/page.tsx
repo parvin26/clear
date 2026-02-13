@@ -1,37 +1,48 @@
+"use client";
+
 import Link from "next/link";
+import { Shell } from "@/components/layout/Shell";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function CFOPage() {
   return (
-    <div className="container mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-6">AI-CFO</h1>
-      <p className="text-gray-600 mb-8">Financial diagnostics and advisory for your business.</p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Link
-          href="/cfo/diagnostic"
-          className="block p-6 border border-gray-300 rounded-lg hover:shadow-lg transition-shadow"
-        >
-          <h2 className="text-xl font-semibold mb-2">Run Diagnostic</h2>
-          <p className="text-gray-600">Assess your financial health</p>
-        </Link>
-        
-        <Link
-          href="/cfo/chat"
-          className="block p-6 border border-gray-300 rounded-lg hover:shadow-lg transition-shadow"
-        >
-          <h2 className="text-xl font-semibold mb-2">Chat with AI-CFO</h2>
-          <p className="text-gray-600">Ask financial questions</p>
-        </Link>
-        
-        <Link
-          href="/cfo/history"
-          className="block p-6 border border-gray-300 rounded-lg hover:shadow-lg transition-shadow"
-        >
-          <h2 className="text-xl font-semibold mb-2">View History</h2>
-          <p className="text-gray-600">See past analyses</p>
-        </Link>
+    <Shell>
+      <div className="space-y-6">
+        <h1 className="text-2xl font-semibold text-ink">Finance advisor</h1>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Link href="/cfo/diagnostic">
+            <Card className="premium-shadow hover:border-primary/30 transition-colors h-full">
+              <CardHeader>
+                <CardTitle className="text-base">Run a diagnostic</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-ink-muted">Assess your financial health.</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/cfo/history">
+            <Card className="premium-shadow hover:border-primary/30 transition-colors h-full">
+              <CardHeader>
+                <CardTitle className="text-base">View past analyses</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-ink-muted">See past analyses.</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/cfo/chat">
+            <Card className="premium-shadow hover:border-primary/30 transition-colors h-full">
+              <CardHeader>
+                <CardTitle className="text-base">Chat with the advisor</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-ink-muted">Ask financial questions.</p>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
       </div>
-    </div>
+    </Shell>
   );
 }
 

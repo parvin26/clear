@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { getDiagnosticPrefill, clearDiagnosticPrefill } from "@/lib/diagnostic-prefill";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { VoiceInputButton } from "@/components/ui/voice-input-button";
 import { postCfoDiagnostic } from "@/lib/api";
 import type { CFOInput } from "@/lib/types";
 import { Loader2, Plus, X } from "lucide-react";
@@ -136,6 +138,7 @@ export function DiagnosticForm() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [prefillBanner, setPrefillBanner] = useState(false);
   const [formData, setFormData] = useState<Partial<CFOInput>>({
     biggest_challenge: "",
     monthly_revenue: [0, 0, 0],
@@ -165,6 +168,18 @@ export function DiagnosticForm() {
     cost_optimization_other: null,
     notes: null,
   });
+
+  useEffect(() => {
+    const prefill = getDiagnosticPrefill();
+    if (prefill?.domain === "cfo" && prefill.diagnosticData.situationDescription) {
+      setFormData((prev) => ({
+        ...prev,
+        notes: (prefill.diagnosticData.situationDescription || prev.notes) ?? null,
+      }));
+      setPrefillBanner(true);
+      clearDiagnosticPrefill();
+    }
+  }, []);
 
   const addRevenueMonth = () => {
     if (formData.monthly_revenue && formData.monthly_revenue.length < 6) {
@@ -307,31 +322,33 @@ export function DiagnosticForm() {
 
     setLoading(true);
     try {
+      const revenue = formData.monthly_revenue || [];
+      const expenses = formData.monthly_expenses || [];
       const payload: CFOInput = {
-        biggest_challenge: formData.biggest_challenge,
-        monthly_revenue: formData.monthly_revenue || [],
-        monthly_expenses: formData.monthly_expenses || [],
-        cash_on_hand: formData.cash_on_hand || 0,
-        debt: formData.debt || 0,
-        upcoming_payments: formData.upcoming_payments || null,
-        funding_structure: formData.funding_structure,
+        biggest_challenge: formData.biggest_challenge!,
+        monthly_revenue: revenue.map((v) => Number(v)),
+        monthly_expenses: expenses.map((v) => Number(v)),
+        cash_on_hand: Number(formData.cash_on_hand ?? 0),
+        debt: Number(formData.debt ?? 0),
+        upcoming_payments: formData.upcoming_payments != null ? Number(formData.upcoming_payments) : null,
+        funding_structure: formData.funding_structure!,
         funding_structure_other: formData.funding_structure_other || null,
-        financial_statements: formData.financial_statements,
+        financial_statements: formData.financial_statements!,
         systems_used: formData.systems_used || [],
-        unit_economics_visibility: formData.unit_economics_visibility,
-        industry: formData.industry,
+        unit_economics_visibility: formData.unit_economics_visibility!,
+        industry: formData.industry!,
         primary_markets: formData.primary_markets || [],
-        fx_exposure: formData.fx_exposure,
+        fx_exposure: formData.fx_exposure!,
         top_revenue_streams: formData.top_revenue_streams || [],
-        avg_collection_period_days: formData.avg_collection_period_days ?? 0,
-        overdue_invoices_percent: formData.overdue_invoices_percent ?? 0,
-        inventory_posture: formData.inventory_posture,
+        avg_collection_period_days: Number(formData.avg_collection_period_days ?? 0),
+        overdue_invoices_percent: Number(formData.overdue_invoices_percent ?? 0),
+        inventory_posture: formData.inventory_posture!,
         credit_facilities: formData.credit_facilities || [],
-        risk_appetite: formData.risk_appetite,
+        risk_appetite: formData.risk_appetite!,
         preferred_output_focus: formData.preferred_output_focus || [],
-        kpi_review_frequency: formData.kpi_review_frequency,
-        fundraising_plan: formData.fundraising_plan,
-        financial_control_confidence: formData.financial_control_confidence ?? 1,
+        kpi_review_frequency: formData.kpi_review_frequency!,
+        fundraising_plan: formData.fundraising_plan!,
+        financial_control_confidence: Number(formData.financial_control_confidence ?? 1),
         cost_optimization_initiatives: formData.cost_optimization_initiatives || [],
         cost_optimization_other: formData.cost_optimization_other || null,
         notes: formData.notes || null,
@@ -339,9 +356,27 @@ export function DiagnosticForm() {
 
       const result = await postCfoDiagnostic(payload);
       router.push(`/cfo/analysis/${result.id}`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error submitting diagnostic:", error);
-      alert("Failed to submit diagnostic. Please try again.");
+      const err = error as { response?: { data?: { detail?: string | unknown[] }; status?: number }; message?: string };
+      const data = err.response?.data;
+      const detail = data && typeof data === "object" && "detail" in data ? data.detail : null;
+      let msg: string | null = null;
+      if (typeof detail === "string") msg = detail;
+      else if (Array.isArray(detail) && detail.length > 0) {
+        const first = detail[0];
+        msg = typeof first === "object" && first !== null && "msg" in first
+          ? `${(first as { msg: string }).msg}${"loc" in first ? ` (${(first as { loc: string[] }).loc?.join(".")})` : ""}`
+          : String(first);
+      }
+      const fallback = error instanceof Error ? error.message : err.message ?? "Please try again.";
+      const isNetwork = err.response == null;
+      const finalMessage = msg
+        ? `Diagnostic failed: ${msg}`
+        : isNetwork
+          ? `Request failed. Check that the backend is running and try again. ${fallback}`
+          : `Failed to submit diagnostic. ${fallback}`;
+      alert(finalMessage);
     } finally {
       setLoading(false);
     }
@@ -355,6 +390,11 @@ export function DiagnosticForm() {
           Step {step} of {TOTAL_STEPS}: {STEP_TITLES[step]}
         </CardDescription>
       </CardHeader>
+      {prefillBanner && (
+        <div className="mx-6 mb-4 rounded-md border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-blue-800">
+          Your capability diagnostic answers have been used to prefill where possible.
+        </div>
+      )}
       <CardContent className="space-y-6">
         {step === 1 && (
           <div className="space-y-6">
@@ -487,15 +527,29 @@ export function DiagnosticForm() {
 
             <div>
               <Label htmlFor="notes">Additional Notes</Label>
-              <Textarea
-                id="notes"
-                value={formData.notes || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, notes: e.target.value })
-                }
-                rows={4}
-                placeholder="Any additional context about your financial situation..."
-              />
+              <p className="text-sm text-muted-foreground mb-1">You can type or use the mic to speak about your situation.</p>
+              <div className="flex gap-2 items-start">
+                <Textarea
+                  id="notes"
+                  value={formData.notes || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, notes: e.target.value })
+                  }
+                  rows={4}
+                  placeholder="Any additional context about your financial situation..."
+                  className="flex-1"
+                />
+                <VoiceInputButton
+                  onTranscription={(text) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      notes: (prev.notes || "") + (prev.notes ? " " : "") + text,
+                    }))
+                  }
+                  beforeText={formData.notes || ""}
+                  aria-label="Speak to fill additional notes"
+                />
+              </div>
             </div>
           </div>
         )}
@@ -522,16 +576,14 @@ export function DiagnosticForm() {
                     <Input
                       type="number"
                       step="0.01"
-                      value={val === 0 ? "" : val}
+                      min={0}
+                      value={val === undefined || val === null ? "" : val}
                       onChange={(e) => {
+                        const v = e.target.value;
+                        const num = v === "" ? 0 : parseFloat(v);
                         const newRevenue = [...(formData.monthly_revenue || [])];
-                        newRevenue[idx] = parseFloat(e.target.value) || 0;
+                        newRevenue[idx] = Number.isNaN(num) ? 0 : num;
                         setFormData({ ...formData, monthly_revenue: newRevenue });
-                      }}
-                      onFocus={(e) => {
-                        if (e.target.value === "0") {
-                          e.target.value = "";
-                        }
                       }}
                       placeholder={`Month ${idx + 1}`}
                     />
@@ -570,16 +622,14 @@ export function DiagnosticForm() {
                     <Input
                       type="number"
                       step="0.01"
-                      value={val === 0 ? "" : val}
+                      min={0}
+                      value={val === undefined || val === null ? "" : val}
                       onChange={(e) => {
+                        const v = e.target.value;
+                        const num = v === "" ? 0 : parseFloat(v);
                         const newExpenses = [...(formData.monthly_expenses || [])];
-                        newExpenses[idx] = parseFloat(e.target.value) || 0;
+                        newExpenses[idx] = Number.isNaN(num) ? 0 : num;
                         setFormData({ ...formData, monthly_expenses: newExpenses });
-                      }}
-                      onFocus={(e) => {
-                        if (e.target.value === "0") {
-                          e.target.value = "";
-                        }
                       }}
                       placeholder={`Month ${idx + 1}`}
                     />
@@ -604,17 +654,15 @@ export function DiagnosticForm() {
                 id="cash"
                 type="number"
                 step="0.01"
-                value={formData.cash_on_hand === 0 ? "" : formData.cash_on_hand}
-                onChange={(e) =>
+                min={0}
+                value={formData.cash_on_hand === undefined || formData.cash_on_hand === null ? "" : formData.cash_on_hand}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  const num = v === "" ? 0 : parseFloat(v);
                   setFormData({
                     ...formData,
-                    cash_on_hand: parseFloat(e.target.value) || 0,
-                  })
-                }
-                onFocus={(e) => {
-                  if (e.target.value === "0") {
-                    e.target.value = "";
-                  }
+                    cash_on_hand: Number.isNaN(num) ? 0 : num,
+                  });
                 }}
               />
             </div>
@@ -625,17 +673,15 @@ export function DiagnosticForm() {
                 id="debt"
                 type="number"
                 step="0.01"
-                value={formData.debt === 0 ? "" : formData.debt}
-                onChange={(e) =>
+                min={0}
+                value={formData.debt === undefined || formData.debt === null ? "" : formData.debt}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  const num = v === "" ? 0 : parseFloat(v);
                   setFormData({
                     ...formData,
-                    debt: parseFloat(e.target.value) || 0,
-                  })
-                }
-                onFocus={(e) => {
-                  if (e.target.value === "0") {
-                    e.target.value = "";
-                  }
+                    debt: Number.isNaN(num) ? 0 : num,
+                  });
                 }}
               />
             </div>
@@ -646,13 +692,12 @@ export function DiagnosticForm() {
                 id="upcoming"
                 type="number"
                 step="0.01"
-                value={formData.upcoming_payments || ""}
+                min={0}
+                value={formData.upcoming_payments !== undefined && formData.upcoming_payments !== null ? formData.upcoming_payments : ""}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    upcoming_payments: e.target.value
-                      ? parseFloat(e.target.value)
-                      : null,
+                    upcoming_payments: e.target.value === "" ? null : (Number.isNaN(parseFloat(e.target.value)) ? null : parseFloat(e.target.value)),
                   })
                 }
               />
@@ -878,18 +923,13 @@ export function DiagnosticForm() {
                   type="number"
                   min={0}
                   max={365}
-                  value={formData.avg_collection_period_days === 0 ? "" : formData.avg_collection_period_days}
+                  value={formData.avg_collection_period_days === undefined || formData.avg_collection_period_days === null ? "" : formData.avg_collection_period_days}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
                       avg_collection_period_days: Math.max(0, parseInt(e.target.value || "0", 10)),
                     })
                   }
-                  onFocus={(e) => {
-                    if (e.target.value === "0") {
-                      e.target.value = "";
-                    }
-                  }}
                 />
               </div>
               <div>
@@ -900,7 +940,7 @@ export function DiagnosticForm() {
                   min={0}
                   max={100}
                   step="0.1"
-                  value={formData.overdue_invoices_percent === 0 ? "" : formData.overdue_invoices_percent}
+                  value={formData.overdue_invoices_percent === undefined || formData.overdue_invoices_percent === null ? "" : formData.overdue_invoices_percent}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -910,11 +950,6 @@ export function DiagnosticForm() {
                       ),
                     })
                   }
-                  onFocus={(e) => {
-                    if (e.target.value === "0") {
-                      e.target.value = "";
-                    }
-                  }}
                 />
               </div>
             </div>
@@ -980,7 +1015,7 @@ export function DiagnosticForm() {
             <div>
               <Label>Preferred output focus *</Label>
               <p className="text-sm text-muted-foreground mb-2">
-                Select where you want AI-CFO to go deeper
+                Select where you want the diagnostic to go deeper
               </p>
               <div className="space-y-2">
                 {OUTPUT_FOCUS.map((focus) => (

@@ -100,7 +100,7 @@ export default function CFOChatPage() {
             <MessageCircle className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">AI-CFO Chat</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Finance Chat</h1>
             <p className="text-gray-600 mt-1">
               Get instant financial insights and guidance tailored for SMEs in South-East Asia
             </p>
@@ -140,7 +140,7 @@ export default function CFOChatPage() {
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">Start a conversation</h3>
                   <p className="text-sm text-gray-600 max-w-md">
-                    Ask AI-CFO anything about your finances. Get insights on cash flow, risk management, 
+                    Ask anything about your finances. Get insights on cash flow, risk management, 
                     fundraising, and more.
                   </p>
                   <div className="mt-6 flex flex-wrap gap-2 justify-center">
@@ -184,7 +184,7 @@ export default function CFOChatPage() {
                   <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-md px-5 py-3 shadow-sm">
                     <div className="flex items-center gap-2">
                       <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-                      <span className="text-sm text-gray-600">AI-CFO is thinking...</span>
+                      <span className="text-sm text-gray-600">Thinking...</span>
                     </div>
                   </div>
                 </div>

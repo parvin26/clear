@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Shell } from "@/components/layout/Shell";
+import { ConvertToDecisionCTA } from "@/components/clear-blocks/ConvertToDecisionCTA";
 import { getCooAnalysis } from "@/lib/api";
 import { AnalysisSummary } from "@/components/coo/AnalysisSummary";
 import { RecommendationsList } from "@/components/coo/RecommendationsList";
@@ -62,6 +63,7 @@ export default function COOAnalysisDetailPage() {
   return (
     <Shell>
       <div className="max-w-6xl mx-auto space-y-6">
+        <ConvertToDecisionCTA domain="coo" analysisId={analysis.id} />
         <AnalysisSummary analysis={analysis} />
         <div className="grid gap-6 md:grid-cols-2">
           <RecommendationsList title="Key Risks" items={analysis.risks} />
@@ -72,7 +74,7 @@ export default function COOAnalysisDetailPage() {
         </div>
         <ActionPlanTimeline actionPlan={analysis.action_plan} />
         <div className="mt-8">
-          <h2 className="mb-4 text-2xl font-semibold">Ask AI-COO About This Analysis</h2>
+          <h2 className="mb-4 text-2xl font-semibold">Ask about this analysis</h2>
           <ChatInterface analysisId={analysis.id} />
         </div>
       </div>

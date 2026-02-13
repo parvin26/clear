@@ -7,12 +7,13 @@ import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
 import type { ChatMessage } from "@/lib/types-cmo";
 import { Send, Loader2 } from "lucide-react";
+import { VoiceInputButton } from "@/components/ui/voice-input-button";
 
 export function ChatInterface() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
-      content: "Hello! I'm AI-CMO, your marketing consultant. How can I help you today?",
+      content: "Hello! I can help with growth and marketing. How can I help you today?",
       timestamp: new Date(),
     },
   ]);
@@ -107,8 +108,14 @@ export function ChatInterface() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleSend()}
-              placeholder="Ask a marketing question..."
+              placeholder="Type or use the mic to speak..."
               disabled={loading}
+            />
+            <VoiceInputButton
+              onTranscription={(text) => setInput((prev) => (prev ? `${prev} ${text}` : text))}
+              beforeText={input}
+              disabled={loading}
+              aria-label="Record voice message"
             />
             <Button onClick={handleSend} disabled={loading || !input.trim()}>
               <Send className="h-4 w-4" />

@@ -3,7 +3,7 @@ from typing import Any
 
 from openai import AsyncOpenAI, OpenAIError
 
-from app.config import settings
+from app.config import settings, model_supports_json_object
 from app.schemas.coo.coo_input import COOInput
 from app.tools import operational_tools as ops_tools
 
@@ -134,7 +134,7 @@ async def _call_llm(messages: list[dict[str, str]], json_mode: bool = True) -> s
         "model": settings.LLM_MODEL,
         "messages": messages,
     }
-    if json_mode:
+    if json_mode and model_supports_json_object(settings.LLM_MODEL):
         kwargs["response_format"] = {"type": "json_object"}
     response = await client.chat.completions.create(**kwargs)
     return response.choices[0].message.content or ("{}" if json_mode else "")
@@ -144,7 +144,12 @@ async def run_ai_coo_agent(
     payload: COOInput,
     docs: list[str] | None = None,
     tools_results: dict[str, Any] | None = None,
+    onboarding_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    from app.diagnostic.mapping import format_onboarding_context_line
+    context_line = format_onboarding_context_line(onboarding_context)
+    system_prompt = (SYSTEM_PROMPT + "\n\n" + context_line) if context_line else SYSTEM_PROMPT
+
     computed_tools = _prepare_tools_results(payload)
     if tools_results:
         computed_tools.update(tools_results)
@@ -157,7 +162,7 @@ async def run_ai_coo_agent(
         message_content["context_snippets"] = docs
 
     messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "system", "content": system_prompt},
         {"role": "user", "content": json.dumps(message_content, ensure_ascii=False)},
     ]
 

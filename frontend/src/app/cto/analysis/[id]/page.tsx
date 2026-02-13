@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Shell } from "@/components/layout/Shell";
+import { ConvertToDecisionCTA } from "@/components/clear-blocks/ConvertToDecisionCTA";
 import { AnalysisSummary } from "@/components/cto/AnalysisSummary";
 import { RisksList } from "@/components/cto/RisksList";
 import { RecommendationsList } from "@/components/cto/RecommendationsList";
@@ -68,6 +69,8 @@ export default function AnalysisDetailPage() {
   return (
     <Shell>
       <div className="max-w-5xl mx-auto space-y-6">
+        <ConvertToDecisionCTA domain="cto" analysisId={analysis.id} />
+
         <div className="flex items-center justify-between">
           <div>
             <Button variant="ghost" onClick={() => router.push("/cto")}>

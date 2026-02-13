@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Shell } from "@/components/layout/Shell";
+import { ConvertToDecisionCTA } from "@/components/clear-blocks/ConvertToDecisionCTA";
 
 export default function AnalysisPage() {
   const params = useParams();
@@ -75,6 +76,8 @@ export default function AnalysisPage() {
   return (
     <Shell>
       <div className="max-w-6xl mx-auto space-y-6">
+        <ConvertToDecisionCTA domain="cmo" analysisId={analysis.id} />
+
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Marketing Analysis</h1>
@@ -86,8 +89,8 @@ export default function AnalysisPage() {
             <Link href="/cmo">
               <Button variant="outline">Back to CMO</Button>
             </Link>
-            <Link href="/cmo/diagnostic">
-              <Button>New Diagnostic</Button>
+            <Link href="/diagnostic">
+              <Button variant="outline">Start diagnostic</Button>
             </Link>
           </div>
         </div>

@@ -1,7 +1,7 @@
 """
 Pydantic schemas for CTO diagnostic input.
 """
-from typing import Optional, List
+from typing import Any, Optional, List
 from pydantic import BaseModel, Field
 
 
@@ -76,6 +76,8 @@ class CTOInputSchema(BaseModel):
     toolset: Optional[str] = None
     automation_level: Optional[str] = None
     notes: Optional[str] = None
+    enterprise_id: Optional[int] = Field(None, description="Link analysis to enterprise")
+    decision_context: Optional[dict[str, Any]] = Field(None, description="Context snapshot at decision initiation")
     
     class Config:
         json_schema_extra = {

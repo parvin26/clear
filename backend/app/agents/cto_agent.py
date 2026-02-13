@@ -5,7 +5,7 @@ import json
 from typing import Dict, Any, List, Optional
 from openai import OpenAI
 import httpx
-from app.config import settings
+from app.config import settings, model_supports_json_object
 from app.schemas.cto.cto_analysis import CTOAnalysisSchema, Risk, Recommendation, ActionPlan, ActionPlanItem
 
 
@@ -32,7 +32,8 @@ Output format must be valid JSON matching the CTOAnalysisSchema structure."""
 def run_ai_cto_agent(
     input_data: Dict[str, Any],
     tools_results: Dict[str, Any],
-    rag_context: Optional[List[Dict[str, Any]]] = None
+    rag_context: Optional[List[Dict[str, Any]]] = None,
+    onboarding_context: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Run the AI-CTO agent with input data, tools results, and optional RAG context.
@@ -113,16 +114,22 @@ Respond ONLY with valid JSON matching this structure:
 
 Ensure all JSON is valid and properly formatted."""
 
+    from app.diagnostic.mapping import format_onboarding_context_line
+    context_line = format_onboarding_context_line(onboarding_context or {})
+    system_prompt = (SYSTEM_PROMPT + "\n\n" + context_line) if context_line else SYSTEM_PROMPT
+
     try:
-        response = client.chat.completions.create(
-            model=settings.LLM_MODEL,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
+        kwargs = {
+            "model": settings.LLM_MODEL,
+            "messages": [
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            temperature=0.7,
-            response_format={"type": "json_object"}
-        )
+            "temperature": 0.7,
+        }
+        if model_supports_json_object(settings.LLM_MODEL):
+            kwargs["response_format"] = {"type": "json_object"}
+        response = client.chat.completions.create(**kwargs)
         
         content = response.choices[0].message.content
         

@@ -10,6 +10,8 @@ from sqlalchemy import text
 from app.config import settings
 from app.routes import (
     health,
+    admin_routes,
+    telemetry_routes,
     cfo_routes,
     cmo_routes,
     cmo_chat_routes,
@@ -18,9 +20,23 @@ from app.routes import (
     cto_routes,
     cto_chat_routes,
     clear_routes,
+    decision_routes,
+    transcribe_routes,
+    advisor_routes,
+    demo_routes,
+    inquiry_routes,
 )
+from app.enterprise.routes import router as enterprise_router
+from app.execution.routes import router as execution_router
+from app.outcomes.routes import router as outcomes_router
+from app.documents.routes import router as documents_router
+from app.capability.routes import router as capability_router
+from app.institutional.routes import router as institutional_router
+from app.auth.routes import router as auth_router
 from app.db.database import engine, init_db, init_pgvector_extension
 from app.utils.logging import setup_logging
+from app.middleware.rate_limit import RateLimitMiddleware
+from app.middleware.request_id import RequestIdMiddleware
 
 # Setup logging
 setup_logging()
@@ -32,82 +48,31 @@ async def lifespan(app: FastAPI):
     # Startup
     print("Starting Exec-Connect unified backend...")
     print(f"Database URL: {settings.DATABASE_URL[:50]}...")
+    key = settings.OPENAI_API_KEY or ""
+    print(f"OPENAI_API_KEY: ...{key[-4:] if len(key) >= 4 else '(not set)'}")
     print(f"OpenAI Model: {settings.LLM_MODEL}")
     print(f"RAG Enabled: {settings.RAG_ENABLED}")
+    wispr = settings.WISPR_API_KEY or ""
+    print(f"Wispr voice input: {'configured' if wispr else 'not configured (set WISPR_API_KEY to enable)'}")
     
     # Test database connection first
     try:
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
-        print("✓ Database connection successful")
+        print("[OK] Database connection successful")
     except Exception as e:
-        print(f"✗ Database connection failed: {e}")
+        print(f"[FAIL] Database connection failed: {e}")
         raise  # Fail startup if database is not accessible
     
-    # Initialize pgvector extension (needed before migrations)
+    # Initialize pgvector extension (needed for migrations and app)
     try:
         init_pgvector_extension()
-        print("✓ pgvector extension initialized")
+        print("[OK] pgvector extension initialized")
     except Exception as e:
         print(f"Warning: pgvector extension initialization failed: {e}")
     
-    # Run database migrations
-    try:
-        print("Running database migrations...")
-        import os
-        import sys
-        from pathlib import Path
-        from alembic.config import Config
-        from alembic import command
-        
-        # Find alembic.ini - try multiple locations
-        # On Render with rootDir=backend, we're already in backend/
-        # Locally or from repo root, we need to find backend/
-        current_dir = Path.cwd()
-        possible_paths = [
-            current_dir / "alembic.ini",  # Already in backend/
-            current_dir / "backend" / "alembic.ini",  # In repo root
-            Path(__file__).resolve().parent.parent / "alembic.ini",  # From app/main.py
-        ]
-        
-        alembic_ini_path = None
-        backend_dir = None
-        
-        for path in possible_paths:
-            if path.exists():
-                alembic_ini_path = path
-                backend_dir = path.parent
-                break
-        
-        if not alembic_ini_path:
-            print(f"Warning: Could not find alembic.ini. Tried: {possible_paths}")
-        else:
-            print(f"Found alembic.ini at: {alembic_ini_path}")
-            # Change to backend directory for alembic to work correctly
-            original_cwd = os.getcwd()
-            backend_path = str(backend_dir)
-            try:
-                os.chdir(backend_dir)
-                print(f"Changed working directory to: {backend_dir}")
-                
-                # Add backend directory to sys.path if not already there
-                if backend_path not in sys.path:
-                    sys.path.insert(0, backend_path)
-                
-                alembic_cfg = Config(str(alembic_ini_path))
-                command.upgrade(alembic_cfg, "head")
-                print("✓ Database migrations completed")
-            finally:
-                os.chdir(original_cwd)
-                if backend_path in sys.path:
-                    sys.path.remove(backend_path)
-    except Exception as e:
-        import traceback
-        print(f"✗ Database migration failed: {e}")
-        print(traceback.format_exc())
-        # Don't fail startup - allow the app to run even if migrations fail
-        # (useful for troubleshooting, but logs will show the error)
-    
+    # Migrations are run by run.ps1 / run.sh before starting the server so the
+    # lifespan stays minimal and the server stays running (avoids exit on some Windows setups).
     yield
     
     # Shutdown
@@ -130,9 +95,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# IP-based rate limits: auth 10/min, telemetry 60/min, diagnostic 30/min (429 + Retry-After: 60)
+app.add_middleware(RateLimitMiddleware)
+# Request ID for structured logging (x-request-id on response)
+app.add_middleware(RequestIdMiddleware)
 
 # Include routers
 app.include_router(health.router)
+app.include_router(admin_routes.router)
+app.include_router(telemetry_routes.router, prefix=settings.API_V1_PREFIX)
 app.include_router(cfo_routes.router)
 app.include_router(cmo_routes.router)
 app.include_router(cmo_chat_routes.router)
@@ -141,6 +112,24 @@ app.include_router(coo_chat_routes.router)
 app.include_router(cto_routes.router)
 app.include_router(cto_chat_routes.router)
 app.include_router(clear_routes.router)
+app.include_router(advisor_routes.router)
+app.include_router(decision_routes.router)
+app.include_router(transcribe_routes.router)
+app.include_router(enterprise_router)
+app.include_router(execution_router)
+app.include_router(outcomes_router)
+app.include_router(documents_router)
+app.include_router(capability_router)
+app.include_router(institutional_router)
+app.include_router(auth_router, prefix=settings.API_V1_PREFIX)
+app.include_router(demo_routes.router)
+app.include_router(inquiry_routes.router)
+
+
+@app.get("/api/health")
+async def api_health():
+    """Health check under API prefix for smoke tests and load balancers."""
+    return {"status": "ok"}
 
 
 @app.get("/")

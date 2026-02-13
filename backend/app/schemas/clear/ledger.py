@@ -28,9 +28,13 @@ class LedgerEventType(str, Enum):
     FINALIZATION_ACKNOWLEDGED = "FINALIZATION_ACKNOWLEDGED"
     ARTIFACT_FINALIZED = "ARTIFACT_FINALIZED"
     DECISION_SUPERSEDED = "DECISION_SUPERSEDED"
+    # Phase 2 execution/outcomes (event-sourced)
+    TASK_CREATED = "TASK_CREATED"
+    TASK_UPDATED = "TASK_UPDATED"
+    MILESTONE_LOGGED = "MILESTONE_LOGGED"
+    OUTCOME_RECORDED = "OUTCOME_RECORDED"
     # Reserved (future)
     IMPLEMENTATION_STARTED = "IMPLEMENTATION_STARTED"
-    MILESTONE_LOGGED = "MILESTONE_LOGGED"
     IMPLEMENTATION_COMPLETED = "IMPLEMENTATION_COMPLETED"
     OUTCOME_CAPTURED = "OUTCOME_CAPTURED"
     DECISION_ARCHIVED = "DECISION_ARCHIVED"
@@ -67,6 +71,11 @@ class DecisionOut(BaseModel):
     latest_artifact: Optional[dict[str, Any]] = None
     latest_artifact_hash: Optional[str] = None
     latest_version_id: Optional[UUID] = None
+    # Execution layer
+    responsible_owner: Optional[str] = None
+    expected_outcome: Optional[str] = None
+    outcome_review_reminder: bool = False
+    outcome_review_notes: Optional[str] = None
 
 
 class LedgerEventOut(BaseModel):
@@ -113,3 +122,11 @@ class CreateDecisionRequest(BaseModel):
     initial_artifact: Optional[dict] = None
     actor_id: Optional[str] = None
     actor_role: Optional[str] = None
+
+
+class ExecutionUpdateRequest(BaseModel):
+    """Update decision execution metadata (owner, expected outcome, outcome review)."""
+    responsible_owner: Optional[str] = None
+    expected_outcome: Optional[str] = None
+    outcome_review_reminder: Optional[bool] = None
+    outcome_review_notes: Optional[str] = None

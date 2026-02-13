@@ -10,7 +10,27 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "hsl(var(--background))",
+        /* CLEAR light SaaS palette – see globals.css */
+        ink: "var(--color-ink)",
+        "ink-muted": "var(--color-ink-muted)",
+        background: "var(--color-bg)",
+        surface: "var(--color-surface)",
+        border: "var(--color-border)",
+        divider: "var(--color-border)",
+        primary: {
+          DEFAULT: "var(--color-primary)",
+          foreground: "#FFFFFF",
+        },
+        "primary-soft": "var(--color-primary-soft)",
+        "primary-hover": "var(--color-primary-hover)",
+        accent: "var(--color-accent)",
+        "accent-soft": "var(--color-accent-soft)",
+        insight: "var(--color-accent)",
+        success: "var(--color-success)",
+        danger: "var(--color-danger)",
+        /* Backward-compat alias */
+        "primary-ink": "var(--color-ink)",
+        /* Legacy semantic (shadcn) */
         foreground: "hsl(var(--foreground))",
         card: {
           DEFAULT: "hsl(var(--card))",
@@ -20,10 +40,6 @@ const config: Config = {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
         },
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
@@ -32,15 +48,10 @@ const config: Config = {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
         },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
-        border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         chart: {
@@ -50,6 +61,16 @@ const config: Config = {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+      },
+      fontFamily: {
+        sans: ["var(--font-inter)", "ui-sans-serif", "system-ui", "sans-serif"],
+      },
+      fontSize: {
+        "ds-h1": ["var(--ds-h1-size)", { lineHeight: "1.2", fontWeight: "600" }],
+        "ds-h2": ["var(--ds-h2-size)", { lineHeight: "1.3", fontWeight: "600" }],
+        "ds-h3": ["var(--ds-h3-size)", { lineHeight: "1.4", fontWeight: "600" }],
+        "ds-body": ["var(--ds-body-size)", { lineHeight: "1.5", fontWeight: "400" }],
+        "ds-small": ["var(--ds-small-size)", { lineHeight: "1.5", fontWeight: "400" }],
       },
       borderRadius: {
         lg: "var(--radius)",

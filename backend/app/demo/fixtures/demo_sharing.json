@@ -1,0 +1,7 @@
+[
+  {"id":"shr-1","enterprise_id":"ent-1","partner_name":"Growth Capital Partners","visibility_scope":"execution","access_expiry":"2025-12-31","status":"active"},
+  {"id":"shr-2","enterprise_id":"ent-1","partner_name":"Audit & Assurance Ltd","visibility_scope":"outcomes","access_expiry":"2025-06-30","status":"active"},
+  {"id":"shr-3","enterprise_id":"ent-2","partner_name":"Summit Accelerator Fund","visibility_scope":"decision_only","access_expiry":"2025-09-30","status":"active"},
+  {"id":"shr-4","enterprise_id":"ent-2","partner_name":"Former Advisor (revoked)","visibility_scope":"execution","access_expiry":"2025-01-15","status":"revoked"},
+  {"id":"shr-5","enterprise_id":"ent-3","partner_name":"Seed Readiness Syndicate","visibility_scope":"decision_only","access_expiry":"2025-10-31","status":"active"}
+]

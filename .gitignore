@@ -11,6 +11,7 @@ backend/venv/
 backend/.venv/
 backend/exec/       # legacy / deploy virtual environment
 backend/.env
+backend/uploads/
 
 # General
 .vscode/

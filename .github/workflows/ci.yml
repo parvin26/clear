@@ -1,4 +1,4 @@
-# CI: backend tests (canonicalization proof and optional future tests)
+# CI: backend tests (canonicalization proof, contract, optional 10-persona stress test)
 name: CI
 
 on:
@@ -29,3 +29,51 @@ jobs:
       - name: Run canonicalization tests
         working-directory: backend
         run: python -m pytest tests/test_canonicalization.py -v
+
+  backend-contract:
+    name: CLEAR contract endpoint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install backend dependencies
+        working-directory: backend
+        run: pip install -r requirements.txt
+      - name: Run contract endpoint tests
+        working-directory: backend
+        run: python -m pytest tests/test_contract_endpoint.py -v
+
+  stress-test-10-persona:
+    name: 10-persona stress test (pre-release)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      CLEAR_API_URL: ${{ secrets.CLEAR_API_URL || 'http://localhost:8000' }}
+      STRESS_TEST_STRICT: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install backend dependencies
+        working-directory: backend
+        run: pip install -r requirements.txt
+      - name: Validate 10-persona script and PERSONAS
+        working-directory: backend
+        run: |
+          python -c "
+          import sys
+          sys.path.insert(0, '.')
+          from scripts.run_10_persona_stress_test import PERSONAS
+          assert len(PERSONAS) == 10, f'Expected 10 personas, got {len(PERSONAS)}'
+          print('10-persona stress test script OK: 10 personas defined')
+          "
+      - name: Run 10-persona stress test (live; requires backend at CLEAR_API_URL)
+        working-directory: backend
+        run: |
+          python scripts/run_10_persona_stress_test.py
+        continue-on-error: true

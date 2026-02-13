@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { ctoApi } from "@/lib/api";
 import type { ChatMessage } from "@/lib/types-cto";
 import { Send, Loader2, Bot, User } from "lucide-react";
+import { VoiceInputButton } from "@/components/ui/voice-input-button";
 
 export function ChatInterface() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -70,7 +71,7 @@ export function ChatInterface() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Bot className="h-5 w-5 text-primary" />
-          AI-CTO Chat Assistant
+          Tech Chat
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col flex-1 overflow-hidden space-y-4">
@@ -132,8 +133,14 @@ export function ChatInterface() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Ask a question about technology strategy..."
+            placeholder="Type or use the mic to speak..."
             disabled={isLoading}
+          />
+          <VoiceInputButton
+            onTranscription={(text) => setInput((prev) => (prev ? `${prev} ${text}` : text))}
+            beforeText={input}
+            disabled={isLoading}
+            aria-label="Record voice message"
           />
           <Button onClick={handleSend} disabled={!input.trim() || isLoading}>
             {isLoading ? (

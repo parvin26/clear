@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Shell } from "@/components/layout/Shell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,9 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
-import { Phone, Mail, MessageCircle, Calendar, Clock } from "lucide-react";
+import { Phone, MessageCircle, Clock, CheckCircle2 } from "lucide-react";
+import { postContactInquiry } from "@/lib/api";
 
 export default function BookCallPage() {
+  const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -23,36 +26,62 @@ export default function BookCallPage() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      alert("Thank you! We'll contact you within 24 hours to schedule your call.");
-      setLoading(false);
-      // Reset form
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        company: "",
-        reason: "",
-        preferredDate: "",
-        preferredTime: "",
-        message: "",
+    setError(null);
+    try {
+      await postContactInquiry({
+        name: formData.name.trim() || undefined,
+        email: formData.email.trim(),
+        phone: formData.phone.trim() || undefined,
+        company: formData.company.trim() || undefined,
+        reason: formData.reason || undefined,
+        preferred_date: formData.preferredDate || undefined,
+        preferred_time: formData.preferredTime || undefined,
+        message: formData.message.trim() || undefined,
       });
-    }, 1000);
+      setSubmitted(true);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Submission failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (submitted) {
+    return (
+      <Shell>
+        <div className="max-w-xl mx-auto py-12 px-4 text-center space-y-6">
+          <div className="flex justify-center">
+            <CheckCircle2 className="h-16 w-16 text-primary" />
+          </div>
+          <h1 className="text-2xl font-bold text-ink">Request received</h1>
+          <p className="text-ink-muted">
+            We will contact you within 24 hours to schedule your call.
+          </p>
+          <div className="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
+            <Button asChild variant="outline">
+              <Link href="/book-call">Submit another request</Link>
+            </Button>
+            <Button asChild>
+              <Link href="/start">Go to Start</Link>
+            </Button>
+          </div>
+        </div>
+      </Shell>
+    );
+  }
 
   return (
     <Shell>
       <div className="max-w-4xl mx-auto py-12 px-4">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Book a Discovery Call</h1>
-          <p className="text-xl text-gray-600">
-            Free 30-minute consultation to discuss how Exec Connect can help your business
+          <h1 className="text-4xl font-bold text-ink mb-4">Book Expert Review</h1>
+          <p className="text-xl text-ink-muted">
+            Free 30-minute consultation to discuss how CLEAR can help your business
           </p>
         </div>
 
@@ -69,7 +98,7 @@ export default function BookCallPage() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="name">Full Name *</Label>
+                      <Label htmlFor="name">Full Name</Label>
                       <Input
                         id="name"
                         value={formData.name}
@@ -91,28 +120,26 @@ export default function BookCallPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="phone">Phone Number *</Label>
+                      <Label htmlFor="phone">Phone Number</Label>
                       <Input
                         id="phone"
                         type="tel"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        required
                       />
                     </div>
                     <div>
-                      <Label htmlFor="company">Company Name *</Label>
+                      <Label htmlFor="company">Company Name</Label>
                       <Input
                         id="company"
                         value={formData.company}
                         onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                        required
                       />
                     </div>
                   </div>
 
                   <div>
-                    <Label htmlFor="reason">What would you like to discuss? *</Label>
+                    <Label htmlFor="reason">What would you like to discuss?</Label>
                     <Select
                       value={formData.reason}
                       onValueChange={(value) => setFormData({ ...formData, reason: value })}
@@ -121,7 +148,7 @@ export default function BookCallPage() {
                         <SelectValue placeholder="Select topic" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="general">General Business Diagnostic</SelectItem>
+                        <SelectItem value="general">Decision Diagnostic (General)</SelectItem>
                         <SelectItem value="finance">Financial Strategy & Cash Flow</SelectItem>
                         <SelectItem value="marketing">Marketing & Growth Strategy</SelectItem>
                         <SelectItem value="operations">Operations Optimization</SelectItem>
@@ -174,8 +201,10 @@ export default function BookCallPage() {
                     />
                   </div>
 
+                  {error && <p className="text-sm text-destructive">{error}</p>}
+
                   <Button type="submit" className="w-full" size="lg" disabled={loading}>
-                    {loading ? "Submitting..." : "Submit Request"}
+                    {loading ? "Submitting…" : "Submit Request"}
                   </Button>
                 </form>
               </CardContent>
@@ -206,7 +235,7 @@ export default function BookCallPage() {
                 <div className="flex items-start gap-3">
                   <Phone className="w-5 h-5 text-blue-600 mt-0.5" />
                   <div>
-                    <p className="font-medium text-sm">Get Recommendations</p>
+                    <p className="font-medium text-sm">Next steps</p>
                     <p className="text-xs text-gray-600">Receive tailored next steps</p>
                   </div>
                 </div>

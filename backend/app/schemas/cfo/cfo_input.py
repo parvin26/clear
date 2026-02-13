@@ -1,6 +1,6 @@
 """Pydantic schemas for CFO diagnostic input."""
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Any, Optional
 
 
 class CFOInput(BaseModel):
@@ -166,4 +166,7 @@ class CFOInput(BaseModel):
         description="Additional context for other initiatives",
     )
     notes: Optional[str] = Field(None, description="Additional notes")
+    # Phase 2: optional enterprise + decision context
+    enterprise_id: Optional[int] = Field(None, description="Link analysis to enterprise")
+    decision_context: Optional[dict[str, Any]] = Field(None, description="Context snapshot at decision initiation")
 

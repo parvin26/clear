@@ -1,0 +1,5 @@
+[
+  {"id":"ent-1","name":"Northgate Manufacturing Ltd","industry":"Manufacturing","size":"50-200","country":"United Kingdom","summary":"SME producing precision components. Improving cash flow visibility and scaling operations.","readiness_band":"Developing"},
+  {"id":"ent-2","name":"Summit Digital Agency","industry":"Professional Services","size":"20-50","country":"United Kingdom","summary":"Digital agency focusing on growth and technology stack consolidation.","readiness_band":"Established"},
+  {"id":"ent-3","name":"ClearWave Labs","industry":"B2B SaaS","size":"5-20","country":"United Kingdom","summary":"Founder-led startup. Needs sharper ICP and activation improvements to extend runway and raise with confidence.","readiness_band":"Developing"}
+]

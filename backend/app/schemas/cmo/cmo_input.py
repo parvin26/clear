@@ -1,7 +1,7 @@
 """
 Pydantic schemas for CMO diagnostic input.
 """
-from typing import Optional
+from typing import Any, Optional
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -73,6 +73,9 @@ class CMOInputSchema(BaseModel):
         description="Additional notes or context"
     )
     
+    enterprise_id: Optional[int] = Field(None, description="Link analysis to enterprise")
+    decision_context: Optional[dict[str, Any]] = Field(None, description="Context snapshot at decision initiation")
+
     @field_validator("primary_challenge")
     @classmethod
     def validate_primary_challenge(cls, v: str) -> str:

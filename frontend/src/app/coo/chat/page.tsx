@@ -8,7 +8,7 @@ export default function COOChatPage() {
     <Shell>
       <div className="container mx-auto py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold">Chat with AI-COO</h1>
+          <h1 className="text-3xl font-bold">Ops Chat</h1>
           <p className="mt-2 text-gray-600">
             Get personalized operational advice and answers to your questions.
           </p>

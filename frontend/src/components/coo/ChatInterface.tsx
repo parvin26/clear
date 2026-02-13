@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Send, MessageSquare } from "lucide-react";
 
 import { sendChatMessage, getChatHistory } from "@/lib/api";
+import { VoiceInputButton } from "@/components/ui/voice-input-button";
 import type { ChatMessage } from "@/lib/types-coo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -87,7 +88,7 @@ export function ChatInterface({ analysisId, initialSessionId }: ChatInterfacePro
           <div className="rounded-lg bg-gradient-premium p-2 text-white shadow-glow">
             <MessageSquare className="h-5 w-5" />
           </div>
-          Chat with AI-COO
+          Ops Chat
         </CardTitle>
         <p className="text-sm text-muted-foreground mt-2">
           Ask questions about your operations, get advice, and explore solutions.
@@ -98,7 +99,7 @@ export function ChatInterface({ analysisId, initialSessionId }: ChatInterfacePro
           {messages.length === 0 ? (
             <div className="flex h-full items-center justify-center text-center text-muted-foreground">
               <div>
-                <p className="font-medium">Start a conversation with AI-COO</p>
+                <p className="font-medium">Start a conversation</p>
                 <p className="text-sm">Ask about operational challenges, best practices, or get advice.</p>
               </div>
             </div>
@@ -126,7 +127,7 @@ export function ChatInterface({ analysisId, initialSessionId }: ChatInterfacePro
           {loading && (
             <div className="flex justify-start">
               <div className="rounded-lg bg-muted px-4 py-2">
-                <p className="text-sm">AI-COO is thinking...</p>
+                <p className="text-sm">Thinking...</p>
               </div>
             </div>
           )}
@@ -142,8 +143,14 @@ export function ChatInterface({ analysisId, initialSessionId }: ChatInterfacePro
                 handleSend();
               }
             }}
-            placeholder="Type your message..."
+            placeholder="Type your message or use the mic to speak..."
             disabled={loading}
+          />
+          <VoiceInputButton
+            onTranscription={(text) => setInput((prev) => (prev ? `${prev} ${text}` : text))}
+            beforeText={input}
+            disabled={loading}
+            aria-label="Record voice message"
           />
           <Button onClick={handleSend} disabled={loading || !input.trim()}>
             <Send className="h-4 w-4" />

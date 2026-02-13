@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { getDiagnosticPrefill, clearDiagnosticPrefill } from "@/lib/diagnostic-prefill";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { VoiceInputButton } from "@/components/ui/voice-input-button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -72,10 +74,23 @@ export function DiagnosticForm({ onSuccess }: DiagnosticFormProps) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [prefillBanner, setPrefillBanner] = useState(false);
   const [formData, setFormData] = useState<Partial<CTOInput>>({
     biggest_challenge: [],
     business_alignment: 3,
   });
+
+  useEffect(() => {
+    const prefill = getDiagnosticPrefill();
+    if (prefill?.domain === "cto" && prefill.diagnosticData.situationDescription) {
+      setFormData((prev) => ({
+        ...prev,
+        notes: (prefill.diagnosticData.situationDescription || prev.notes) ?? undefined,
+      }));
+      setPrefillBanner(true);
+      clearDiagnosticPrefill();
+    }
+  }, []);
 
   const updateFormData = (field: keyof CTOInput, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -155,6 +170,11 @@ export function DiagnosticForm({ onSuccess }: DiagnosticFormProps) {
           </CardDescription>
           <Progress value={progress} className="mt-4" />
         </CardHeader>
+        {prefillBanner && (
+          <div className="mx-6 mb-4 rounded-md border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-blue-800">
+            Your capability diagnostic answers have been used to prefill where possible.
+          </div>
+        )}
         <CardContent className="space-y-6">
           {/* Step 1: Infra & Stack */}
           {currentStep === 1 && (
@@ -370,13 +390,24 @@ export function DiagnosticForm({ onSuccess }: DiagnosticFormProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="notes">Additional Notes (Optional)</Label>
-                <Textarea
-                  id="notes"
-                  placeholder="Any additional information about your technology situation..."
-                  value={formData.notes || ""}
-                  onChange={(e) => updateFormData("notes", e.target.value)}
-                  rows={4}
-                />
+                <p className="text-sm text-muted-foreground">You can type or use the mic to speak.</p>
+                <div className="flex gap-2 items-start">
+                  <Textarea
+                    id="notes"
+                    placeholder="Any additional information about your technology situation..."
+                    value={formData.notes || ""}
+                    onChange={(e) => updateFormData("notes", e.target.value)}
+                    rows={4}
+                    className="flex-1"
+                  />
+                  <VoiceInputButton
+                    onTranscription={(text) =>
+                      updateFormData("notes", (formData.notes || "") + (formData.notes ? " " : "") + text)
+                    }
+                    beforeText={formData.notes || ""}
+                    aria-label="Speak to fill additional notes"
+                  />
+                </div>
               </div>
             </div>
           )}

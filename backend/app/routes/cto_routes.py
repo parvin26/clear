@@ -8,6 +8,8 @@ from sqlalchemy import desc
 
 from app.db.database import get_db
 from app.db.models import CTOAnalysis, User
+from app.governance_engine.rtco_service import create_decision_from_analysis
+from app.enterprise.decision_context_service import store_context
 from app.schemas.cto.cto_input import CTOInputSchema
 from app.schemas.cto.cto_analysis import CTOAnalysisSchema, CTOAnalysisResponse
 from app.tools.tech_tools import calculate_all_tools
@@ -42,7 +44,7 @@ async def diagnose_technology(
     """
     try:
         user = get_or_create_user(db, user_email, user_name)
-        input_dict = input_data.model_dump()
+        input_dict = input_data.model_dump(exclude={"enterprise_id", "decision_context"})
         tools_results = calculate_all_tools(input_dict)
         
         rag_context = []
@@ -56,6 +58,7 @@ async def diagnose_technology(
         
         analysis = CTOAnalysis(
             user_id=user.id,
+            enterprise_id=getattr(input_data, "enterprise_id", None),
             input_payload=input_dict,
             analysis_json=analysis_data,
             risk_level=analysis_data.get("risk_level", tools_results.get("risk_level", "medium"))
@@ -63,7 +66,24 @@ async def diagnose_technology(
         db.add(analysis)
         db.commit()
         db.refresh(analysis)
-        
+        try:
+            rec = create_decision_from_analysis(
+                analysis_id=analysis.id,
+                agent_domain="cto",
+                analysis_table="cto_analyses",
+                artifact_json=analysis_data,
+                db=db,
+            )
+            db.commit()
+            analysis.decision_id = rec.decision_id
+            if getattr(input_data, "enterprise_id", None) is not None:
+                analysis.enterprise_id = input_data.enterprise_id
+            if getattr(input_data, "decision_context", None) is not None:
+                store_context(rec.decision_id, input_data.decision_context, db, enterprise_id=input_data.enterprise_id)
+            db.commit()
+            db.refresh(analysis)
+        except Exception:
+            db.rollback()
         analysis_schema = CTOAnalysisSchema(**analysis_data)
         
         return CTOAnalysisResponse(

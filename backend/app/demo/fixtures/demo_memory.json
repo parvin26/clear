@@ -1,0 +1,5 @@
+[
+  {"id":"mem-1","enterprise_id":"ent-1","decision_id":"dec-2","what_we_learned":"Start with one product line to stabilize planning cadence before scaling dashboards.","what_to_reuse_next_time":"Weekly planning review structure and a single page capacity snapshot.","related_decisions":["dec-1"]},
+  {"id":"mem-2","enterprise_id":"ent-2","decision_id":"dec-4","what_we_learned":"Tool consolidation works only when the release checklist is agreed first.","what_to_reuse_next_time":"Default release checklist and ownership model for handoffs.","related_decisions":["dec-3"]},
+  {"id":"mem-3","enterprise_id":"ent-3","decision_id":"dec-6","what_we_learned":"A single guided onboarding route outperformed multiple choices.","what_to_reuse_next_time":"One path to first value with clear prompts and measurement.","related_decisions":["dec-5"]}
+]

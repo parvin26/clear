@@ -1,0 +1,12 @@
+[
+  {"id":"ms-1","decision_id":"dec-1","milestone_title":"Define 13-week template and data sources","owner_name":"Finance Lead","due_date":"2025-03-15","status":"completed","progress_percent":100,"evidence_link":"/docs/cash-flow-template-v1.pdf"},
+  {"id":"ms-2","decision_id":"dec-1","milestone_title":"First full 13-week forecast run and review","owner_name":"Finance Lead","due_date":"2025-04-30","status":"in_progress","progress_percent":60,"evidence_link":null},
+  {"id":"ms-3","decision_id":"dec-1","milestone_title":"Draft and approve 90-day reserve policy","owner_name":"CFO","due_date":"2025-06-15","status":"pending","progress_percent":0,"evidence_link":null},
+  {"id":"ms-4","decision_id":"dec-2","milestone_title":"Capacity and lead-time dashboard live","owner_name":"Operations Manager","due_date":"2025-02-28","status":"completed","progress_percent":100,"evidence_link":"/docs/ops-dashboard-screenshot.png"},
+  {"id":"ms-5","decision_id":"dec-3","milestone_title":"ICP document and attribution rules agreed","owner_name":"Marketing Lead","due_date":"2025-04-15","status":"in_progress","progress_percent":40,"evidence_link":null},
+  {"id":"ms-6","decision_id":"dec-4","milestone_title":"Primary project tool selected and migrated","owner_name":"Tech Lead","due_date":"2025-05-31","status":"in_progress","progress_percent":70,"evidence_link":null},
+  {"id":"ms-7","decision_id":"dec-5","milestone_title":"Define ICP, qualification checklist and target list (first 50 accounts)","owner_name":"Founder","due_date":"2025-03-20","status":"completed","progress_percent":100,"evidence_link":"/docs/icp-brief-v1.pdf"},
+  {"id":"ms-8","decision_id":"dec-5","milestone_title":"Run outbound sequence and track replies, qualified calls and conversion","owner_name":"Founder","due_date":"2025-04-30","status":"in_progress","progress_percent":55,"evidence_link":null},
+  {"id":"ms-9","decision_id":"dec-6","milestone_title":"Instrument activation funnel and define first-value moment event","owner_name":"Product Lead","due_date":"2025-03-25","status":"completed","progress_percent":100,"evidence_link":"/docs/activation-funnel-events.png"},
+  {"id":"ms-10","decision_id":"dec-6","milestone_title":"Ship onboarding v1 changes and run 2-week experiment","owner_name":"Engineer","due_date":"2025-04-20","status":"in_progress","progress_percent":35,"evidence_link":null}
+]

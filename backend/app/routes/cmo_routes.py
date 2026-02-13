@@ -7,6 +7,8 @@ from typing import Optional
 
 from app.db.database import get_db
 from app.db.models import User, CMOAnalysis
+from app.governance_engine.rtco_service import create_decision_from_analysis
+from app.enterprise.decision_context_service import store_context
 from app.schemas.cmo.cmo_input import CMOInputSchema
 from app.schemas.cmo.cmo_analysis import CMOAnalysisSchema, CMOAnalysisResponse
 from app.agents.cmo_agent import run_ai_cmo_agent
@@ -24,11 +26,12 @@ async def diagnose_marketing(
     """
     Run AI-CMO diagnostic analysis.
     """
-    input_dict = input_data.model_dump()
+    input_dict = input_data.model_dump(exclude={"enterprise_id", "decision_context"})
     analysis_result = run_ai_cmo_agent(input_dict, db)
     
     analysis_record = CMOAnalysis(
         user_id=user_id,
+        enterprise_id=getattr(input_data, "enterprise_id", None),
         input_payload=input_dict,
         analysis_json=analysis_result,
         risk_level=analysis_result.get("risk_level", "yellow")
@@ -36,7 +39,24 @@ async def diagnose_marketing(
     db.add(analysis_record)
     db.commit()
     db.refresh(analysis_record)
-    
+    try:
+        rec = create_decision_from_analysis(
+            analysis_id=analysis_record.id,
+            agent_domain="cmo",
+            analysis_table="cmo_analyses",
+            artifact_json=analysis_result,
+            db=db,
+        )
+        db.commit()
+        analysis_record.decision_id = rec.decision_id
+        if getattr(input_data, "enterprise_id", None) is not None:
+            analysis_record.enterprise_id = input_data.enterprise_id
+        if getattr(input_data, "decision_context", None) is not None:
+            store_context(rec.decision_id, input_data.decision_context, db, enterprise_id=input_data.enterprise_id)
+        db.commit()
+        db.refresh(analysis_record)
+    except Exception:
+        db.rollback()
     return {
         "id": analysis_record.id,
         "analysis": analysis_result,

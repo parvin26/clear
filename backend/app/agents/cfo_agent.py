@@ -1,6 +1,6 @@
 """AI-CFO agent using OpenAI."""
 from openai import OpenAI
-from app.config import settings
+from app.config import settings, model_supports_json_object
 from app.schemas.cfo.cfo_input import CFOInput
 import json
 import logging
@@ -95,10 +95,14 @@ When discussing:
 def run_ai_cfo_agent(
     input_data: CFOInput,
     docs: list[str] | None = None,
-    tools_results: dict | None = None
+    tools_results: dict | None = None,
+    onboarding_context: dict | None = None,
 ) -> dict:
     """Run the AI-CFO agent and return structured analysis."""
-    
+    from app.diagnostic.mapping import format_onboarding_context_line
+    context_line = format_onboarding_context_line(onboarding_context)
+    system_prompt = (SYSTEM_PROMPT + "\n\n" + context_line) if context_line else SYSTEM_PROMPT
+
     # Build user message
     user_message = f"""Analyze this SME financial diagnostic:
 
@@ -124,16 +128,18 @@ Relevant Finance Best Practices:
 """
     
     try:
-        # Call OpenAI
-        response = client.chat.completions.create(
-            model=settings.LLM_MODEL,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
+        # Call OpenAI (only send response_format for models that support it)
+        kwargs = {
+            "model": settings.LLM_MODEL,
+            "messages": [
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
             ],
-            temperature=0.7,
-            response_format={"type": "json_object"}
-        )
+            "temperature": 0.7,
+        }
+        if model_supports_json_object(settings.LLM_MODEL):
+            kwargs["response_format"] = {"type": "json_object"}
+        response = client.chat.completions.create(**kwargs)
         
         content = response.choices[0].message.content
         

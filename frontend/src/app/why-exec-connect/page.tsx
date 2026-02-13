@@ -61,7 +61,7 @@ export default function WhyExecConnectPage() {
           <CardContent>
             <p className="text-gray-700">
               Successful SMEs combine funding with strategic leadership. Exec Connect bridges this gap by providing 
-              on-demand CXO expertise through AI-powered diagnostics and fractional human advisors. This approach 
+              decision diagnostics and optional expert review. This approach 
               delivers the strategic guidance you need at a fraction of the cost.
             </p>
           </CardContent>
@@ -75,7 +75,7 @@ export default function WhyExecConnectPage() {
               <div>
                 <CardTitle className="text-2xl text-green-900">Our Solution</CardTitle>
                 <CardDescription className="text-base">
-                  Fractional CXO + Ecosystem + AI Diagnostics
+                  Decision diagnostics + Execution tracking + Optional expert review
                 </CardDescription>
               </div>
             </div>
@@ -83,15 +83,15 @@ export default function WhyExecConnectPage() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="bg-white p-4 rounded-lg">
-                <h4 className="font-semibold mb-2">AI-Powered Diagnostics</h4>
+                <h4 className="font-semibold mb-2">Decision diagnostics</h4>
                 <p className="text-sm text-gray-600">
                   Instant strategic insights across finance, marketing, operations, and technology
                 </p>
               </div>
               <div className="bg-white p-4 rounded-lg">
-                <h4 className="font-semibold mb-2">Human CXO Network</h4>
+                <h4 className="font-semibold mb-2">Expert Review (Optional)</h4>
                 <p className="text-sm text-gray-600">
-                  Access to experienced fractional executives when you need human judgment
+                  Request expert review of your diagnostic when you need human judgment
                 </p>
               </div>
               <div className="bg-white p-4 rounded-lg">
@@ -141,7 +141,7 @@ export default function WhyExecConnectPage() {
                 <h4 className="font-semibold text-lg mb-2">Retail Chain Turnaround</h4>
                 <p className="text-gray-700 mb-4">
                   A struggling retail chain with 5 locations was losing RM15K per month. 
-                  Through Exec Connect's AI-COO diagnostic and fractional COO support, 
+                  Through Exec Connect's Ops diagnostic and execution support, 
                   they optimized inventory, reduced costs, and returned to profitability in 3 months.
                 </p>
                 <div className="space-y-2">

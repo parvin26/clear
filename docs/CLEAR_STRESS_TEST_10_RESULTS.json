@@ -1,0 +1,186 @@
+[
+  {
+    "name": "A1 \u2013 Cash\u2011strained Hawker Stall Owner",
+    "decision_id": "49a3527e-6928-4ec8-a958-74cdc9369459",
+    "primary_domain": "coo",
+    "decision_statement": "for a startup company in f&b \u2013 hawker stall, This small hawker stall is struggling with cash flow due to lack of robust tracking and outdated SOPs. Despite reasonable monthly revenue of RM 35k, they often face shortage of funds leading to unstable operations.",
+    "success_metric": "On-time delivery \u2265 95%",
+    "key_constraints": [
+      "Staff capacity",
+      "Process maturity",
+      "Limited founder time"
+    ],
+    "emr_summary": {
+      "milestones_count": 3,
+      "metrics_count": 2,
+      "domain": "coo"
+    },
+    "sample_advisor_reply": "First, focus on milestone \"A1: Map the steps\". This involves understanding and documenting your current operations. This will help identify areas of inefficiency and delay. Once you have a clear picture, move to \"A2: Fix the top 2 delays\". Use the map you've created to pinpoint and address these issues. Your success metric of on-time delivery \u2265 95% will be directly impacted by this. After these, implement \"A3: Daily checklist and handover\" to ensure smooth daily operations.",
+    "emerging_decision": "Your hawker stall business is currently facing significant cash flow challenges, with no formal financial tracking and a"
+  },
+  {
+    "name": "A2 \u2013 Family Manufacturing SME Owner",
+    "decision_id": "eaeedc41-1d1f-43de-92ef-f45d3b159878",
+    "primary_domain": "coo",
+    "decision_statement": "for a startup company in manufacturing \u2013 components, This family-run components manufacturing business in Penang struggles with working capital management due to late customer payments and excessive inventory. Operational efficiency is hindered by outdated systems and processes, affecting cash conve",
+    "success_metric": "On-time delivery \u2265 95%",
+    "key_constraints": [
+      "Staff capacity",
+      "Process maturity",
+      "Limited founder time"
+    ],
+    "emr_summary": {
+      "milestones_count": 5,
+      "metrics_count": 3,
+      "domain": "coo"
+    },
+    "sample_advisor_reply": "Based on your Execution Plan, the first thing to focus on is conducting a 'Bottleneck Analysis'. This will help identify areas in your operations that are slowing down the process, affecting efficiency, and contributing to late deliveries. Following this, you should start developing 'Standard Operating Procedures' (SOPs) for key steps to streamline processes and improve operational efficiency. Simultaneously, begin a 'Quality Check at Source' to minimize defects and reduce cycle time. Remember, ",
+    "emerging_decision": "This family-run components manufacturing business in Penang struggles with working capital management due to late custom"
+  },
+  {
+    "name": "A3 \u2013 Bootstrapped Services Agency Founder",
+    "decision_id": "642b77ff-f831-46d8-8d26-c62fecbe0af7",
+    "primary_domain": "cto",
+    "decision_statement": "for a startup company in services \u2013 creative agency, The creative agency has a growing but partially mature tech stack with some scalability components. It lacks systematic roadmap management and security policies, with operational risks manageable but requiring monitoring. The DevOps adoption is pa",
+    "success_metric": "Critical systems uptime \u2265 99.5%",
+    "key_constraints": [
+      "Tech debt and legacy systems",
+      "Team skills",
+      "Limited founder time"
+    ],
+    "emr_summary": {
+      "milestones_count": 5,
+      "metrics_count": 3,
+      "domain": "cto"
+    },
+    "sample_advisor_reply": "Based on your Execution Plan, the first focus should be on your must-do milestones. Start by forming a team to develop and document security policies (milestone B3). Prioritize areas with the highest risk. Simultaneously, begin implementing CI/CD practices for a subset of projects and train the team in these processes (milestone B2). This will improve automation and reliability. Lastly, research and adopt a roadmap management tool suitable for your needs and budget to better manage your tech roa",
+    "emerging_decision": "The Jakarta-based agency is facing unstable cash flow due to project-based revenue and lack of cost forecasting. Process"
+  },
+  {
+    "name": "B1 \u2013 VC-backed SaaS Startup Founder",
+    "decision_id": "bb123847-ba75-4dc4-baa7-6f8a1845f918",
+    "primary_domain": "cfo",
+    "decision_statement": "for a startup company in b2b saas, Your business is in a precarious position with a high burn rate and limited cash flow, despite having no formal debt. The lack of clear go-to-market focus and visibility into unit economics is adding to the uncertainty.",
+    "success_metric": "Net operating cash flow positive within 6\u201312 months",
+    "key_constraints": [
+      "Working capital access",
+      "Revenue predictability",
+      "Limited founder time"
+    ],
+    "emr_summary": {
+      "milestones_count": 5,
+      "metrics_count": 3,
+      "domain": "cfo"
+    },
+    "sample_advisor_reply": "Given your situation, the first focus should be on achieving the \"13 week cash forecast\" milestone. This will provide a clear picture of your financial health and cash flow situation. Simultaneously, begin working on the \"Expense reset and burn target\" milestone. This will help identify areas of potential cost savings, which is crucial in your current position. These two actions will lay the groundwork for the \"Pricing or margin quick win test\", allowing you to make informed decisions about your",
+    "emerging_decision": "Faced with high burn rate and unclear go-to-market focus, this pre-Series A B2B SaaS SME shows strong need for process s"
+  },
+  {
+    "name": "B2 \u2013 E\u2011commerce Brand Founder",
+    "decision_id": "e681b82b-5458-4fd0-b5d1-257fef6cc40a",
+    "primary_domain": "coo",
+    "decision_statement": "for a startup company in e-commerce \u2013 consumer brand, Despite a strong Gross Merchandise Value (GMV), the E-commerce consumer brand is wrestling with disarray in operations, marked by inefficient ad spend, frequent stockouts, overordering, and outdated standard operating procedures (SOPs). The compa",
+    "success_metric": "On-time delivery \u2265 95%",
+    "key_constraints": [
+      "Staff capacity",
+      "Process maturity",
+      "Limited founder time"
+    ],
+    "emr_summary": {
+      "milestones_count": 3,
+      "metrics_count": 2,
+      "domain": "coo"
+    },
+    "sample_advisor_reply": "Given the must-do milestones and your current situation, you should first focus on \"Map the steps.\" This involves documenting all critical processes in your operations. Understanding the flow of your operations will help identify inefficiencies, overordering, and frequent stockouts. Once this is done, you can move to \"Fix the top 2 delays,\" which will likely emerge from the process mapping. Remember, the ultimate goal is to improve your on-time delivery to >= 95%.",
+    "emerging_decision": "Despite a strong Gross Merchandise Value (GMV), the E-commerce consumer brand is wrestling with disarray in operations, "
+  },
+  {
+    "name": "B3 \u2013 Multi-outlet Restaurant Group Owner",
+    "decision_id": "d715cbd8-4ba5-4b6c-9f42-359d962d821a",
+    "primary_domain": "coo",
+    "decision_statement": "for a startup company in f&b \u2013 multi-outlet, The primary issue for the business is the lack of standardization among outlets leading to inconsistent performance and high wastage. A lack of transparent reporting exacerbates this issue.",
+    "success_metric": "On-time delivery \u2265 95%",
+    "key_constraints": [
+      "Staff capacity",
+      "Process maturity",
+      "Limited founder time"
+    ],
+    "emr_summary": {
+      "milestones_count": 3,
+      "metrics_count": 2,
+      "domain": "coo"
+    },
+    "sample_advisor_reply": "Your first focus should be on the milestone \"Map the steps.\" Meet with outlet heads to understand the current processes and areas of concern. This will help you to identify the steps in your operations that need standardization and where the top delays might be. Once you have a clear map of the steps, you can start drafting standardized operating procedures. Remember, the goal is to improve on-time delivery to \u2265 95% and reduce defect rate by 20% in 60 days.",
+    "emerging_decision": "The primary issue for the business is the lack of standardization among outlets leading to inconsistent performance and "
+  },
+  {
+    "name": "C1 \u2013 Logistics SME Owner",
+    "decision_id": "76c60050-1b94-459a-b686-eec8a6f37da9",
+    "primary_domain": "coo",
+    "decision_statement": "for a startup company in logistics \u2013 last mile, The logistics company is experiencing high driver turnover, missed deliveries, and customer complaints due to a lack of process standardization and route planning system. This scenario is critically impacting reliability and customer satisfaction.",
+    "success_metric": "On-time delivery \u2265 95%",
+    "key_constraints": [
+      "Staff capacity",
+      "Process maturity",
+      "Limited founder time"
+    ],
+    "emr_summary": {
+      "milestones_count": 5,
+      "metrics_count": 3,
+      "domain": "coo"
+    },
+    "sample_advisor_reply": "Your first focus should be on conducting a bottleneck analysis (milestone B1). This will help you identify the key areas causing delays in your delivery process. Simultaneously, start the selection process for suitable route planning system options. These actions will set the foundation for the next steps, which include developing standard operating procedures (SOPs) and implementing quality checks at the source.",
+    "emerging_decision": "The logistics company is experiencing high driver turnover, missed deliveries, and customer complaints due to a lack of "
+  },
+  {
+    "name": "C2 \u2013 Clinic Network Founder",
+    "decision_id": "0c8e48f1-dcaa-4167-b76c-5c7862105c4f",
+    "primary_domain": "coo",
+    "decision_statement": "for a startup company in healthcare \u2013 clinic network, The client operates a network of three healthcare clinics suffering from inconsistent processes, undermining patient experience. Inefficiencies stem from lack of standard SOPs, system adoption and ad-hoc training.",
+    "success_metric": "On-time delivery \u2265 95%",
+    "key_constraints": [
+      "Staff capacity",
+      "Process maturity",
+      "Limited founder time"
+    ],
+    "emr_summary": {
+      "milestones_count": 5,
+      "metrics_count": 3,
+      "domain": "coo"
+    },
+    "sample_advisor_reply": "Your first focus should be on the \"Bottleneck analysis\" milestone. This will help you understand where the main inefficiencies lie in your current processes across all clinics. Once you've identified the bottlenecks, you can then move on to the \"SOPs for key step\" milestone, where you'll standardize the procedures to address these inefficiencies. Remember, it's crucial to involve your staff in this process to ensure the SOPs are practical and effective.",
+    "emerging_decision": "The client operates a network of three healthcare clinics suffering from inconsistent processes, undermining patient exp"
+  },
+  {
+    "name": "D1 \u2013 Idea-stage Tech Founder",
+    "idea_stage": true,
+    "idea_stage_message": "CLEAR is designed for operating businesses. We've noted your interest for a future validation path.",
+    "decision_id": null,
+    "primary_domain": null,
+    "decision_statement": null,
+    "success_metric": null,
+    "key_constraints": [],
+    "emr_summary": {},
+    "sample_advisor_reply": null,
+    "emerging_decision": null
+  },
+  {
+    "name": "D2 \u2013 Newly Registered Sole Proprietor",
+    "decision_id": "e490fb0c-1aa7-4ca8-ba5b-6bc16781755e",
+    "primary_domain": "coo",
+    "decision_statement": "for a startup company in f&b \u2013 home bakery, The home bakery is experiencing challenges with basic financial discipline, ad-hoc pricing, and process standardization. There's a lack of formal tracking and the intermingling of personal and business finances",
+    "success_metric": "On-time delivery \u2265 95%",
+    "key_constraints": [
+      "Staff capacity",
+      "Process maturity",
+      "Limited founder time"
+    ],
+    "emr_summary": {
+      "milestones_count": 3,
+      "metrics_count": 2,
+      "domain": "coo"
+    },
+    "sample_advisor_reply": "Given the milestones and metrics in your Execution Plan, the first focus should be on \"Map the steps\". This involves defining your bakery's operational processes in detail. It's critical to understand where potential bottlenecks or inefficiencies might be causing delays. This will also help in creating a daily checklist later. Simultaneously, start working on separating your business and personal finances by opening a separate business account. This will help in better financial discipline and a",
+    "emerging_decision": "The home bakery is experiencing challenges with basic financial discipline, ad-hoc pricing, and process standardization."
+  }
+]

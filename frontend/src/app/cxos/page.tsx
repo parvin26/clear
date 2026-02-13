@@ -225,12 +225,12 @@ export default function CXOsPage() {
     <Shell>
       <div className="max-w-7xl mx-auto py-12 px-4">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Human CXOs</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Request Expert Review</h1>
           <p className="text-xl text-gray-600 mb-6">
-            Experienced executives ready to help your business grow
+            Experienced experts ready to review your diagnostic and support key decisions
           </p>
           <p className="text-gray-600 mb-8">
-            Rate: RM 100/hour | Book a consultation or escalate from AI agent when critical decisions are needed
+            Rate: RM 100/hour | Book a consultation or request expert review when critical decisions are needed
           </p>
         </div>
 
@@ -339,17 +339,17 @@ export default function CXOsPage() {
         <Card className="mt-12 bg-blue-50">
           <CardContent className="pt-6">
             <div className="text-center">
-              <h3 className="font-semibold text-lg mb-2">AI + Human Expertise</h3>
+              <h3 className="font-semibold text-lg mb-2">Diagnostics + Expert Review</h3>
               <p className="text-gray-700 text-sm mb-4">
-                Start with our AI agents for instant insights. When you need human judgment for critical decisions,
-                easily escalate to book a consultation with our expert CXOs.
+                Run a decision diagnostic first for instant insights. When you need human judgment for critical decisions,
+                request an expert review or book a consultation.
               </p>
               <div className="flex gap-4 justify-center">
                 <Link href="/get-started">
-                  <Button variant="outline">Try AI Agents First</Button>
+                  <Button variant="outline">Run a diagnostic first</Button>
                 </Link>
-                <Link href="/book-call">
-                  <Button>Book Discovery Call</Button>
+                <Link href="/contact">
+                  <Button>Book Expert Review</Button>
                 </Link>
               </div>
             </div>
