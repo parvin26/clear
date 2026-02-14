@@ -2,8 +2,11 @@
 # Run after deploy to confirm pgvector and RAG are working.
 # Usage: .\rag_smoke_test.ps1 [-BaseUrl "https://clear-production-c8ca.up.railway.app"]
 param(
-    [string]$BaseUrl = $env:API_BASE_URL ?? "http://localhost:8000"
+    [string]$BaseUrl
 )
+
+if (-not $BaseUrl) { $BaseUrl = $env:API_BASE_URL }
+if (-not $BaseUrl) { $BaseUrl = "http://localhost:8000" }
 
 $ErrorActionPreference = "Stop"
 $failed = 0
@@ -42,7 +45,22 @@ try {
         $failed++
     }
 } catch {
-    Write-Host "FAIL POST /api/documents : $_" -ForegroundColor Red
+    $statusCode = ""
+    $responseBody = ""
+    if ($_.Exception.Response) {
+        try { $statusCode = $_.Exception.Response.StatusCode.value__ } catch { }
+        try {
+            $stream = $_.Exception.Response.GetResponseStream()
+            if ($stream) {
+                $reader = New-Object System.IO.StreamReader($stream)
+                $reader.BaseStream.Position = 0
+                $responseBody = $reader.ReadToEnd()
+                $reader.Close()
+            }
+        } catch { }
+    }
+    Write-Host "FAIL POST /api/documents : $statusCode $($_.Exception.Message)" -ForegroundColor Red
+    if ($responseBody) { Write-Host "  Response: $responseBody" -ForegroundColor Red }
     $failed++
 }
 

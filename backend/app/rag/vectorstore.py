@@ -27,6 +27,10 @@ def get_openai_client() -> OpenAI:
     return _client
 
 
+# OpenAI text-embedding-3-small dimension
+EMBEDDING_DIM = 1536
+
+
 def get_embedding(text: str) -> List[float]:
     """Get embedding vector for text using OpenAI."""
     client = get_openai_client()
@@ -41,12 +45,18 @@ def get_embedding(text: str) -> List[float]:
         return []
 
 
+def _embedding_or_none(embedding: Optional[List[float]]) -> Optional[List[float]]:
+    """Return embedding if valid for DB (length 1536), else None to avoid pgvector errors."""
+    if not embedding or len(embedding) != EMBEDDING_DIM:
+        return None
+    return embedding
+
+
 # Finance Documents
 def upsert_finance_document(db: Session, title: str, content: str) -> FinanceDocument:
     """Create or update a finance document with embedding."""
     try:
-        embedding = get_embedding(content)
-        
+        embedding = _embedding_or_none(get_embedding(content))
         doc = FinanceDocument(
             title=title,
             content=content,
@@ -100,26 +110,23 @@ def search_finance_docs(db: Session, query: str, top_k: int = 4) -> List[Finance
 # Marketing Documents
 def upsert_marketing_document(db: Session, title: str, content: str) -> MarketingDocument:
     """Upsert a marketing document with its embedding."""
-    embedding = get_embedding(content)
-    
+    embedding = _embedding_or_none(get_embedding(content))
     existing = db.query(MarketingDocument).filter(MarketingDocument.title == title).first()
-    
     if existing:
         existing.content = content
         existing.embedding = embedding
         db.commit()
         db.refresh(existing)
         return existing
-    else:
-        doc = MarketingDocument(
-            title=title,
-            content=content,
-            embedding=embedding
-        )
-        db.add(doc)
-        db.commit()
-        db.refresh(doc)
-        return doc
+    doc = MarketingDocument(
+        title=title,
+        content=content,
+        embedding=embedding
+    )
+    db.add(doc)
+    db.commit()
+    db.refresh(doc)
+    return doc
 
 
 def search_marketing_docs(db: Session, query: str, top_k: int = 4) -> List[MarketingDocument]:
@@ -156,7 +163,7 @@ def search_marketing_docs(db: Session, query: str, top_k: int = 4) -> List[Marke
 # Operations Documents
 def upsert_ops_document(db: Session, title: str, content: str) -> OpsDocument:
     """Upsert an operations document with embedding."""
-    embedding = get_embedding(content)
+    embedding = _embedding_or_none(get_embedding(content))
     doc = OpsDocument(title=title, content=content, embedding=embedding)
     db.add(doc)
     db.commit()
@@ -184,21 +191,18 @@ def search_ops_docs(db: Session, query: str, top_k: Optional[int] = None) -> Lis
 # Technology Documents (native pgvector: store list, search with <=>)
 def upsert_tech_document(db: Session, title: str, content: str) -> TechDocument:
     """Insert or update a technical document with embedding (native vector(1536))."""
-    embedding = get_embedding(f"{title}\n\n{content}")
-    
+    embedding = _embedding_or_none(get_embedding(f"{title}\n\n{content}"))
     existing = db.query(TechDocument).filter(TechDocument.title == title).first()
-    
     if existing:
         existing.content = content
-        existing.embedding = embedding if embedding else None
+        existing.embedding = embedding
         db.commit()
         db.refresh(existing)
         return existing
-    
     doc = TechDocument(
         title=title,
         content=content,
-        embedding=embedding if embedding else None
+        embedding=embedding
     )
     db.add(doc)
     db.commit()

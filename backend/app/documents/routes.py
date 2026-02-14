@@ -35,3 +35,5 @@ def upload_document(body: DocumentUploadBody, db: Session = Depends(get_db)):
         return {"id": doc.id, "domain": body.domain, "title": doc.title}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Document upload failed: {e!s}")
