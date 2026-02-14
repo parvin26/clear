@@ -185,8 +185,8 @@ Use this as a concrete, ordered checklist. Tick items as you complete them.
 - [ ] **C1.** In the **backend** service → **Variables**, set at least:
   - **DATABASE_URL** (from B2).
   - **OPENAI_API_KEY** (valid OpenAI key).
-  - **CORS_ORIGINS** = `https://<your-vercel-app>.vercel.app` (and any other origins you need; comma-separated, no trailing slash).
-  - **JWT_SECRET_KEY** = a long random string (if you use auth).
+  - **CORS_ORIGINS** = your frontend URL(s), e.g. `https://www.clear-commons.com,https://clear-commons.com` or `https://<your-vercel-app>.vercel.app` (comma-separated, no trailing slash). If unset, the app defaults to localhost + clear-commons.com.
+  - **JWT_SECRET_KEY** = a long random string (required for signup/login; do not use the default in production).
 - [ ] **C2.** Optionally set: **LLM_MODEL** (e.g. `gpt-4o-mini`), **FRONTEND_URL** (your Vercel URL), **DEBUG** = `false`, **RAG_ENABLED**, **WISPR_API_KEY**, **ZEPTO_MAIL_***.
 - [ ] **C3.** Save and trigger a **redeploy** of the backend so new variables are applied.
 
@@ -214,6 +214,13 @@ Use this as a concrete, ordered checklist. Tick items as you complete them.
 - [ ] **G1.** Open Railway → backend service → **Deployments** → latest deployment → **View logs** (Deploy logs, not only Build).
 - [ ] **G2.** Look for Python tracebacks (e.g. `ImportError`, `ModuleNotFoundError`, or DB connection errors). Fix the cause (e.g. add missing env, fix code, ensure `DATABASE_URL` is correct).
 - [ ] **G3.** Ensure **Root Directory** is **`backend`** so that `app.main:app` and `alembic` resolve correctly.
+
+### H. Sign-up / Register failing (CORS or 500)
+
+If users see "Registration failed" after entering the email verification code (pincode), check:
+
+- [ ] **H1. CORS:** Browser console may show "blocked by CORS policy: No 'Access-Control-Allow-Origin' header". **Fix:** In Railway → backend service → **Variables**, set **CORS_ORIGINS** to include your frontend origin(s), e.g. `https://www.clear-commons.com,https://clear-commons.com` (comma-separated, no trailing slash). If you leave CORS_ORIGINS empty, the app now defaults to including these origins; redeploy after changing.
+- [ ] **H2. 500 on POST /api/auth/register:** Check Railway **Deploy logs** (or **View logs** for the running service) when you submit the form. Common causes: **JWT_SECRET_KEY** not set or still the default (set a long random string in production); **DATABASE_URL** wrong or migrations not applied (ensure `users` and `pending_verifications` exist); unhandled exception in auth. Fix the cause and redeploy.
 
 ---
 

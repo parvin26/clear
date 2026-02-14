@@ -7,6 +7,8 @@
 # STT_PROVIDER=openai   # Voice input: openai (Whisper, default) or wispr. Set wispr to use Wispr Flow.
 # STT_OPENAI_MODEL=whisper-1
 # WISPR_API_KEY=   # Optional: only when STT_PROVIDER=wispr
+# CORS_ORIGINS: comma-separated; for production include frontend URL, e.g.:
+#   https://www.clear-commons.com,https://clear-commons.com
 # CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 # DEBUG=false
 
@@ -19,4 +21,7 @@ STT_PROVIDER=
 STT_OPENAI_MODEL=
 WISPR_API_KEY=
 CORS_ORIGINS=
+# Auth (required for signup/login): set in production
+# JWT_SECRET_KEY=
+# FRONTEND_URL=https://www.clear-commons.com
 DEBUG=

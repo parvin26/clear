@@ -105,13 +105,19 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins_list(self) -> List[str]:
-        """Parse CORS_ORIGINS from comma-separated string to list."""
+        """Parse CORS_ORIGINS from comma-separated string to list.
+        When empty or unset, includes localhost and production clear-commons origins so signup works."""
+        _default_origins = [
+            "http://localhost:3000", "http://127.0.0.1:3000",
+            "http://localhost:3003", "http://127.0.0.1:3003",
+            "https://www.clear-commons.com", "https://clear-commons.com",
+        ]
         if isinstance(self.CORS_ORIGINS, str):
             origins = [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
             if not origins:
-                origins = ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:3003", "http://127.0.0.1:3003"]
+                return _default_origins
             return origins
-        return self.CORS_ORIGINS if isinstance(self.CORS_ORIGINS, list) else []
+        return self.CORS_ORIGINS if isinstance(self.CORS_ORIGINS, list) else _default_origins
 
     model_config = SettingsConfigDict(
         env_file=_ENV_FILE if _ENV_FILE.exists() else ".env",
