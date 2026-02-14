@@ -210,12 +210,19 @@ CREATE INDEX IF NOT EXISTS idx_knowledge_chunks_embedding ON knowledge_chunks US
 
 1. Create or switch to a **pgvector-capable** Postgres (Railway pgvector template or Supabase).
 2. Set **backend** env vars (especially `DATABASE_URL` to pgvector, `OPENAI_API_KEY`, `CORS_ORIGINS`).
-3. **Redeploy the backend** so the **release** phase runs `alembic upgrade head` against the pgvector DB. Migrations in this repo now include:
-   - `z0enablepgvec` – runs `CREATE EXTENSION IF NOT EXISTS vector` (first on fresh DBs).
-   - `x2b3c4d5e6f7` – runs it again at the end of the chain (for existing DBs).
-   So you do **not** need to run `CREATE EXTENSION` manually unless you prefer to.
+3. **Run migrations** so tables (e.g. `finance_documents`) exist:
+   - **Option A (Railway):** Redeploy the **clear** service. The release phase runs `python -m alembic -c alembic.ini upgrade head` and creates tables on the pgvector DB.
+   - **Option B (from your PC):** Get the **public** database URL for pgvector from Railway (pgvector service → Variables → `DATABASE_PUBLIC_URL` or `DATABASE_URL` if you’re on the same network). From the repo, run:
+     ```powershell
+     cd c:\Users\parvi\clear\exec-connect\exec-connect\backend
+     $env:DATABASE_URL = "postgresql://user:pass@host:port/railway"   # paste pgvector public URL
+     .\scripts\run_migrations.ps1
+     ```
+   Migrations include `z0enablepgvec` (CREATE EXTENSION vector) and create all RAG tables.
 4. (Optional) Seed knowledge: from `backend/`, `python -m scripts.seed_knowledge_finance_ops` (use pgvector’s public URL if running from your machine).
 5. Deploy **frontend** on Vercel with backend URL in env (e.g. `NEXT_PUBLIC_API_URL`).
+
+**If you see `relation "finance_documents" does not exist`:** The pgvector database has no schema yet. Run migrations (Option A or B above).
 
 ### 5.5 Smoke test commands to confirm RAG works
 
