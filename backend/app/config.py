@@ -28,8 +28,8 @@ def model_supports_json_object(model: str) -> bool:
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
-    # Database
-    DATABASE_URL: str = "postgresql+psycopg://postgres:postgres@localhost:5432/exec_connect"
+    # Database (driver: psycopg2; URL normalized to postgresql+psycopg2://)
+    DATABASE_URL: str = "postgresql+psycopg2://postgres:postgres@localhost:5432/exec_connect"
     
     # OpenAI
     OPENAI_API_KEY: str = ""
@@ -78,16 +78,15 @@ class Settings(BaseSettings):
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
     def normalize_database_url(cls, v: str) -> str:
-        """Convert postgres URLs to postgresql+psycopg:// for psycopg3 (we use psycopg[binary], not psycopg2)."""
+        """Normalize postgres URLs to postgresql+psycopg2:// (we use psycopg2-binary)."""
         if not isinstance(v, str):
             return v
-        # Railway and others may provide postgresql+psycopg2://; we only have psycopg (v3)
-        if v.startswith("postgresql+psycopg2://"):
-            v = v.replace("postgresql+psycopg2://", "postgresql+psycopg://", 1)
-        elif v.startswith("postgresql://") and "+psycopg" not in v:
-            v = v.replace("postgresql://", "postgresql+psycopg://", 1)
-        elif v.startswith("postgres://") and "+psycopg" not in v:
-            v = v.replace("postgres://", "postgresql+psycopg://", 1)
+        if v.startswith("postgresql+psycopg://"):
+            v = v.replace("postgresql+psycopg://", "postgresql+psycopg2://", 1)
+        elif v.startswith("postgresql://") and "+psycopg2" not in v:
+            v = v.replace("postgresql://", "postgresql+psycopg2://", 1)
+        elif v.startswith("postgres://"):
+            v = v.replace("postgres://", "postgresql+psycopg2://", 1)
         return v
     
     @property

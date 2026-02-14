@@ -8,24 +8,33 @@ from app.config import settings
 
 
 def _normalize_db_url(url: str) -> str:
-    """Ensure URL uses postgresql+psycopg:// (psycopg v3). Railway may give postgresql+psycopg2://."""
+    """Ensure URL uses postgresql+psycopg2:// (psycopg2-binary)."""
     if not url or not isinstance(url, str):
         return url
-    if url.startswith("postgresql+psycopg2://"):
-        return url.replace("postgresql+psycopg2://", "postgresql+psycopg://", 1)
-    if url.startswith("postgresql://") and "+psycopg" not in url:
-        return url.replace("postgresql://", "postgresql+psycopg://", 1)
-    if url.startswith("postgres://") and "+psycopg" not in url:
-        return url.replace("postgres://", "postgresql+psycopg://", 1)
+    if url.startswith("postgresql+psycopg://"):
+        return url.replace("postgresql+psycopg://", "postgresql+psycopg2://", 1)
+    if url.startswith("postgresql://") and "+psycopg2" not in url:
+        return url.replace("postgresql://", "postgresql+psycopg2://", 1)
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+psycopg2://", 1)
     return url
 
 
-# Create SQLAlchemy engine with pgvector support (URL normalized for psycopg v3)
-engine = create_engine(
-    _normalize_db_url(settings.DATABASE_URL),
-    pool_pre_ping=True,
-    echo=False
-)
+# Create SQLAlchemy engine with pgvector support (URL normalized for psycopg2)
+try:
+    engine = create_engine(
+        _normalize_db_url(settings.DATABASE_URL),
+        pool_pre_ping=True,
+        echo=False
+    )
+except ModuleNotFoundError as e:
+    if "psycopg2" in str(e):
+        raise RuntimeError(
+            "Missing Postgres driver. Install psycopg2-binary (add psycopg2-binary>=2.9 to requirements.txt). "
+            "On Railway: ensure the backend service builds from the repo that includes psycopg2-binary. "
+            f"Original: {e}"
+        ) from e
+    raise
 
 # Create session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

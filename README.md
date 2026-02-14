@@ -53,10 +53,11 @@ exec-connect/
    ```
 
 2. **Configure environment:**
-   Create a `.env` file in the `backend/` directory:
+   Create a `.env` file in the `backend/` directory. Required for production (e.g. Railway): **DATABASE_URL**, **OPENAI_API_KEY**, **CORS_ORIGINS**. The backend uses the psycopg2 driver (URL scheme `postgresql+psycopg2://`).
    ```env
-   DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/exec_connect
+   DATABASE_URL=postgresql+psycopg2://postgres:postgres@localhost:5432/exec_connect
    OPENAI_API_KEY=your_openai_api_key_here
+   CORS_ORIGINS=http://localhost:3000,http://localhost:3003
    LLM_MODEL=gpt-5.1
    RAG_ENABLED=true
    RAG_TOP_K=4
