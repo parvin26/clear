@@ -6,7 +6,6 @@ from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session
 from sqlalchemy import text, select
 from openai import OpenAI
-import json
 
 from app.config import settings
 from app.db.models import (
@@ -182,17 +181,16 @@ def search_ops_docs(db: Session, query: str, top_k: Optional[int] = None) -> Lis
     return list(db.execute(stmt).scalars())
 
 
-# Technology Documents
+# Technology Documents (native pgvector: store list, search with <=>)
 def upsert_tech_document(db: Session, title: str, content: str) -> TechDocument:
-    """Insert or update a technical document with embedding."""
+    """Insert or update a technical document with embedding (native vector(1536))."""
     embedding = get_embedding(f"{title}\n\n{content}")
-    embedding_json = json.dumps(embedding) if embedding else None
     
     existing = db.query(TechDocument).filter(TechDocument.title == title).first()
     
     if existing:
         existing.content = content
-        existing.embedding = embedding_json
+        existing.embedding = embedding if embedding else None
         db.commit()
         db.refresh(existing)
         return existing
@@ -200,7 +198,7 @@ def upsert_tech_document(db: Session, title: str, content: str) -> TechDocument:
     doc = TechDocument(
         title=title,
         content=content,
-        embedding=embedding_json
+        embedding=embedding if embedding else None
     )
     db.add(doc)
     db.commit()
@@ -208,50 +206,39 @@ def upsert_tech_document(db: Session, title: str, content: str) -> TechDocument:
     return doc
 
 
-def cosine_similarity(vec1: List[float], vec2: List[float]) -> float:
-    """Calculate cosine similarity between two vectors."""
-    if not vec1 or not vec2 or len(vec1) != len(vec2):
-        return 0.0
-    
-    dot_product = sum(a * b for a, b in zip(vec1, vec2))
-    magnitude1 = sum(a * a for a in vec1) ** 0.5
-    magnitude2 = sum(b * b for b in vec2) ** 0.5
-    
-    if magnitude1 == 0 or magnitude2 == 0:
-        return 0.0
-    
-    return dot_product / (magnitude1 * magnitude2)
-
-
 def search_tech_docs(db: Session, query: str, top_k: int = 4) -> List[Dict[str, Any]]:
-    """Search technical documents using semantic similarity."""
+    """Search technical documents using pgvector cosine distance (<=>)."""
     if not settings.RAG_ENABLED:
         return []
     
-    query_embedding = get_embedding(query)
-    if not query_embedding:
-        return []
-    
-    docs = db.query(TechDocument).filter(TechDocument.embedding.isnot(None)).all()
-    
-    scored_docs = []
-    for doc in docs:
-        if not doc.embedding:
-            continue
+    try:
+        query_embedding = get_embedding(query)
+        if not query_embedding:
+            return []
         
-        try:
-            doc_embedding = json.loads(doc.embedding)
-            similarity = cosine_similarity(query_embedding, doc_embedding)
-            
-            scored_docs.append({
-                "title": doc.title,
-                "content": doc.content,
-                "similarity": similarity
-            })
-        except Exception as e:
-            print(f"Error processing document {doc.id}: {e}")
-            continue
-    
-    scored_docs.sort(key=lambda x: x["similarity"], reverse=True)
-    return scored_docs[:top_k]
+        embedding_str = "[" + ",".join(map(str, query_embedding)) + "]"
+        conn = db.connection().connection
+        
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT id, title, content
+                FROM tech_documents
+                WHERE embedding IS NOT NULL
+                ORDER BY embedding <=> %s::vector
+                LIMIT %s
+            """, (embedding_str, top_k))
+            results = cursor.fetchall()
+        
+        # Return same shape as before: list of dicts with title, content, similarity.
+        # Cosine similarity = 1 - cosine_distance; we don't have distance in cursor, so use 1.0 for "match".
+        docs = []
+        for row in results:
+            doc_id, title, content = row[0], row[1], row[2]
+            doc = db.query(TechDocument).filter(TechDocument.id == doc_id).first()
+            if doc:
+                docs.append({"title": doc.title, "content": doc.content, "similarity": 1.0})
+        return docs
+    except Exception as e:
+        print(f"Error searching tech docs: {e}")
+        return []
 

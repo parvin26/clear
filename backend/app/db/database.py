@@ -1,4 +1,6 @@
 """Database connection and session management."""
+from urllib.parse import urlparse, urlunparse
+
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 from typing import Generator
@@ -8,15 +10,28 @@ from app.config import settings
 
 
 def _normalize_db_url(url: str) -> str:
-    """Ensure URL uses postgresql+psycopg2:// (psycopg2-binary)."""
+    """Ensure URL uses postgresql+psycopg2:// and fix concatenated URLs (e.g. two URLs in one)."""
     if not url or not isinstance(url, str):
         return url
+    # Scheme normalization
     if url.startswith("postgresql+psycopg://"):
-        return url.replace("postgresql+psycopg://", "postgresql+psycopg2://", 1)
-    if url.startswith("postgresql://") and "+psycopg2" not in url:
-        return url.replace("postgresql://", "postgresql+psycopg2://", 1)
-    if url.startswith("postgres://"):
-        return url.replace("postgres://", "postgresql+psycopg2://", 1)
+        url = url.replace("postgresql+psycopg://", "postgresql+psycopg2://", 1)
+    elif url.startswith("postgresql://") and "+psycopg2" not in url:
+        url = url.replace("postgresql://", "postgresql+psycopg2://", 1)
+    elif url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql+psycopg2://", 1)
+    # Fix concatenated DATABASE_URL (e.g. internal + public pasted together): path must be a single segment
+    try:
+        parsed = urlparse(url)
+        path = (parsed.path or "").strip("/")
+        if "://" in path:
+            # Path looks like "railwaypostgresql+psycopg://..."; use only the real db name (before "postgresql")
+            first_segment = path.split("postgresql")[0].split("postgres")[0].strip("/") or "railway"
+            if not first_segment:
+                first_segment = "railway"
+            url = urlunparse(parsed._replace(path="/" + first_segment))
+    except Exception:
+        pass
     return url
 
 
@@ -44,12 +59,11 @@ Base = declarative_base()
 
 
 def get_db() -> Generator[Session, None, None]:
-    """Dependency for FastAPI to get database session."""
+    """Dependency for FastAPI to get database session.
+    pgvector extension is initialized at startup only (init_pgvector_extension in main.py).
+    """
     db = SessionLocal()
     try:
-        # Ensure pgvector extension is enabled
-        db.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
-        db.commit()
         yield db
     finally:
         db.close()
