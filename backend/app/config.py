@@ -78,14 +78,16 @@ class Settings(BaseSettings):
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
     def normalize_database_url(cls, v: str) -> str:
-        """Convert postgresql:// URLs to postgresql+psycopg:// for psycopg3 compatibility."""
-        if isinstance(v, str):
-            # Convert postgresql:// to postgresql+psycopg:// if not already converted
-            if v.startswith("postgresql://") and "+psycopg" not in v:
-                v = v.replace("postgresql://", "postgresql+psycopg://", 1)
-            # Also handle postgres:// format
-            elif v.startswith("postgres://") and "+psycopg" not in v:
-                v = v.replace("postgres://", "postgresql+psycopg://", 1)
+        """Convert postgres URLs to postgresql+psycopg:// for psycopg3 (we use psycopg[binary], not psycopg2)."""
+        if not isinstance(v, str):
+            return v
+        # Railway and others may provide postgresql+psycopg2://; we only have psycopg (v3)
+        if v.startswith("postgresql+psycopg2://"):
+            v = v.replace("postgresql+psycopg2://", "postgresql+psycopg://", 1)
+        elif v.startswith("postgresql://") and "+psycopg" not in v:
+            v = v.replace("postgresql://", "postgresql+psycopg://", 1)
+        elif v.startswith("postgres://") and "+psycopg" not in v:
+            v = v.replace("postgres://", "postgresql+psycopg://", 1)
         return v
     
     @property
