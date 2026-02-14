@@ -7,10 +7,33 @@ import { VoiceRecorder } from "@/lib/voice-recorder";
 import { transcribeAudio } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
+/** Window with optional Web Speech API (non-standard, not in DOM typings). */
+type WindowWithSpeech = Window & { SpeechRecognition?: unknown; webkitSpeechRecognition?: unknown };
+
+/** Result item from Web Speech API. */
+interface WebSpeechResultItem {
+  isFinal: boolean;
+  0: { transcript: string };
+  length: number;
+}
+/** Minimal type for Web Speech recognition instance (browser API, not in DOM typings). */
+interface WebSpeechRecognitionInstance {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start(): void;
+  stop(): void;
+  abort?(): void;
+  onresult: ((event: { resultIndex: number; results: { length: number; [key: number]: WebSpeechResultItem } }) => void) | null;
+  onend: (() => void) | null;
+  onerror: ((event: { error: string }) => void) | null;
+}
+
 /** True when SpeechRecognition is available (Chrome, Edge, Safari). */
 function isWebSpeechAvailable(): boolean {
   if (typeof window === "undefined") return false;
-  return !!(window.SpeechRecognition || (window as unknown as { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition);
+  const w = window as WindowWithSpeech;
+  return !!(w.SpeechRecognition || w.webkitSpeechRecognition);
 }
 
 export interface VoiceInputButtonProps {
@@ -42,7 +65,7 @@ export function VoiceInputButton({
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
   const recorderRef = useRef<VoiceRecorder | null>(null);
-  const recognitionRef = useRef<InstanceType<typeof SpeechRecognition> | null>(null);
+  const recognitionRef = useRef<WebSpeechRecognitionInstance | null>(null);
   const transcriptsRef = useRef<string[]>([]);
   const useWebSpeech = isWebSpeechAvailable();
 
@@ -108,14 +131,15 @@ export function VoiceInputButton({
   // Web Speech path: browser STT when available (no backend call)
   const startRecordingWebSpeech = useCallback(() => {
     if (recording || transcribing || disabled) return;
-    const SpeechRecognitionCtor = window.SpeechRecognition || (window as unknown as { webkitSpeechRecognition: typeof SpeechRecognition }).webkitSpeechRecognition;
-    if (!SpeechRecognitionCtor) return;
+    const w = typeof window !== "undefined" ? (window as WindowWithSpeech) : null;
+    const SpeechRecognitionCtor = w?.SpeechRecognition ?? w?.webkitSpeechRecognition;
+    if (!SpeechRecognitionCtor || typeof SpeechRecognitionCtor !== "function") return;
     transcriptsRef.current = [];
-    const recognition = new SpeechRecognitionCtor();
+    const recognition = new (SpeechRecognitionCtor as new () => WebSpeechRecognitionInstance)();
     recognition.continuous = true;
     recognition.interimResults = false;
     recognition.lang = "en-US";
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: { resultIndex: number; results: { length: number; [key: number]: WebSpeechResultItem } }) => {
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal && transcript) transcriptsRef.current.push(transcript);
@@ -129,7 +153,7 @@ export function VoiceInputButton({
       if (text) onTranscription(text);
       else onTranscription("[No speech detected. Try again or type.]");
     };
-    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+    recognition.onerror = (event: { error: string }) => {
       recognitionRef.current = null;
       setRecording(false);
       setTranscribing(false);
@@ -170,7 +194,7 @@ export function VoiceInputButton({
     return () => {
       const rec = recognitionRef.current;
       if (rec) {
-        try { rec.abort(); } catch { /* noop */ }
+        try { rec.abort?.(); } catch { /* noop */ }
         recognitionRef.current = null;
       }
     };
