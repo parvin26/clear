@@ -68,8 +68,13 @@ async def lifespan(app: FastAPI):
     print(f"OPENAI_API_KEY: ...{key[-4:] if len(key) >= 4 else '(not set)'}")
     print(f"OpenAI Model: {settings.LLM_MODEL}")
     print(f"RAG Enabled: {settings.RAG_ENABLED}")
-    wispr = settings.WISPR_API_KEY or ""
-    print(f"Wispr voice input: {'configured' if wispr else 'not configured (set WISPR_API_KEY to enable)'}")
+    stt = getattr(settings, "STT_PROVIDER", "openai")
+    if stt == "wispr":
+        wispr = settings.WISPR_API_KEY or ""
+        print(f"Voice input (Wispr): {'configured' if wispr else 'not configured (set WISPR_API_KEY to enable)'}")
+    else:
+        key = settings.OPENAI_API_KEY or ""
+        print(f"Voice input (OpenAI Whisper): {'configured' if key else 'not configured (set OPENAI_API_KEY to enable)'}")
 
     # Fail fast: ensure Postgres driver is available
     try:

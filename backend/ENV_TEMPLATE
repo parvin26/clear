@@ -4,7 +4,9 @@
 # LLM_MODEL=gpt-4o-mini
 # RAG_ENABLED=true
 # RAG_TOP_K=4
-# WISPR_API_KEY=   # Optional: Wispr Flow API key for voice input in chats/diagnostics
+# STT_PROVIDER=openai   # Voice input: openai (Whisper, default) or wispr. Set wispr to use Wispr Flow.
+# STT_OPENAI_MODEL=whisper-1
+# WISPR_API_KEY=   # Optional: only when STT_PROVIDER=wispr
 # CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 # DEBUG=false
 
@@ -13,6 +15,8 @@ OPENAI_API_KEY=
 LLM_MODEL=
 RAG_ENABLED=
 RAG_TOP_K=
+STT_PROVIDER=
+STT_OPENAI_MODEL=
 WISPR_API_KEY=
 CORS_ORIGINS=
 DEBUG=
