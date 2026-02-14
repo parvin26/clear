@@ -22,65 +22,83 @@ def upgrade() -> None:
     conn = op.get_bind()
 
     # ---- 1. Fix function search_path (Security Advisor: Function Search Path Mutable) ----
-    op.execute("ALTER FUNCTION IF EXISTS public.rtco_forbid_update_delete() SET search_path = public")
-    op.execute("ALTER FUNCTION IF EXISTS public.clear_forbid_update_delete() SET search_path = public")
-    op.execute("ALTER FUNCTION IF EXISTS public.clear_forbid_update_delete_context() SET search_path = public")
+    # PostgreSQL does not support ALTER FUNCTION IF EXISTS; use DO block.
+    op.execute("""
+        DO $$
+        BEGIN
+            IF EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid WHERE n.nspname = 'public' AND p.proname = 'rtco_forbid_update_delete') THEN
+                ALTER FUNCTION public.rtco_forbid_update_delete() SET search_path = public;
+            END IF;
+            IF EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid WHERE n.nspname = 'public' AND p.proname = 'clear_forbid_update_delete') THEN
+                ALTER FUNCTION public.clear_forbid_update_delete() SET search_path = public;
+            END IF;
+            IF EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid WHERE n.nspname = 'public' AND p.proname = 'clear_forbid_update_delete_context') THEN
+                ALTER FUNCTION public.clear_forbid_update_delete_context() SET search_path = public;
+            END IF;
+        END $$;
+    """)
 
-    # ---- 2. Enable RLS on all tables in public schema ----
-    result = conn.execute(
-        sa.text(
-            """
-            SELECT tablename
-            FROM pg_tables
-            WHERE schemaname = 'public'
-            ORDER BY tablename
-            """
-        )
-    )
-    tables = [row[0] for row in result]
-
-    for table in tables:
-        # Enable RLS (idempotent: no-op if already enabled)
-        op.execute(sa.text(f'ALTER TABLE public."{table}" ENABLE ROW LEVEL SECURITY'))
-
-        policy_name = "service_role_full_access"
-        # Drop if exists so migration is idempotent
-        op.execute(
+    # ---- 2. Enable RLS on all tables (Supabase only: service_role exists) ----
+    # On Railway/plain Postgres there is no service_role; skip RLS so migration succeeds.
+    # On Supabase, service_role exists and we enable RLS + policy for Security Advisor.
+    role_check = conn.execute(sa.text("SELECT 1 FROM pg_roles WHERE rolname = 'service_role'"))
+    if role_check.fetchone():
+        result = conn.execute(
             sa.text(
-                f'DROP POLICY IF EXISTS "{policy_name}" ON public."{table}"'
+                """
+                SELECT tablename
+                FROM pg_tables
+                WHERE schemaname = 'public'
+                ORDER BY tablename
+                """
             )
         )
-        op.execute(
-            sa.text(
-                f'''CREATE POLICY "{policy_name}" ON public."{table}"
-                FOR ALL TO service_role USING (true) WITH CHECK (true)'''
+        tables = [row[0] for row in result]
+        for table in tables:
+            op.execute(sa.text(f'ALTER TABLE public."{table}" ENABLE ROW LEVEL SECURITY'))
+            policy_name = "service_role_full_access"
+            op.execute(sa.text(f'DROP POLICY IF EXISTS "{policy_name}" ON public."{table}"'))
+            op.execute(
+                sa.text(
+                    f'''CREATE POLICY "{policy_name}" ON public."{table}"
+                    FOR ALL TO service_role USING (true) WITH CHECK (true)'''
+                )
             )
-        )
 
 
 def downgrade() -> None:
     conn = op.get_bind()
 
-    # Remove RLS policies and disable RLS
-    result = conn.execute(
-        sa.text(
-            """
-            SELECT tablename
-            FROM pg_tables
-            WHERE schemaname = 'public'
-            ORDER BY tablename
-            """
+    # Remove RLS policies and disable RLS only if we're on Supabase (service_role exists)
+    role_check = conn.execute(sa.text("SELECT 1 FROM pg_roles WHERE rolname = 'service_role'"))
+    if role_check.fetchone():
+        result = conn.execute(
+            sa.text(
+                """
+                SELECT tablename
+                FROM pg_tables
+                WHERE schemaname = 'public'
+                ORDER BY tablename
+                """
+            )
         )
-    )
-    tables = [row[0] for row in result]
-
-    for table in tables:
-        op.execute(
-            sa.text(f'DROP POLICY IF EXISTS "service_role_full_access" ON public."{table}"')
-        )
-        op.execute(sa.text(f'ALTER TABLE public."{table}" DISABLE ROW LEVEL SECURITY'))
+        tables = [row[0] for row in result]
+        for table in tables:
+            op.execute(sa.text(f'DROP POLICY IF EXISTS "service_role_full_access" ON public."{table}"'))
+            op.execute(sa.text(f'ALTER TABLE public."{table}" DISABLE ROW LEVEL SECURITY'))
 
     # Reset function search_path (optional; leave as public is safe)
-    op.execute("ALTER FUNCTION IF EXISTS public.rtco_forbid_update_delete() RESET search_path")
-    op.execute("ALTER FUNCTION IF EXISTS public.clear_forbid_update_delete() RESET search_path")
-    op.execute("ALTER FUNCTION IF EXISTS public.clear_forbid_update_delete_context() RESET search_path")
+    op.execute("""
+        DO $$
+        BEGIN
+            IF EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid WHERE n.nspname = 'public' AND p.proname = 'rtco_forbid_update_delete') THEN
+                ALTER FUNCTION public.rtco_forbid_update_delete() RESET search_path;
+            END IF;
+            IF EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid WHERE n.nspname = 'public' AND p.proname = 'clear_forbid_update_delete') THEN
+                ALTER FUNCTION public.clear_forbid_update_delete() RESET search_path;
+            END IF;
+            IF EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid WHERE n.nspname = 'public' AND p.proname = 'clear_forbid_update_delete_context') THEN
+                ALTER FUNCTION public.clear_forbid_update_delete_context() RESET search_path;
+            END IF;
+        END $$;
+    """)

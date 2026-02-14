@@ -11,6 +11,11 @@ if (-not $env:DATABASE_URL) {
     exit 1
 }
 Write-Host "Running migrations (database from DATABASE_URL)..." -ForegroundColor Cyan
-python -m alembic -c alembic.ini upgrade head
+$alembicExe = Join-Path $BackendDir "venv\Scripts\alembic.exe"
+if (Test-Path $alembicExe) {
+    & $alembicExe -c alembic.ini upgrade head
+} else {
+    alembic -c alembic.ini upgrade head
+}
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 Write-Host "[OK] Migrations done." -ForegroundColor Green
