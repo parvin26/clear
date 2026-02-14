@@ -154,7 +154,7 @@ export default function AdvisorDecisionPage() {
             <div className="flex flex-wrap gap-2 mt-2">
               {artifactData?.decision_context != null ? (
                 <Badge variant="outline">
-                  {String(contextFromFounder.primary_domain ?? "—")}
+                  {String(contextFromFounder.primary_domain ?? "-")}
                 </Badge>
               ) : null}
               {readiness != null ? <Badge variant="secondary">{String(readiness.band)}</Badge> : null}
@@ -236,7 +236,7 @@ export default function AdvisorDecisionPage() {
                   <ul className="space-y-2">
                     {emrMilestones.map((m) => (
                       <li key={m.id || ""} className="border rounded-md p-2 text-sm">
-                        <span className="font-medium">{m.title ?? "—"}</span>
+                        <span className="font-medium">{m.title ?? "-"}</span>
                         <span className="text-muted-foreground ml-2">{m.owner ?? ""}</span>
                         <span className="text-muted-foreground ml-2">{m.due_date ? new Date(m.due_date).toLocaleDateString() : ""}</span>
                         <span className="ml-2 text-muted-foreground">({m.status ?? "pending"})</span>
@@ -295,7 +295,7 @@ export default function AdvisorDecisionPage() {
                   <>
                     <div className="rounded-md border bg-muted/30 p-4">
                       <p className="text-xs font-medium text-muted-foreground uppercase mb-1">Your latest review</p>
-                      <p className="text-sm">{latestReview.created_at ? new Date(latestReview.created_at).toLocaleDateString() : ""} · {latestReview.headline_assessment ?? "—"}</p>
+                      <p className="text-sm">{latestReview.created_at ? new Date(latestReview.created_at).toLocaleDateString() : ""} · {latestReview.headline_assessment ?? "-"}</p>
                       {latestReview.confidence && <Badge variant="secondary" className="mt-1">{latestReview.confidence}</Badge>}
                     </div>
                     <p className="text-sm text-muted-foreground">You can add another review below; past versions remain in history.</p>

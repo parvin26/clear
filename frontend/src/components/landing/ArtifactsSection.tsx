@@ -17,7 +17,7 @@ const ARTIFACTS = [
     id: "03",
     title: "Outcome review",
     description:
-      "What worked, what didn't, and the key learnings — recorded, not forgotten.",
+      "What worked, what didn't, and the key learnings, recorded, not forgotten.",
   },
   {
     id: "04",

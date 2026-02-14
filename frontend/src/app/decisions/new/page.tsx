@@ -132,7 +132,7 @@ export default function NewDecisionPage() {
                 value={enterpriseId}
                 onChange={(e) => setEnterpriseId(e.target.value)}
               >
-                <option value="">— None —</option>
+                <option value="">- None -</option>
                 {enterprises.map((e) => (
                   <option key={e.id} value={e.id}>
                     {e.name || `Enterprise ${e.id}`} {e.sector ? `(${e.sector})` : ""}

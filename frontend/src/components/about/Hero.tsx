@@ -17,7 +17,7 @@ export function Hero() {
             </h1>
 
             <p className="text-[17px] text-[#1F2A37]/65 font-normal leading-relaxed mb-10 max-w-[480px]">
-              We build the decision infrastructure that growing businesses need — so founders stop
+              We build the decision infrastructure that growing businesses need. So founders stop
               guessing and teams start governing.
             </p>
 

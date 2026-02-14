@@ -7,19 +7,19 @@ Use this before pushing to git and when deploying to Vercel so the site is safe 
 ## Critical before pushing to Git
 
 ### 1. No secrets in the repo
-- [ ] **`.env` and `.env.local` are not committed** — They are listed in `.gitignore` (`backend/.env`, `frontend/.env.local`). Confirm with `git status` that they do not appear as staged or untracked.
-- [ ] **No API keys or passwords in code** — All secrets belong in environment variables (e.g. `OPENAI_API_KEY`, `DATABASE_URL`). The repo uses `NEXT_PUBLIC_API_URL` / `NEXT_PUBLIC_API_BASE_URL` and backend `ENV_TEMPLATE` with placeholders only.
-- [ ] **`backend/exec/` is ignored** — This is the legacy venv; it must not be committed (already in `.gitignore`).
+- [ ] **`.env` and `.env.local` are not committed** : They are listed in `.gitignore` (`backend/.env`, `frontend/.env.local`). Confirm with `git status` that they do not appear as staged or untracked.
+- [ ] **No API keys or passwords in code** : All secrets belong in environment variables (e.g. `OPENAI_API_KEY`, `DATABASE_URL`). The repo uses `NEXT_PUBLIC_API_URL` / `NEXT_PUBLIC_API_BASE_URL` and backend `ENV_TEMPLATE` with placeholders only.
+- [ ] **`backend/exec/` is ignored** : This is the legacy venv; it must not be committed (already in `.gitignore`).
 
 ### 2. Build and type-check
-- [ ] **Frontend builds** — From repo root: `cd frontend && npm run build` (or `npm run build` in `frontend`). Fix any TypeScript or build errors before pushing.
-- [ ] **Optional: type-check only** — `cd frontend && npx tsc --noEmit` to verify types without a full build.
+- [ ] **Frontend builds** : From repo root: `cd frontend && npm run build` (or `npm run build` in `frontend`). Fix any TypeScript or build errors before pushing.
+- [ ] **Optional: type-check only** : `cd frontend && npx tsc --noEmit` to verify types without a full build.
 
 ### 3. What you can safely commit
-- **Modified and new app code** — All frontend/backend app and config changes you intend to deploy.
-- **`backend/ENV_TEMPLATE`** — Safe; it contains only placeholder variable names, no real values.
-- **Docs and migrations** — `docs/`, `backend/docs/`, `backend/alembic/versions/` as needed for your release.
-- **New pages and CLEAR blocks** — e.g. `frontend/src/app/governance`, `for-enterprises`, `for-partners`, `pricing`, `guided-start`, `frontend/src/components/clear-blocks/`.
+- **Modified and new app code** : All frontend/backend app and config changes you intend to deploy.
+- **`backend/ENV_TEMPLATE`** : Safe; it contains only placeholder variable names, no real values.
+- **Docs and migrations** : `docs/`, `backend/docs/`, `backend/alembic/versions/` as needed for your release.
+- **New pages and CLEAR blocks** : e.g. `frontend/src/app/governance`, `for-enterprises`, `for-partners`, `pricing`, `guided-start`, `frontend/src/components/clear-blocks/`.
 
 ### 4. Optional but recommended
 - [ ] Run **`npm run lint`** in `frontend` and fix critical lint issues.

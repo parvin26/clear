@@ -1,10 +1,10 @@
-# Launch checklist — built vs missing
+# Launch checklist: built vs missing
 
 Use this with the [Pre-push and deployment checklist](PRE_PUSH_AND_DEPLOYMENT_CHECKLIST.md) before deploy. It tracks the eight launch areas and what is **built** vs **missing**.
 
 ---
 
-## 1. Blocking build issue — FIXED
+## 1. Blocking build issue: FIXED
 
 | Item | Status | Notes |
 |------|--------|--------|
@@ -15,7 +15,7 @@ Use this with the [Pre-push and deployment checklist](PRE_PUSH_AND_DEPLOYMENT_CH
 
 ---
 
-## 2. Required pages — built vs missing
+## 2. Required pages: built vs missing
 
 | Page | Route | Built? | What exists / what's missing |
 |------|--------|--------|------------------------------|
@@ -31,7 +31,7 @@ Use this with the [Pre-push and deployment checklist](PRE_PUSH_AND_DEPLOYMENT_CH
 
 ---
 
-## 3. Partner onboarding capture — missing
+## 3. Partner onboarding capture: missing
 
 | Item | Status | Notes |
 |------|--------|--------|
@@ -41,7 +41,7 @@ Use this with the [Pre-push and deployment checklist](PRE_PUSH_AND_DEPLOYMENT_CH
 
 ---
 
-## 4. Guided start booking or fallback — missing
+## 4. Guided start booking or fallback: missing
 
 | Item | Status | Notes |
 |------|--------|--------|
@@ -50,7 +50,7 @@ Use this with the [Pre-push and deployment checklist](PRE_PUSH_AND_DEPLOYMENT_CH
 
 ---
 
-## 5. Snapshots operational — not verified in this pass
+## 5. Snapshots operational: not verified in this pass
 
 | Item | Status | Notes |
 |------|--------|--------|
@@ -59,7 +59,7 @@ Use this with the [Pre-push and deployment checklist](PRE_PUSH_AND_DEPLOYMENT_CH
 
 ---
 
-## 6. Partner nav gating — optional for launch
+## 6. Partner nav gating: optional for launch
 
 | Item | Status | Notes |
 |------|--------|--------|
@@ -68,7 +68,7 @@ Use this with the [Pre-push and deployment checklist](PRE_PUSH_AND_DEPLOYMENT_CH
 
 ---
 
-## 7. Launch-grade instrumentation — missing / not verified
+## 7. Launch-grade instrumentation: missing / not verified
 
 | Item | Status | Notes |
 |------|--------|--------|
@@ -80,7 +80,7 @@ Use this with the [Pre-push and deployment checklist](PRE_PUSH_AND_DEPLOYMENT_CH
 
 ---
 
-## 8. Conversion routing — partial
+## 8. Conversion routing: partial
 
 | Rule | Status | Notes |
 |------|--------|--------|

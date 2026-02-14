@@ -25,7 +25,7 @@ export default function DiagnosticEntryPage() {
             </p>
             {hasProfile && (
               <p className="text-xs text-ink-muted mt-2">
-                We have your profile (name, industry, or region) — you can still pick either path.
+                We have your profile (name, industry, or region). You can still pick either path.
               </p>
             )}
           </div>

@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Loader2 } from "lucide-react";
 
 /**
- * Phase 4 — Screen A: Portfolios list (read-only).
+ * Phase 4: Screen A: Portfolios list (read-only).
  * Columns: name, institution (id), created_at. Row click → portfolio detail.
  */
 export default function PortfoliosListPage() {
@@ -85,9 +85,9 @@ export default function PortfoliosListPage() {
                         {p.name}
                       </Link>
                     </TableCell>
-                    <TableCell>—</TableCell>
-                    <TableCell>—</TableCell>
-                    <TableCell>{p.created_at ?? "—"}</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell>{p.created_at ?? "-"}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

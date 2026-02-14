@@ -46,6 +46,21 @@ jobs:
         working-directory: backend
         run: python -m pytest tests/test_contract_endpoint.py -v
 
+  no-em-dash:
+    name: No em dash in source/copy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for em dashes
+        run: |
+          FOUND=0
+          for f in $(git ls-files '*.tsx' '*.ts' '*.md' '*.py' 2>/dev/null | grep -E '^(frontend/src|backend/app|backend/scripts|docs)/' || true); do
+            [ -f "$f" ] || continue
+            if grep -q '—' "$f" 2>/dev/null; then echo "Em dash found: $f"; FOUND=1; fi
+          done
+          [ "$FOUND" -eq 0 ] || { echo "Remove em dashes (—) from the listed files."; exit 1; }
+          echo "OK: no em dashes in tracked source/copy."
+
   stress-test-10-persona:
     name: 10-persona stress test (pre-release)
     runs-on: ubuntu-latest

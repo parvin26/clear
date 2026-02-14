@@ -22,7 +22,7 @@ alwaysApply: false
    - Or restrict motion to **below-the-fold** or non-critical elements (e.g. cards that appear on scroll).
 
 3. **Existing examples to follow**
-   - `frontend/src/components/landing/HeroSection.tsx` — hero uses static `div`s and `min-h-[480px]`.
-   - `frontend/src/components/about/AboutHero.tsx` — about hero uses static `div`s and `min-h-[320px]`.
+   - `frontend/src/components/landing/HeroSection.tsx`: hero uses static `div`s and `min-h-[480px]`.
+   - `frontend/src/components/about/AboutHero.tsx`: about hero uses static `div`s and `min-h-[320px]`.
 
 This prevents "missing hero" or blank sections on any page.

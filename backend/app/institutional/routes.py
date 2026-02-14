@@ -1,4 +1,4 @@
-"""Phase 4: Institutional APIs — portfolios, enterprise snapshot, exports, cohorts."""
+"""Phase 4: Institutional APIs (portfolios, enterprise snapshot, exports, cohorts)."""
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import Response

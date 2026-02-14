@@ -42,7 +42,7 @@ Write-Host "`nSmoke test (API: $BaseUrl)" -ForegroundColor Cyan
 if (-not (Invoke-Smoke -Method GET -Url "$BaseUrl/api/health")) { $failed++ }
 else { Write-Host "OK  GET /api/health" -ForegroundColor Green }
 
-# 2) GET /api/demo — must return enterprises and portfolios
+# 2) GET /api/demo: must return enterprises and portfolios
 $demo = Get-SmokeJson -Method GET -Url "$BaseUrl/api/demo"
 if (-not $demo) { $failed++ }
 elseif (-not ($demo.enterprises -is [Array]) -or -not ($demo.portfolios -is [Array])) {
@@ -67,7 +67,7 @@ try {
     }
 }
 
-# 4) GET /api/institutional/cohorts — auth required; skip if no token
+# 4) GET /api/institutional/cohorts: auth required; skip if no token
 if ($AuthToken) {
     if (-not (Invoke-Smoke -Method GET -Url "$BaseUrl/api/institutional/cohorts" -Headers @{ "Authorization" = $AuthToken })) { $failed++ }
     else { Write-Host "OK  GET /api/institutional/cohorts" -ForegroundColor Green }

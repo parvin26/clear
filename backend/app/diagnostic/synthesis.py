@@ -356,7 +356,7 @@ CLARIFIER_MILESTONE_HINTS: dict[str, tuple[str, str]] = {
     "sales are declining or unstable": ("Define ICP and 3-step sales process", "Founder"),
     "too many decisions depend on me": ("Set execution cadence and top 3 priorities", "Founder"),
     "operations feel messy or fragile": ("Document core processes and one owner per area", "Ops lead"),
-    "i'm not sure — it's complicated": ("Clarify the single biggest bottleneck", "Founder"),
+    "i'm not sure; it's complicated": ("Clarify the single biggest bottleneck", "Founder"),
 }
 
 def _recommended_first_milestones(
@@ -365,7 +365,7 @@ def _recommended_first_milestones(
     diagnostic_data: dict | None = None,
     onboarding_context: dict | None = None,
 ) -> list[dict[str, Any]]:
-    """2–5 milestone-like items: use situationClarifiers for specific labels and owner, else action_plan."""
+    """2-5 milestone-like items: use situationClarifiers for specific labels and owner, else action_plan."""
     out = agent_outputs.get(primary) or {}
     ap = out.get("action_plan") or {}
     clarifiers = [c for c in (diagnostic_data.get("situationClarifiers") or []) if c]

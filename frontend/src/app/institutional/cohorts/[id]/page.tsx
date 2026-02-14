@@ -118,7 +118,7 @@ export default function CohortDetailPage() {
               <CardContent className="pt-5 pb-5">
                 <p className="text-sm text-ink-muted font-medium">Avg health score</p>
                 <p className="text-2xl font-bold text-ink mt-1">
-                  {summary.average_health_score != null ? summary.average_health_score : "—"}
+                  {summary.average_health_score != null ? summary.average_health_score : "-"}
                 </p>
               </CardContent>
             </Card>
@@ -198,7 +198,7 @@ export default function CohortDetailPage() {
                           )}
                         </TableCell>
                         <TableCell>
-                          {row.health_score != null ? row.health_score : "—"}
+                          {row.health_score != null ? row.health_score : "-"}
                         </TableCell>
                         <TableCell>
                           {row.decision_velocity?.velocity_band ? (
@@ -214,7 +214,7 @@ export default function CohortDetailPage() {
                               {row.decision_velocity.velocity_band}
                             </Badge>
                           ) : (
-                            "—"
+                            "-"
                           )}
                           {row.decision_velocity?.avg_cycle_days != null && (
                             <span className="text-xs text-ink-muted ml-1">

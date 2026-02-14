@@ -1,4 +1,4 @@
-"""Phase 4: Institutional service — portfolios, enterprise snapshots."""
+"""Phase 4: Institutional service (portfolios, enterprise snapshots)."""
 from uuid import UUID
 from typing import Any, Optional
 

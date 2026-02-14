@@ -84,7 +84,7 @@ async def send_otp_email(to_email: str, otp: str) -> Tuple[bool, Optional[str]]:
     <div style="font-family: sans-serif; max-width: 400px;">
       <p>Your verification code is: <strong>{otp}</strong></p>
       <p>It expires in 15 minutes. If you didn't request this, you can ignore this email.</p>
-      <p>— CLEAR</p>
+      <p>- CLEAR</p>
     </div>
     """
     ok, err = await send_email(to_email, subject, html)
@@ -140,7 +140,7 @@ async def send_magic_link_email(to_email: str, magic_link_url: str) -> bool:
       <p>Click the link below to sign in to your CLEAR account:</p>
       <p><a href="{magic_link_url}" style="display: inline-block; padding: 10px 20px; background: #1D4ED8; color: white; text-decoration: none; border-radius: 8px;">Sign in to CLEAR</a></p>
       <p>This link expires in 15 minutes. If you didn't request it, you can ignore this email.</p>
-      <p>— CLEAR</p>
+      <p>- CLEAR</p>
     </div>
     """
     return _success_only(await send_email(to_email, subject, html))
@@ -172,7 +172,7 @@ async def send_activation_reminder_email(
       <p><strong>{display_name}</strong> started on CLEAR {nudge_day} day(s) ago. Here's your next step:</p>
       <p style="font-size: 1.1em; color: #1D4ED8;"><strong>{message}</strong></p>
       <p><a href="{settings.FRONTEND_URL}/dashboard" style="display: inline-block; padding: 10px 20px; background: #1D4ED8; color: white; text-decoration: none; border-radius: 8px;">Open CLEAR Dashboard</a></p>
-      <p>— CLEAR</p>
+      <p>- CLEAR</p>
     </div>
     """
     return await send_email(to_email, subject, html)

@@ -32,8 +32,8 @@ python scripts/seed_portfolios.py
 ## Where to see it
 
 - **Institutional portfolios list:** `/institutional/portfolios` (or “Portfolios” from role selector).
-- **Portfolio detail:** `/institutional/portfolios/{id}` — enterprises with last decision, readiness band, primary domain, last review date, plan committed.
-- **Dashboard:** `/dashboard` — lists decisions (all enterprises’ decisions will appear if the app lists by current user/context; otherwise ensure you’re viewing in a context that includes these enterprises).
+- **Portfolio detail:** `/institutional/portfolios/{id}`: enterprises with last decision, readiness band, primary domain, last review date, plan committed.
+- **Dashboard:** `/dashboard`: lists decisions (all enterprises’ decisions will appear if the app lists by current user/context; otherwise ensure you’re viewing in a context that includes these enterprises).
 
 ## Re-run
 

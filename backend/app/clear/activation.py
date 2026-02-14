@@ -1,5 +1,5 @@
 """
-CLEAR Activation Engine — server-side progress for first decision cycle.
+CLEAR Activation Engine: server-side progress for first decision cycle.
 Derives activation state from enterprise's decisions, milestones, artifacts, outcome reviews.
 Used by GET /api/clear/enterprises/:id/activation and for cohort rollout (Layer 5).
 """

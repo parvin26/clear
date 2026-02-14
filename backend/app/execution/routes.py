@@ -1,4 +1,4 @@
-"""Phase 2: Execution APIs — tasks + milestones."""
+"""Phase 2: Execution APIs (tasks + milestones)."""
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 

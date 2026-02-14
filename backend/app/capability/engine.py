@@ -1,4 +1,4 @@
-"""Phase 3: Capability engine — compute and persist capability_scores and financing_readiness from analyses (+ optional tasks/outcomes)."""
+"""Phase 3: Capability engine: compute and persist capability_scores and financing_readiness from analyses (+ optional tasks/outcomes)."""
 from decimal import Decimal
 from uuid import UUID
 from typing import Any, Optional

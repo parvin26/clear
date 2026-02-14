@@ -21,7 +21,7 @@ export function ActivationChecklist({ progress, firstDecisionId }: ActivationChe
     return (
       <Card className="border-primary/20 bg-primary/5">
         <CardContent className="pt-6 pb-6">
-          <p className="font-semibold text-ink mb-1">First CLEAR cycle completed — start next decision</p>
+          <p className="font-semibold text-ink mb-1">First CLEAR cycle completed. Start next decision</p>
           <p className="text-sm text-ink-muted mb-4">
             You’ve run a diagnostic, finalized a decision, set milestones, and scheduled a review.
           </p>

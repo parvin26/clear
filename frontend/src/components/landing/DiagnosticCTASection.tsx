@@ -12,7 +12,7 @@ export function DiagnosticCTASection() {
             Start with clarity
           </h2>
           <p className="text-ink-muted leading-relaxed">
-            The diagnostic takes under 7 minutes. You receive a clear capability map and a focused decision to work on next—no advice dump, no obligation.
+            The diagnostic takes under 7 minutes. You receive a clear capability map and a focused decision to work on next. No advice dump, no obligation.
           </p>
           <Button size="lg" className="text-base px-8 py-6" asChild>
             <Link href="/diagnostic/run">Start capability diagnostic</Link>

@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "CLEAR – Capability diagnostic and execution",
+  title: "CLEAR: Capability diagnostic and execution",
   description: "Turn messy business problems into a disciplined plan. Diagnose, agree a plan, and track execution.",
   icons: {
     icon: "/favicon.png",

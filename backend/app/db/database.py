@@ -6,9 +6,23 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 
-# Create SQLAlchemy engine with pgvector support
+
+def _normalize_db_url(url: str) -> str:
+    """Ensure URL uses postgresql+psycopg:// (psycopg v3). Railway may give postgresql+psycopg2://."""
+    if not url or not isinstance(url, str):
+        return url
+    if url.startswith("postgresql+psycopg2://"):
+        return url.replace("postgresql+psycopg2://", "postgresql+psycopg://", 1)
+    if url.startswith("postgresql://") and "+psycopg" not in url:
+        return url.replace("postgresql://", "postgresql+psycopg://", 1)
+    if url.startswith("postgres://") and "+psycopg" not in url:
+        return url.replace("postgres://", "postgresql+psycopg://", 1)
+    return url
+
+
+# Create SQLAlchemy engine with pgvector support (URL normalized for psycopg v3)
 engine = create_engine(
-    settings.DATABASE_URL,
+    _normalize_db_url(settings.DATABASE_URL),
     pool_pre_ping=True,
     echo=False
 )

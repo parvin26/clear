@@ -148,7 +148,7 @@ function ResourcesContent() {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base">{p.title}</CardTitle>
                     <p className="text-xs text-ink-muted">
-                      {TYPE_LABELS[p.type]} – {DOMAIN_LABELS[p.domain]}
+                      {TYPE_LABELS[p.type]} · {DOMAIN_LABELS[p.domain]}
                     </p>
                   </CardHeader>
                   <CardContent className="pt-0">

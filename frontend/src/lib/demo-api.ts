@@ -1,4 +1,4 @@
-/** CLEAR demo mode API — read-only fixtures. */
+/** CLEAR demo mode API: read-only fixtures. */
 import axios from "axios";
 
 const API_BASE_URL =

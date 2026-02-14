@@ -1,4 +1,4 @@
-# CLEAR runbook — guest flow (decision governance, EMR, outcome review, readiness, chat)
+# CLEAR runbook: guest flow (decision governance, EMR, outcome review, readiness, chat)
 
 **Purpose:** Step-by-step verification that the extended CLEAR flow works end-to-end for a guest user.
 
@@ -31,9 +31,9 @@
 
 4. **View and tweak EMR**
    - Open the **Execution** tab.
-   - **EMR — Milestones**: list of milestones from the artifact (title, owner, due_date) with status dropdown (pending / in_progress / done). Change status to update the artifact.
-   - **EMR — Metrics**: name, target+unit, actual (editable); source label.
-   - **EMR — Config**: cadence and next_review_date; you can change the next review date.
+   - **EMR: Milestones**: list of milestones from the artifact (title, owner, due_date) with status dropdown (pending / in_progress / done). Change status to update the artifact.
+   - **EMR: Metrics**: name, target+unit, actual (editable); source label.
+   - **EMR: Config**: cadence and next_review_date; you can change the next review date.
    - All EMR edits are saved via PATCH to the decision artifact.
 
 5. **Readiness to approve (soft warning)**
@@ -47,7 +47,7 @@
    - Click it to open the outcome review form (summary, what_worked, what_did_not_work, key_learnings, assumptions_validated, assumptions_broken, readiness_impact −1/0/+1).
    - Submit → POST `/api/clear/decisions/{id}/outcome-review`; the new review appears in the list below. Previous reviews are always listed with date and summary.
 
-8. **Chat tab — seeded first message**
+8. **Chat tab: seeded first message**
    - Open the **Chat** tab (e.g. from result page: “Talk to AI advisor” → `/decisions/{id}?tab=chat&from_diagnostic=1`).
    - The app calls `POST /api/clear/decisions/{id}/chat/start` once; you see the **initial assistant message** (greeting, restated decision, one next question).
    - Type in the input and Send → `POST .../chat/message` with session_id and message; the assistant reply appears in the thread. Domain chat links (Finance, Growth, Ops, Tech) remain available.

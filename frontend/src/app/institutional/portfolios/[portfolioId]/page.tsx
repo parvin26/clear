@@ -171,7 +171,7 @@ export default function PortfolioDetailPage() {
               <strong className="text-ink">
                 {(() => {
                   const withEcri = enterprises.filter((e) => e.readiness_index != null);
-                  if (withEcri.length === 0) return "—";
+                  if (withEcri.length === 0) return "-";
                   const avg = withEcri.reduce((s, e) => s + (e.readiness_index ?? 0), 0) / withEcri.length;
                   return `${Math.round(avg)} / 100`;
                 })()}
@@ -191,7 +191,7 @@ export default function PortfolioDetailPage() {
               <strong className="text-ink">
                 {(() => {
                   const withVel = enterprises.filter((e) => e.avg_cycle_days != null);
-                  if (withVel.length === 0) return "—";
+                  if (withVel.length === 0) return "-";
                   const avg = withVel.reduce((s, e) => s + (e.avg_cycle_days ?? 0), 0) / withVel.length;
                   return `${Math.round(avg)} days`;
                 })()}
@@ -243,7 +243,7 @@ export default function PortfolioDetailPage() {
                           {e.ecri_readiness_band ? ` · ${e.ecri_readiness_band}` : ""}
                           {e.ecri_trend_direction && e.ecri_trend_direction !== "Stable" ? ` · ${e.ecri_trend_direction}` : ""}
                         </span>
-                      ) : "—"}
+                      ) : "-"}
                     </td>
                     <td className="border border-gray-200 p-2">
                       {e.avg_cycle_days != null ? (
@@ -252,12 +252,12 @@ export default function PortfolioDetailPage() {
                           {e.trend_direction && e.trend_direction !== "stable" ? ` · ${e.trend_direction}` : ""}
                         </span>
                       ) : (
-                        "—"
+                        "-"
                       )}
                     </td>
-                    <td className="border border-gray-200 p-2">{e.country ?? "—"}</td>
-                    <td className="border border-gray-200 p-2">{e.industry ?? "—"}</td>
-                    <td className="border border-gray-200 p-2">{e.readiness_band ?? "—"}</td>
+                    <td className="border border-gray-200 p-2">{e.country ?? "-"}</td>
+                    <td className="border border-gray-200 p-2">{e.industry ?? "-"}</td>
+                    <td className="border border-gray-200 p-2">{e.readiness_band ?? "-"}</td>
                     <td className="border border-gray-200 p-2">
                       {e.health_score != null ? (
                         <span title={e.health_status_label ?? undefined}>
@@ -265,17 +265,17 @@ export default function PortfolioDetailPage() {
                           {e.health_trend_direction === "up" && " ↑"}
                           {e.health_trend_direction === "down" && " ↓"}
                         </span>
-                      ) : "—"}
+                      ) : "-"}
                     </td>
-                    <td className="border border-gray-200 p-2">{e.last_primary_domain ?? "—"}</td>
-                    <td className="border border-gray-200 p-2">{e.last_review_date ?? "—"}</td>
-                    <td className="border border-gray-200 p-2">{e.has_committed_plan ? "Yes" : "—"}</td>
+                    <td className="border border-gray-200 p-2">{e.last_primary_domain ?? "-"}</td>
+                    <td className="border border-gray-200 p-2">{e.last_review_date ?? "-"}</td>
+                    <td className="border border-gray-200 p-2">{e.has_committed_plan ? "Yes" : "-"}</td>
                     <td className="border border-gray-200 p-2">
                       {e.last_decision_id ? (
                         <Link href={`/decisions/${e.last_decision_id}`} className="text-blue-600 hover:underline">
                           View
                         </Link>
-                      ) : "—"}
+                      ) : "-"}
                     </td>
                   </tr>
                 ))}

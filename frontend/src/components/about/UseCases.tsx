@@ -23,7 +23,7 @@ const ROLES: Record<
       </>
     ),
     delivers:
-      "One place per decision—from first question to final call—with a single record, workspace, and optional advisor support.",
+      "One place per decision, from first question to final call, with a single record, workspace, and optional advisor support.",
     flow: [
       "Tell CLEAR who you are",
       "8‑step diagnostic",
@@ -59,7 +59,7 @@ const ROLES: Record<
       </>
     ),
     delivers:
-      "Light‑touch portfolio visibility into execution readiness and governance maturity—powered by decision data, not long decks.",
+      "Light‑touch portfolio visibility into execution readiness and governance maturity, powered by decision data, not long decks.",
     flow: [
       "View portfolios",
       "Scan readiness signals",

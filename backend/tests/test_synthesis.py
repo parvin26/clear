@@ -42,7 +42,7 @@ def test_decision_snapshot_cfo_with_dict_recommendations():
     diagnostic_data = {
         "businessStage": "Early but operating",
         "situationDescription": "I just registered as sole prop. I sell baked goods from home.",
-        "situationClarifiers": ["Cash feels tight or unpredictable", "I'm not sure — it's complicated"],
+        "situationClarifiers": ["Cash feels tight or unpredictable", "I'm not sure; it's complicated"],
     }
     snapshot = _decision_snapshot(agent_outputs, "cfo", onboarding_context, diagnostic_data)
     assert snapshot["decision_statement"]

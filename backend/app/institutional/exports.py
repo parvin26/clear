@@ -1,4 +1,4 @@
-"""Phase 4: Export decision/enterprise data — JSON, CSV; PDF stub."""
+"""Phase 4: Export decision/enterprise data (JSON, CSV; PDF stub)."""
 import csv
 import io
 import json

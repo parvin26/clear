@@ -21,7 +21,7 @@ const ENTERPRISE_STEPS: DemoTourStep[] = [
   { section: "decision", title: "Decision artifact", body: "The committed path: what we decided to do, with constraints and assumptions." },
   { section: "milestones", title: "Milestones and owners", body: "Execution broken into trackable steps with due dates and evidence." },
   { section: "outcome", title: "Outcome review", body: "What we expected vs achieved, and lessons learned." },
-  { section: "institutional-memory", title: "Institutional memory", body: "What we learned and what to reuse next time—so it sticks." },
+  { section: "institutional-memory", title: "Institutional memory", body: "What we learned and what to reuse next time. So it sticks." },
   { section: "sharing", title: "Controlled sharing", body: "Who can see what: decision only, execution, or outcomes. Enterprise-controlled." },
   { section: "portfolio-link", title: "Portfolio view", body: "Partners see all of this through the portfolio page. See how readiness and support signals work." },
 ];

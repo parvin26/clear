@@ -36,7 +36,7 @@ CHUNKS = [
     {
         "source_type": "framework",
         "title": "Inventory and stock basics",
-        "content": "Match stock levels to demand: avoid over-ordering and stockouts. Simple reorder points and safety stock for key items. Count critical items regularly. For F&B and retail, wastage and expiry matter—track and reduce.",
+        "content": "Match stock levels to demand: avoid over-ordering and stockouts. Simple reorder points and safety stock for key items. Count critical items regularly. For F&B and retail, wastage and expiry matter: track and reduce.",
         "tags": ["operations", "inventory", "retail", "F&B", "SME"],
     },
     {

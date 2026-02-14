@@ -21,7 +21,7 @@ const CHALLENGE_OPTIONS = [
   { value: "costs_rising", label: "Costs are rising faster than revenue" },
   { value: "decisions_on_me", label: "Too many decisions depend on me" },
   { value: "ops_messy", label: "Operations feel messy or fragile" },
-  { value: "not_sure", label: "I'm not sure — it's complicated" },
+  { value: "not_sure", label: "I'm not sure; it's complicated" },
 ];
 
 const TOTAL_STEPS = 4;

@@ -1,4 +1,4 @@
-"""Phase 2: Document upload — call existing RAG upsert; optionally store document_link."""
+"""Phase 2: Document upload: call existing RAG upsert; optionally store document_link."""
 from typing import Optional
 from uuid import UUID
 from sqlalchemy.orm import Session

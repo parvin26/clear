@@ -147,8 +147,8 @@ export default function CohortsListPage() {
                   <TableRow key={c.id}>
                     <TableCell className="font-medium">{c.name}</TableCell>
                     <TableCell>{c.activation_window_days} days</TableCell>
-                    <TableCell>{c.start_date ?? "—"}</TableCell>
-                    <TableCell>{c.created_at ? new Date(c.created_at).toLocaleDateString() : "—"}</TableCell>
+                    <TableCell>{c.start_date ?? "-"}</TableCell>
+                    <TableCell>{c.created_at ? new Date(c.created_at).toLocaleDateString() : "-"}</TableCell>
                     <TableCell>
                       <Button variant="outline" size="sm" asChild>
                         <Link href={`/institutional/cohorts/${c.id}`}>View</Link>

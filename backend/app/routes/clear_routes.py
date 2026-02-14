@@ -1136,7 +1136,7 @@ def _build_last_cycle_summary(
     total = len(milestones)
     completed = sum(1 for m in milestones if (m.get("status") or "").lower() in ("done", "completed"))
     readiness_after_data = compute_readiness(db, decision_id)
-    readiness_after = readiness_after_data.get("band") or "—"
+    readiness_after = readiness_after_data.get("band") or "-"
     keep_raise = getattr(review_rec, "keep_raise_reduce_stop", None) or ""
     key_learnings = (review_rec.key_learnings or "").strip()[:200]
     next_cycle_focus = f"{keep_raise}".strip()
@@ -1162,11 +1162,11 @@ def create_outcome_review(decision_id: UUID, body: OutcomeReviewCreate, db: Sess
     if not d:
         raise HTTPException(status_code=404, detail="Decision not found")
     latest = get_latest_artifact_for_decision(db, decision_id)
-    readiness_before = "—"
+    readiness_before = "-"
     if latest and latest.canonical_json:
         from app.governance.readiness import compute_readiness
         r = compute_readiness(db, decision_id)
-        readiness_before = r.get("band") or "—"
+        readiness_before = r.get("band") or "-"
     rec = OutcomeReview(
         decision_id=decision_id,
         summary=body.summary,

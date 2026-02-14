@@ -38,7 +38,7 @@ export function HeroSection() {
               </h1>
 
               <p className="text-lg md:text-xl text-slate-600 mb-10 leading-relaxed max-w-lg">
-                A repeatable way to diagnose, plan, and track execution — for
+                A repeatable way to diagnose, plan, and track execution, for
                 founders and the people who back them.
               </p>
 

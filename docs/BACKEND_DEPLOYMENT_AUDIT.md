@@ -40,7 +40,11 @@ If you **don’t have a Postgres service** in Railway yet: add one (Railway → 
 
 If deploy logs show SQLAlchemy loading the **psycopg2** dialect and failing with **No module named 'psycopg2'**, the cause is that Railway (or your Postgres provider) often sets **DATABASE_URL** as `postgresql+psycopg2://...`, while this app uses the **psycopg v3** driver (`psycopg[binary]`) and expects `postgresql+psycopg://`.
 
-**Fix (in code):** In `app/config.py`, **DATABASE_URL** is normalized so that any `postgresql+psycopg2://` URL is converted to `postgresql+psycopg://` before the engine is created. After pulling the latest backend and redeploying, the backend should use the installed psycopg (v3) driver and start successfully. No need to add `psycopg2-binary` unless you want to support the legacy driver.
+**Fix (in code):** The app normalizes the URL in two places so the correct driver is always used:
+- **`app/config.py`**: `DATABASE_URL` validator converts `postgresql+psycopg2://`, `postgresql://`, and `postgres://` to `postgresql+psycopg://`.
+- **`app/db/database.py`**: `_normalize_db_url()` is applied to `settings.DATABASE_URL` before `create_engine()`, so even if config didn’t normalize (e.g. old deploy), the engine still gets a psycopg v3 URL.
+
+After pulling the latest backend and redeploying on Railway, the backend should use the installed psycopg (v3) driver and start successfully. No need to add `psycopg2-binary` unless you want to support the legacy driver.
 
 ---
 

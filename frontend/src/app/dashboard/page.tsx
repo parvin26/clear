@@ -325,7 +325,7 @@ export default function DashboardPage() {
           <Card className="bg-white border border-border shadow-sm rounded-lg">
             <CardContent className="pt-5 pb-5">
               <p className="text-sm text-ink-muted font-medium">Avg Diagnostic Score</p>
-              <p className="text-2xl font-bold text-ink mt-1">{avgReadinessPercent != null ? `${avgReadinessPercent}%` : "—"}</p>
+              <p className="text-2xl font-bold text-ink mt-1">{avgReadinessPercent != null ? `${avgReadinessPercent}%` : "-"}</p>
               {avgReadinessPercent != null && (
                 <p className="text-xs text-[#10B981] mt-0.5">+5.2%</p>
               )}
@@ -341,7 +341,7 @@ export default function DashboardPage() {
             <CardContent className="pt-5 pb-5">
               <p className="text-sm text-ink-muted font-medium">Decision Velocity</p>
               <p className="text-2xl font-bold text-ink mt-1">
-                {velocity?.avg_cycle_days != null ? `${velocity.avg_cycle_days} days` : "—"}
+                {velocity?.avg_cycle_days != null ? `${velocity.avg_cycle_days} days` : "-"}
               </p>
               <p className="text-xs text-ink-muted mt-0.5 capitalize">
                 {velocity?.velocity_band ? velocity.velocity_band.replace("_", " ") : "No completed cycles yet"}
@@ -361,7 +361,7 @@ export default function DashboardPage() {
                   </p>
                   <div className="mt-2 flex items-center gap-2">
                     <span className="text-sm text-ink-muted capitalize">
-                      Status: {velocity.velocity_band ? velocity.velocity_band.replace("_", " ") : "—"}
+                      Status: {velocity.velocity_band ? velocity.velocity_band.replace("_", " ") : "-"}
                     </span>
                     {velocity.trend_direction && velocity.trend_direction !== "stable" && (
                       <span className="flex items-center gap-0.5 text-sm">
@@ -373,9 +373,9 @@ export default function DashboardPage() {
                   </div>
                   {velocity.avg_cycle_days != null && (
                     <ul className="mt-3 space-y-1 text-sm text-ink-muted">
-                      <li>Time to decision: {velocity.avg_time_to_decision != null ? `${velocity.avg_time_to_decision} days` : "—"}</li>
-                      <li>Time to execution: {velocity.avg_time_to_execution != null ? `${velocity.avg_time_to_execution} days` : "—"}</li>
-                      <li>Time to review: {velocity.avg_time_to_review != null ? `${velocity.avg_time_to_review} days` : "—"}</li>
+                      <li>Time to decision: {velocity.avg_time_to_decision != null ? `${velocity.avg_time_to_decision} days` : "-"}</li>
+                      <li>Time to execution: {velocity.avg_time_to_execution != null ? `${velocity.avg_time_to_execution} days` : "-"}</li>
+                      <li>Time to review: {velocity.avg_time_to_review != null ? `${velocity.avg_time_to_review} days` : "-"}</li>
                     </ul>
                   )}
                 </div>

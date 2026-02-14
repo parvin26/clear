@@ -116,11 +116,11 @@ export default function DecisionsListPage() {
                         {d.statement}
                       </Link>
                     </TableCell>
-                    <TableCell className="text-ink-muted">{d.enterprise_id ?? "—"}</TableCell>
-                    <TableCell>{d.primaryDomain ? domainLabel[d.primaryDomain] ?? d.primaryDomain : "—"}</TableCell>
+                    <TableCell className="text-ink-muted">{d.enterprise_id ?? "-"}</TableCell>
+                    <TableCell>{d.primaryDomain ? domainLabel[d.primaryDomain] ?? d.primaryDomain : "-"}</TableCell>
                     <TableCell>{new Date(d.created_at).toLocaleDateString()}</TableCell>
-                    <TableCell>{d.readiness ?? "—"}</TableCell>
-                    <TableCell>{d.lastReviewDate ?? "—"}</TableCell>
+                    <TableCell>{d.readiness ?? "-"}</TableCell>
+                    <TableCell>{d.lastReviewDate ?? "-"}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

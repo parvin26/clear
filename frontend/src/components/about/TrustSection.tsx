@@ -14,7 +14,7 @@ export function TrustSection() {
     },
     {
       title: "Evidence-linked milestones",
-      desc: "Documents and metrics attach directly to milestones — decisions backed by data.",
+      desc: "Documents and metrics attach directly to milestones. Decisions backed by data.",
     },
     {
       title: "Enterprise-controlled sharing",
@@ -37,7 +37,7 @@ export function TrustSection() {
             Your decisions are structured, auditable, and yours.
           </h2>
           <p className="max-w-[560px] text-[16px] font-normal text-[#1F2A37]/65">
-            CLEAR treats every decision as a governed artifact — not a note in a
+            CLEAR treats every decision as a governed artifact, not a note in a
             chat thread.
           </p>
         </div>

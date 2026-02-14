@@ -32,7 +32,7 @@ def demo_overview():
         "demo": True,
         "enterprises": enterprises,
         "portfolios": portfolios,
-        "message": "CLEAR demo mode — read-only. Full lifecycle: situation → decision → milestones → outcome → sharing → portfolio.",
+        "message": "CLEAR demo mode: read-only. Full lifecycle: situation → decision → milestones → outcome → sharing → portfolio.",
     }
 
 

@@ -1,5 +1,5 @@
 /**
- * CLEAR Activation Engine — progress and nudges for first decision cycle.
+ * CLEAR Activation Engine: progress and nudges for first decision cycle.
  * Success state: one diagnostic, one finalized decision, milestones, progress update, review scheduled.
  */
 
@@ -61,7 +61,7 @@ export function computeActivationProgress(
   const completedSteps: ActivationStepKey[] = [];
   const hasAnyDecision = decisions.length > 0;
 
-  // Step 1 & 2: Describe situation / Run diagnostic — has at least one decision (from diagnostic or created)
+  // Step 1 & 2: Describe situation / Run diagnostic; has at least one decision (from diagnostic or created)
   if (hasAnyDecision) {
     completedSteps.push("describe", "diagnostic");
   }

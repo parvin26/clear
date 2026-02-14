@@ -16,8 +16,8 @@ import { Button } from "@/components/ui/button";
 import { Loader2, ArrowLeft } from "lucide-react";
 
 /**
- * Phase 4 — Screen C: Enterprise snapshot (read-only). Renders backend snapshot as-is.
- * Screen D: Export buttons — direct backend download (JSON/CSV).
+ * Phase 4: Screen C: Enterprise snapshot (read-only). Renders backend snapshot as-is.
+ * Screen D: Export buttons: direct backend download (JSON/CSV).
  */
 export default function EnterpriseSnapshotPage() {
   const params = useParams();
@@ -97,7 +97,7 @@ export default function EnterpriseSnapshotPage() {
           </p>
         </div>
 
-        {/* Decisions by domain — exact backend structure */}
+        {/* Decisions by domain: exact backend structure */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Decisions by domain</CardTitle>
@@ -133,7 +133,7 @@ export default function EnterpriseSnapshotPage() {
           </CardContent>
         </Card>
 
-        {/* Capability trend — table */}
+        {/* Capability trend: table */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Capability trend</CardTitle>
@@ -156,7 +156,7 @@ export default function EnterpriseSnapshotPage() {
                       <tr key={i} className="border-b border-gray-200">
                         <td className="border border-gray-200 p-2">{row.capability_id}</td>
                         <td className="border border-gray-200 p-2 text-right font-mono">{row.score}</td>
-                        <td className="border border-gray-200 p-2">{row.computed_at ?? "—"}</td>
+                        <td className="border border-gray-200 p-2">{row.computed_at ?? "-"}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -182,7 +182,7 @@ export default function EnterpriseSnapshotPage() {
           </CardContent>
         </Card>
 
-        {/* Screen D — Export buttons */}
+        {/* Screen D: Export buttons */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Exports</CardTitle>

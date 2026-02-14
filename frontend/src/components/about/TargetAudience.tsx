@@ -34,7 +34,7 @@ export function TargetAudience() {
         <div className="grid md:grid-cols-3 gap-8">
           <Card
             title="Owner-Led SMEs"
-            pain="Too many decisions stuck in the founder's head — and everyone waiting."
+            pain="Too many decisions stuck in the founder's head, and everyone waiting."
             users="200+ SME founders"
           />
           <Card
@@ -44,7 +44,7 @@ export function TargetAudience() {
           />
           <Card
             title="Capital Providers"
-            pain="Investors who want governance clarity and execution signals — without asking for another deck."
+            pain="Investors who want governance clarity and execution signals, without asking for another deck."
             users="VCs & Family Offices"
           />
         </div>

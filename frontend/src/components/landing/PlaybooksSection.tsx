@@ -33,7 +33,7 @@ export function PlaybooksSection() {
         </div>
         <div className="text-center mt-10">
           <p className="text-sm text-ink-muted max-w-2xl mx-auto">
-            When self‑serve isn’t enough, CLEAR uses human advisors selectively—always scoped by the diagnostic, never by guesswork.
+            When self‑serve isn’t enough, CLEAR uses human advisors selectively, always scoped by the diagnostic, never by guesswork.
           </p>
         </div>
       </div>

@@ -114,7 +114,7 @@ export default function CohortActivationPage() {
                           )}
                         </TableCell>
                         <TableCell>
-                          {activation.next_step_key ? STEP_LABELS[activation.next_step_key] ?? activation.next_step_key : "—"}
+                          {activation.next_step_key ? STEP_LABELS[activation.next_step_key] ?? activation.next_step_key : "-"}
                         </TableCell>
                         <TableCell>{activation.days_since_start}</TableCell>
                         <TableCell>

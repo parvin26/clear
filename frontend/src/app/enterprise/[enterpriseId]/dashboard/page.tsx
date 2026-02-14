@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, TrendingUp, TrendingDown, Minus, ChevronRight, BarChart3 } from "lucide-react";
 
 /**
- * Phase 3 — Enterprise Dashboard (read-only).
+ * Phase 3: Enterprise Dashboard (read-only).
  * Data: financing-readiness (latest only) + capability scores (time series table).
  * Rows in capability table: reverse-chronological (newest first, per backend order).
  */
@@ -185,7 +185,7 @@ export default function EnterpriseDashboardPage() {
           </Card>
         )}
 
-        {/* Section A — Financing Readiness (latest only) */}
+        {/* Section A: Financing Readiness (latest only) */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Financing Readiness (Latest)</CardTitle>
@@ -203,7 +203,7 @@ export default function EnterpriseDashboardPage() {
                   </div>
                   <div>
                     <span className="text-muted-foreground">computed_at</span>
-                    <span className="ml-2">{latestFinancing.computed_at ?? "—"}</span>
+                    <span className="ml-2">{latestFinancing.computed_at ?? "-"}</span>
                   </div>
                 </div>
                 {latestFinancing.flags_json && latestFinancing.flags_json.length > 0 && (
@@ -221,7 +221,7 @@ export default function EnterpriseDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Section B — Capability Scores (time series table, reverse-chronological) */}
+        {/* Section B: Capability Scores (time series table, reverse-chronological) */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Capability Scores (Time Series)</CardTitle>
@@ -247,10 +247,10 @@ export default function EnterpriseDashboardPage() {
                     {capabilities.map((row) => (
                       <tr key={row.id} className="border-b border-gray-200">
                         <td className="border border-gray-200 p-2">{row.capability_name ?? row.capability_code ?? row.capability_id}</td>
-                        <td className="border border-gray-200 p-2">{row.domain ?? "—"}</td>
+                        <td className="border border-gray-200 p-2">{row.domain ?? "-"}</td>
                         <td className="border border-gray-200 p-2 text-right font-mono">{row.score}</td>
-                        <td className="border border-gray-200 p-2 text-right font-mono">{row.confidence ?? "—"}</td>
-                        <td className="border border-gray-200 p-2">{row.computed_at ?? "—"}</td>
+                        <td className="border border-gray-200 p-2 text-right font-mono">{row.confidence ?? "-"}</td>
+                        <td className="border border-gray-200 p-2">{row.computed_at ?? "-"}</td>
                       </tr>
                     ))}
                   </tbody>

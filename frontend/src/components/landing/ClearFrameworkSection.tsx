@@ -3,27 +3,27 @@
 const frameworkItems = [
   {
     letter: "C",
-    label: "C — Clarify the situation",
+    label: "C: Clarify the situation",
     body: "Understand what is really happening in the business, using your own words, without jargon or judgment.",
   },
   {
     letter: "L",
-    label: "L — Locate the real capability gaps",
+    label: "L: Locate the real capability gaps",
     body: "Translate symptoms like cash pressure or team chaos into specific capability gaps, not vague “work harder” advice.",
   },
   {
     letter: "E",
-    label: "E — Enable the right capability",
+    label: "E: Enable the right capability",
     body: "Turn your top gaps into a focused execution plan with milestones, metrics, and the lightest effective support.",
   },
   {
     letter: "A",
-    label: "A — Anchor the capability",
+    label: "A: Anchor the capability",
     body: "Use structured reviews so what you learn in each cycle becomes part of how the business operates.",
   },
   {
     letter: "R",
-    label: "R — Release dependency",
+    label: "R: Release dependency",
     body: "As capability strengthens, CLEAR steps back. Dependency is treated as a failure condition, not a business model.",
   },
 ];

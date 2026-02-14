@@ -693,7 +693,7 @@ export default function DecisionWorkspacePage() {
             <div className="flex flex-wrap gap-2 mt-2">
               {artifactData?.decision_context != null ? (
                 <Badge variant="outline">
-                  {String((artifactData.decision_context as Record<string, unknown>)?.primary_domain ?? "—")}
+                  {String((artifactData.decision_context as Record<string, unknown>)?.primary_domain ?? "-")}
                 </Badge>
               ) : null}
               {readiness != null ? <Badge variant="secondary">{String(readiness.band)}</Badge> : null}
@@ -758,9 +758,9 @@ export default function DecisionWorkspacePage() {
                   <CardTitle className="text-base">Synthesis summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-1 text-sm">
-                  <p><span className="font-medium text-ink-muted">Primary domain:</span> {(artifactData?.decision_context as { primary_domain?: string })?.primary_domain ?? (artifactData?.synthesis_summary as { primary_domain?: string })?.primary_domain ?? "—"}</p>
-                  <p><span className="font-medium text-ink-muted">Secondary domains:</span> {(artifactData?.synthesis_summary as { secondary_domains?: string[] })?.secondary_domains?.join(", ") ?? "—"}</p>
-                  <p><span className="font-medium text-ink-muted">Recommended next step:</span> {(artifactData?.synthesis_summary as { recommended_next_step?: string })?.recommended_next_step ?? "—"}</p>
+                  <p><span className="font-medium text-ink-muted">Primary domain:</span> {(artifactData?.decision_context as { primary_domain?: string })?.primary_domain ?? (artifactData?.synthesis_summary as { primary_domain?: string })?.primary_domain ?? "-"}</p>
+                  <p><span className="font-medium text-ink-muted">Secondary domains:</span> {(artifactData?.synthesis_summary as { secondary_domains?: string[] })?.secondary_domains?.join(", ") ?? "-"}</p>
+                  <p><span className="font-medium text-ink-muted">Recommended next step:</span> {(artifactData?.synthesis_summary as { recommended_next_step?: string })?.recommended_next_step ?? "-"}</p>
                 </CardContent>
               </Card>
             )}
@@ -772,7 +772,7 @@ export default function DecisionWorkspacePage() {
                 </CardHeader>
                 <CardContent className="text-sm space-y-1">
                   <p>Milestones completed: {lastCycleSummary.milestones_completed ?? 0} of {lastCycleSummary.milestones_total ?? 0}.</p>
-                  <p>Readiness: {lastCycleSummary.readiness_before ?? "—"} → {lastCycleSummary.readiness_after ?? "—"}.</p>
+                  <p>Readiness: {lastCycleSummary.readiness_before ?? "-"} → {lastCycleSummary.readiness_after ?? "-"}.</p>
                   {lastCycleSummary.next_cycle_focus && <p>Next cycle focus: {lastCycleSummary.next_cycle_focus}</p>}
                 </CardContent>
               </Card>
@@ -798,7 +798,7 @@ export default function DecisionWorkspacePage() {
                     <span className="font-medium">Milestones:</span> {lastCycleSummary.milestones_completed ?? 0} of {lastCycleSummary.milestones_total ?? 0} completed
                   </p>
                   <p>
-                    <span className="font-medium">Readiness:</span> {lastCycleSummary.readiness_before ?? "—"} → {lastCycleSummary.readiness_after ?? "—"}
+                    <span className="font-medium">Readiness:</span> {lastCycleSummary.readiness_before ?? "-"} → {lastCycleSummary.readiness_after ?? "-"}
                   </p>
                   {lastCycleSummary.next_cycle_focus && (
                     <p>
@@ -819,7 +819,7 @@ export default function DecisionWorkspacePage() {
                   id="exec-emr-milestones"
                   openId={openInfoId}
                   setOpenId={setOpenInfoId}
-                  title={<CardTitle className="text-base">EMR — Milestones</CardTitle>}
+                  title={<CardTitle className="text-base">EMR: Milestones</CardTitle>}
                   content="What it's for: Track key steps to execute this decision (from diagnostic or added by you). Use it: Update status (pending → in progress → done) as work progresses; changes are saved to the artifact."
                 />
                 <p className="text-xs text-muted-foreground">From artifact; status: pending → in_progress → done.</p>
@@ -831,7 +831,7 @@ export default function DecisionWorkspacePage() {
                   <ul className="space-y-2">
                     {emrMilestones.map((m) => (
                       <li key={m.id || ""} className="border rounded-md p-2 flex flex-wrap items-center gap-2 text-sm">
-                        <span className="font-medium">{m.title ?? "—"}</span>
+                        <span className="font-medium">{m.title ?? "-"}</span>
                         <span className="text-muted-foreground">{m.owner ?? ""}</span>
                         <span className="text-muted-foreground">{m.due_date ? new Date(m.due_date).toLocaleDateString() : ""}</span>
                         <Select
@@ -862,7 +862,7 @@ export default function DecisionWorkspacePage() {
                   id="exec-emr-metrics"
                   openId={openInfoId}
                   setOpenId={setOpenInfoId}
-                  title={<CardTitle className="text-base">EMR — Metrics</CardTitle>}
+                  title={<CardTitle className="text-base">EMR: Metrics</CardTitle>}
                   content="What it's for: Measures that show whether the decision is on track. Use it: Enter actual values as data comes in; target and source are set from the diagnostic or here."
                 />
                 <p className="text-xs text-muted-foreground">Target and actual; source: manual or integrated.</p>
@@ -876,8 +876,8 @@ export default function DecisionWorkspacePage() {
                       const inputType = (met.input_type === "number" ? "number" : "text") as "number" | "text";
                       return (
                         <li key={met.id || ""} className="flex flex-wrap items-center gap-2 border-b pb-2">
-                          <span className="font-medium">{met.name ?? "—"}</span>
-                          <span className="text-muted-foreground">Target: {met.target_value ?? "—"}{met.unit ? ` ${met.unit}` : ""}</span>
+                          <span className="font-medium">{met.name ?? "-"}</span>
+                          <span className="text-muted-foreground">Target: {met.target_value ?? "-"}{met.unit ? ` ${met.unit}` : ""}</span>
                           <Input
                             type={inputType}
                             className="w-24 h-8"
@@ -904,7 +904,7 @@ export default function DecisionWorkspacePage() {
                   id="exec-emr-config"
                   openId={openInfoId}
                   setOpenId={setOpenInfoId}
-                  title={<CardTitle className="text-base">EMR — Config</CardTitle>}
+                  title={<CardTitle className="text-base">EMR: Config</CardTitle>}
                   content="What it's for: How often you review progress and when the next review is due. Use it: Set the next review date; when it's passed, the Outcome review section will prompt you to add a review."
                 />
                 <p className="text-xs text-muted-foreground">Cadence and next review date. {!planCommitted && "EMR is draft until you commit the plan below."}</p>
@@ -1357,8 +1357,8 @@ export default function DecisionWorkspacePage() {
                       {timeline.map((t) => (
                         <li key={t.decision_id} className="flex items-start gap-3 border-b border-border pb-2 last:border-0">
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs text-muted-foreground">{t.created_at ?? ""} · {t.primary_domain ?? "—"} · {t.readiness_band ?? "—"}{t.has_outcome_review ? " · ✓ Review" : ""}</p>
-                            <p className="text-sm truncate">{t.decision_statement ?? "—"}</p>
+                            <p className="text-xs text-muted-foreground">{t.created_at ?? ""} · {t.primary_domain ?? "-"} · {t.readiness_band ?? "-"}{t.has_outcome_review ? " · ✓ Review" : ""}</p>
+                            <p className="text-sm truncate">{t.decision_statement ?? "-"}</p>
                           </div>
                           <Link href={`/decisions/${t.decision_id}`} className="text-sm text-primary hover:underline shrink-0">View</Link>
                         </li>
@@ -1442,7 +1442,7 @@ export default function DecisionWorkspacePage() {
                 </p>
               </CardHeader>
               <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p><strong>How to add it:</strong> Add at least one piece of evidence: either paste a URL or reference and click Add, or upload a file below. Link and file upload are independent—you can use one or both.</p>
+                <p><strong>How to add it:</strong> Add at least one piece of evidence: either paste a URL or reference and click Add, or upload a file below. Link and file upload are independent; you can use one or both.</p>
                 <p><strong>How it helps:</strong> Evidence ties the decision to verifiable information, improves transparency for reviews and audits, and gives your team clear context when they revisit the decision later.</p>
               </CardContent>
             </Card>
@@ -1536,7 +1536,7 @@ export default function DecisionWorkspacePage() {
                     {evidence.map((e) => {
                       const uri = (e.source_ref as { uri?: string })?.uri;
                       const isUpload = uri?.includes("/uploads/evidence/");
-                      const display = uri ?? (e.source_table && e.source_id ? `${e.source_table}#${e.source_id}` : e.source_table ?? e.source_id ?? "—");
+                      const display = uri ?? (e.source_table && e.source_id ? `${e.source_table}#${e.source_id}` : e.source_table ?? e.source_id ?? "-");
                       return (
                         <li key={e.id} className="flex gap-2 items-center flex-wrap">
                           <Badge variant="outline">{e.evidence_type}</Badge>

@@ -94,7 +94,7 @@ export default function AdvisorEnterpriseDetailPage() {
                       <tr key={d.decision_id} className="border-b">
                         <td className="py-2 max-w-[280px] truncate">{d.decision_statement || d.decision_id.slice(0, 8) + "…"}</td>
                         <td className="py-2">{d.current_status}</td>
-                        <td className="py-2 text-muted-foreground">{d.created_at ? new Date(d.created_at).toLocaleDateString() : "—"}</td>
+                        <td className="py-2 text-muted-foreground">{d.created_at ? new Date(d.created_at).toLocaleDateString() : "-"}</td>
                         <td className="py-2">
                           <Link href={`/advisor/decisions/${d.decision_id}?token=${encodeURIComponent(token || "")}`} className="text-primary hover:underline">
                             View

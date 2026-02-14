@@ -1,4 +1,4 @@
-# CLEAR website – Progress and UX audit (v2)
+# CLEAR website: Progress and UX audit (v2)
 
 **Purpose:** Track how far we’ve come against the [CLEAR Website & Product UX Strategy Audit](CLEAR_WEBSITE_AND_PRODUCT_UX_STRATEGY_AUDIT.md) and what remains for the next phase. Use this for internal status and for sharing progress with stakeholders.
 
