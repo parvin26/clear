@@ -232,7 +232,7 @@ export default function GuidedStartPage() {
       <div className="content-container pb-10">
         <div className="max-w-3xl mx-auto flex flex-col sm:flex-row gap-4 justify-center">
           <Button asChild variant="outline" size="lg">
-            <Link href="/diagnostic">Start diagnostic</Link>
+            <Link href="/diagnostic?source=guided_start">Start diagnostic</Link>
           </Button>
           <Button asChild size="lg">
             <Link href="/start">Get started</Link>
@@ -244,7 +244,7 @@ export default function GuidedStartPage() {
         primaryLabel="Get started"
         primaryHref="/start"
         secondaryLabel="Start diagnostic"
-        secondaryHref="/diagnostic"
+        secondaryHref="/diagnostic?source=guided_start"
         heading="Next step"
       />
     </Shell>

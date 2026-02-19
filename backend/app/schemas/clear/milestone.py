@@ -1,6 +1,6 @@
 """Execution milestone schemas for decision workspace."""
 from datetime import date, datetime
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 from pydantic import BaseModel, Field
 
@@ -12,6 +12,8 @@ class MilestoneCreate(BaseModel):
     due_date: Optional[date] = None
     status: str = Field(default="pending", pattern="^(pending|completed)$")
     notes: Optional[str] = None
+    linked_org_indicator_ids: Optional[List[int]] = None
+    impact_expected_output_note: Optional[str] = None
 
 
 class MilestoneUpdate(BaseModel):
@@ -21,6 +23,8 @@ class MilestoneUpdate(BaseModel):
     due_date: Optional[date] = None
     status: Optional[str] = Field(None, pattern="^(pending|completed)$")
     notes: Optional[str] = None
+    linked_org_indicator_ids: Optional[List[int]] = None
+    impact_expected_output_note: Optional[str] = None
 
 
 class MilestoneOut(BaseModel):
@@ -32,6 +36,8 @@ class MilestoneOut(BaseModel):
     due_date: Optional[date] = None
     status: str
     notes: Optional[str] = None
+    linked_org_indicator_ids: Optional[List[int]] = None
+    impact_expected_output_note: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

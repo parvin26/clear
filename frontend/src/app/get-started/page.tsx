@@ -8,10 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, CheckCircle, Zap } from "lucide-react";
 import Link from "next/link";
 import { getOnboardingContext, setOnboardingContext } from "@/lib/onboarding-context";
+import { USE_NEW_DIAGNOSTIC_REDIRECTS } from "@/lib/feature-flags";
+import { trackEvent } from "@/lib/analytics";
+import { INTAKE_COUNTRIES } from "@/lib/intake-constants";
 
 /** Map "Biggest Challenge" to the diagnostic page so user can proceed with diagnosis. */
 function getDiagnosticPath(challenge: string): { path: string; label: string } {
@@ -33,6 +36,23 @@ function getDiagnosticPath(challenge: string): { path: string; label: string } {
 
 export default function GetStartedPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (!USE_NEW_DIAGNOSTIC_REDIRECTS) return;
+    const params = new URLSearchParams();
+    const source = searchParams.get("source");
+    if (source) params.set("source", source);
+    const toPath = params.toString() ? `/diagnostic?${params.toString()}` : "/diagnostic";
+    trackEvent("diagnostic_redirect_triggered", {
+      from_path: "/get-started",
+      to_path: "/diagnostic",
+      intake_version: "conversational_v1",
+      source: source ?? undefined,
+    });
+    router.replace(toPath);
+  }, [router, searchParams]);
+
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [countryError, setCountryError] = useState("");
@@ -86,6 +106,16 @@ export default function GetStartedPage() {
     });
     setSubmitted(true);
   };
+
+  if (USE_NEW_DIAGNOSTIC_REDIRECTS) {
+    return (
+      <Shell>
+        <div className="min-h-[40vh] flex items-center justify-center px-4">
+          <p className="text-ink-muted">Redirecting to diagnostic…</p>
+        </div>
+      </Shell>
+    );
+  }
 
   return (
     <Shell>
@@ -186,19 +216,11 @@ export default function GetStartedPage() {
                     <SelectValue placeholder="Select country" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="AU">Australia</SelectItem>
-                    <SelectItem value="CA">Canada</SelectItem>
-                    <SelectItem value="DE">Germany</SelectItem>
-                    <SelectItem value="IN">India</SelectItem>
-                    <SelectItem value="IE">Ireland</SelectItem>
-                    <SelectItem value="KE">Kenya</SelectItem>
-                    <SelectItem value="NG">Nigeria</SelectItem>
-                    <SelectItem value="SG">Singapore</SelectItem>
-                    <SelectItem value="ZA">South Africa</SelectItem>
-                    <SelectItem value="AE">United Arab Emirates</SelectItem>
-                    <SelectItem value="GB">United Kingdom</SelectItem>
-                    <SelectItem value="US">United States</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    {INTAKE_COUNTRIES.map((c) => (
+                      <SelectItem key={c.value} value={c.value}>
+                        {c.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 {countryError && (

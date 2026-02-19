@@ -355,9 +355,9 @@ class DecisionChatSession(Base):
 
 
 class DecisionExecutionMilestone(Base):
-    """Execution milestone per decision: name, owner, due date, status (pending/completed), notes."""
+    """Execution milestone per decision: name, owner, due date, status (pending/completed), notes. Phase 4: optional impact linkage."""
     __tablename__ = "decision_execution_milestones"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     decision_id = Column(PG_UUID(as_uuid=True), ForeignKey("decisions.decision_id", ondelete="CASCADE"), nullable=False, index=True)
     milestone_name = Column(String(500), nullable=False)
@@ -365,9 +365,11 @@ class DecisionExecutionMilestone(Base):
     due_date = Column(Date, nullable=True)
     status = Column(String(50), nullable=False, server_default="pending")  # pending | completed
     notes = Column(Text, nullable=True)
+    linked_org_indicator_ids = Column(JSONB, nullable=True, server_default="[]")  # Phase 4: OrgImpactIndicator IDs
+    impact_expected_output_note = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
-    
+
     decision = relationship("Decision", back_populates="execution_milestones")
 
 
@@ -484,6 +486,77 @@ class IdeaStageLead(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     email = Column(String(255), nullable=True)
     short_text = Column(Text, nullable=True)
+
+
+class InvestorProfileSubmission(Base):
+    """Phase 3: impact investor / capital partner profile from POST /api/intake/investor-profile."""
+    __tablename__ = "investor_profiles"
+
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    onboarding_context = Column(JSONB, nullable=True)
+    investor_profile = Column(JSONB, nullable=False)
+
+
+class ImpactProfile(Base):
+    """Phase 3: impact setup per decision (social enterprise). One per decision_id."""
+    __tablename__ = "impact_profiles"
+
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    decision_id = Column(PG_UUID(as_uuid=True), nullable=False, unique=True, index=True)
+    impact_categories = Column(JSONB, nullable=False, server_default="[]")  # list of ImpactCategoryId
+    primary_sdg_tags = Column(JSONB, nullable=False, server_default="[]")  # list of strings
+    theory_of_change = Column(JSONB, nullable=True)  # { problem, solution, beneficiaries, change_sought }
+
+    org_impact_indicators = relationship("OrgImpactIndicator", back_populates="impact_profile", cascade="all, delete-orphan")
+
+
+class OrgImpactIndicator(Base):
+    """Phase 3: org <-> indicator template; optional target."""
+    __tablename__ = "org_impact_indicators"
+
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    impact_profile_id = Column(Integer, ForeignKey("impact_profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    indicator_template_id = Column(String(120), nullable=False)
+    target_value = Column(Numeric(18, 4), nullable=True)
+    target_year = Column(Integer, nullable=True)
+
+    impact_profile = relationship("ImpactProfile", back_populates="org_impact_indicators")
+    measurements = relationship("IndicatorMeasurement", back_populates="org_impact_indicator", cascade="all, delete-orphan")
+
+
+class IndicatorMeasurement(Base):
+    """Phase 3: period value for an org indicator."""
+    __tablename__ = "indicator_measurements"
+
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    org_impact_indicator_id = Column(Integer, ForeignKey("org_impact_indicators.id", ondelete="CASCADE"), nullable=False, index=True)
+    period_start = Column(String(20), nullable=False)
+    period_end = Column(String(20), nullable=False)
+    value = Column(Numeric(18, 4), nullable=False)
+    data_source = Column(String(255), nullable=False, server_default="self_reported")
+    notes = Column(Text, nullable=True)
+
+    org_impact_indicator = relationship("OrgImpactIndicator", back_populates="measurements")
+
+
+class ImpactProduct(Base):
+    """Phase 4: product/service impact coefficients for future accounting automation."""
+    __tablename__ = "impact_products"
+
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    organization_id = Column(Integer, nullable=True)
+    decision_id = Column(PG_UUID(as_uuid=True), nullable=True, index=True)
+    name = Column(String(255), nullable=False)
+    sku = Column(String(120), nullable=True)
+    linked_indicator_ids = Column(JSONB, nullable=False, server_default="[]")
+    impact_coefficients = Column(JSONB, nullable=False, server_default="{}")
 
 
 class KnowledgeChunk(Base):

@@ -34,7 +34,7 @@ export function ActivationChecklist({ progress, firstDecisionId }: ActivationChe
   }
 
   const baseHref = (stepKey: string) => {
-    if (stepKey === "finalize" && firstDecisionId) return `/decisions/${firstDecisionId}`;
+    if (stepKey === "finalize" && firstDecisionId) return `/decisions/${firstDecisionId}#finalize`;
     if (stepKey === "milestones" && firstDecisionId) return `/decisions/${firstDecisionId}?tab=execution`;
     if (stepKey === "review" && firstDecisionId) return `/decisions/${firstDecisionId}?tab=execution`;
     const step = ACTIVATION_STEPS.find((s) => s.key === stepKey);

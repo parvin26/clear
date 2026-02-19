@@ -577,7 +577,7 @@ export function DiagnosticForm() {
                       type="number"
                       step="0.01"
                       min={0}
-                      value={val === undefined || val === null ? "" : val}
+                      value={val === undefined || val === null || val === 0 ? "" : val}
                       onChange={(e) => {
                         const v = e.target.value;
                         const num = v === "" ? 0 : parseFloat(v);
@@ -623,7 +623,7 @@ export function DiagnosticForm() {
                       type="number"
                       step="0.01"
                       min={0}
-                      value={val === undefined || val === null ? "" : val}
+                      value={val === undefined || val === null || val === 0 ? "" : val}
                       onChange={(e) => {
                         const v = e.target.value;
                         const num = v === "" ? 0 : parseFloat(v);
@@ -655,7 +655,7 @@ export function DiagnosticForm() {
                 type="number"
                 step="0.01"
                 min={0}
-                value={formData.cash_on_hand === undefined || formData.cash_on_hand === null ? "" : formData.cash_on_hand}
+                value={formData.cash_on_hand === undefined || formData.cash_on_hand === null || formData.cash_on_hand === 0 ? "" : formData.cash_on_hand}
                 onChange={(e) => {
                   const v = e.target.value;
                   const num = v === "" ? 0 : parseFloat(v);
@@ -674,7 +674,7 @@ export function DiagnosticForm() {
                 type="number"
                 step="0.01"
                 min={0}
-                value={formData.debt === undefined || formData.debt === null ? "" : formData.debt}
+                value={formData.debt === undefined || formData.debt === null || formData.debt === 0 ? "" : formData.debt}
                 onChange={(e) => {
                   const v = e.target.value;
                   const num = v === "" ? 0 : parseFloat(v);

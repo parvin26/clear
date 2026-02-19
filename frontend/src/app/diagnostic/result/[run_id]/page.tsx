@@ -1,6 +1,7 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { Suspense } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Shell } from "@/components/layout/Shell";
@@ -64,9 +65,11 @@ function SnapshotBlock({ snapshot }: { snapshot: DecisionSnapshot }) {
   );
 }
 
-export default function DiagnosticResultPage() {
+function DiagnosticResultContent() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const runId = params.run_id as string;
+  const isSocialEnterprise = searchParams.get("social_enterprise") === "1";
   const [decision, setDecision] = useState<DecisionOut | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -132,6 +135,22 @@ export default function DiagnosticResultPage() {
             <div className="space-y-6">
               <h2 className="text-lg font-semibold text-ink">What would you like to do next?</h2>
 
+              {isSocialEnterprise && (
+                <Card className="premium-shadow border-primary/30 bg-primary/5">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Set up your Impact Dashboard</CardTitle>
+                    <p className="text-sm text-ink-muted font-normal">
+                      We&apos;re piloting the Impact Dashboard with our first social enterprises. Your impact focus is already saved—join the pilot to configure your indicators and reports.
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <Button asChild size="sm" variant="outline">
+                      <Link href={`/impact/setup?decision_id=${runId}`}>Configure indicators &amp; reports</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+
               <div className="space-y-4">
                 <Card className="premium-shadow">
                   <CardHeader className="pb-2">
@@ -190,5 +209,19 @@ export default function DiagnosticResultPage() {
         </div>
       </div>
     </Shell>
+  );
+}
+
+export default function DiagnosticResultPage() {
+  return (
+    <Suspense fallback={
+      <Shell>
+        <div className="min-h-screen flex items-center justify-center px-6">
+          <Loader2 className="w-8 h-8 animate-spin text-ink" />
+        </div>
+      </Shell>
+    }>
+      <DiagnosticResultContent />
+    </Suspense>
   );
 }

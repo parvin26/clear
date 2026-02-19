@@ -17,6 +17,8 @@ import {
   createMilestone,
   updateMilestone,
   deleteMilestone,
+  getImpactProfile,
+  postImpactMeasurement,
   patchArtifactPartial,
   createOutcomeReview,
   listOutcomeReviews,
@@ -44,7 +46,9 @@ import {
   type OutcomeReviewCreateBody,
   type TimelineItem,
   type DecisionCommentOut,
+  type ImpactProfileOut,
 } from "@/lib/clear-api";
+import { getIndicatorById } from "@/lib/impact-indicators";
 import { computeActivationProgress, mapEnterpriseActivationToProgress } from "@/lib/activation";
 import { ActivationChecklist } from "@/components/activation";
 import { Button } from "@/components/ui/button";
@@ -164,28 +168,118 @@ function SectionInfo({
   );
 }
 
+type MilestoneUpdateBody = {
+  milestone_name?: string;
+  responsible_person?: string | null;
+  due_date?: string | null;
+  status?: string;
+  notes?: string | null;
+  linked_org_indicator_ids?: number[] | null;
+  impact_expected_output_note?: string | null;
+};
+
 function MilestoneEditRow({
   milestone,
+  impactIndicators,
   onSave,
   onCancel,
 }: {
   milestone: MilestoneOut;
-  onSave: (body: { milestone_name?: string; responsible_person?: string | null; due_date?: string | null; status?: string; notes?: string | null }) => void;
+  impactIndicators: { id: number; indicator_template_id: string }[];
+  onSave: (body: MilestoneUpdateBody) => void;
   onCancel: () => void;
 }) {
   const [name, setName] = useState(milestone.milestone_name);
   const [person, setPerson] = useState(milestone.responsible_person ?? "");
   const [due, setDue] = useState(milestone.due_date ? milestone.due_date.toString().slice(0, 10) : "");
   const [notes, setNotes] = useState(milestone.notes ?? "");
+  const [affectsImpact, setAffectsImpact] = useState(
+    (milestone.linked_org_indicator_ids?.length ?? 0) > 0
+  );
+  const [linkedIds, setLinkedIds] = useState<number[]>(milestone.linked_org_indicator_ids ?? []);
+  const [impactNote, setImpactNote] = useState(milestone.impact_expected_output_note ?? "");
+
+  const toggleIndicator = (id: number) => {
+    setLinkedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id].slice(-10)
+    );
+  };
+
   return (
-    <div className="flex flex-col gap-2 w-full">
+    <div className="flex flex-col gap-3 w-full">
       <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Milestone name" />
       <Input value={person} onChange={(e) => setPerson(e.target.value)} placeholder="Responsible person" />
       <Input type="date" value={due} onChange={(e) => setDue(e.target.value)} placeholder="Due date" />
       <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes" rows={2} />
+      <div className="border-t pt-2 mt-1">
+        <p className="text-xs font-medium text-muted-foreground mb-1">Impact</p>
+        <p className="text-xs text-muted-foreground mb-2">Does this milestone affect impact metrics?</p>
+        <div className="flex items-center gap-2 mb-2">
+          <Button
+            type="button"
+            size="sm"
+            variant={affectsImpact ? "default" : "outline"}
+            onClick={() => setAffectsImpact(true)}
+          >
+            Yes
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={!affectsImpact ? "default" : "outline"}
+            onClick={() => { setAffectsImpact(false); setLinkedIds([]); setImpactNote(""); }}
+          >
+            No
+          </Button>
+        </div>
+        {affectsImpact && (
+          <>
+            <Label className="text-xs">Link to indicators (select 1–3)</Label>
+            <div className="flex flex-wrap gap-2 mt-1 mb-2">
+              {impactIndicators.map((ind) => {
+                const template = getIndicatorById(ind.indicator_template_id);
+                const label = template?.name ?? ind.indicator_template_id;
+                const checked = linkedIds.includes(ind.id);
+                return (
+                  <label key={ind.id} className="flex items-center gap-1.5 text-sm">
+                    <Checkbox
+                      checked={checked}
+                      onCheckedChange={() => toggleIndicator(ind.id)}
+                      disabled={!checked && linkedIds.length >= 3}
+                    />
+                    <span>{label}</span>
+                  </label>
+                );
+              })}
+            </div>
+            <Input
+              value={impactNote}
+              onChange={(e) => setImpactNote(e.target.value)}
+              placeholder="Expected output (e.g. 30 trainees)"
+              className="text-sm"
+            />
+          </>
+        )}
+      </div>
       <div className="flex gap-2">
-        <Button size="sm" onClick={() => onSave({ milestone_name: name.trim(), responsible_person: person.trim() || null, due_date: due || null, notes: notes.trim() || null })}>Save</Button>
-        <Button size="sm" variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button
+          size="sm"
+          onClick={() =>
+            onSave({
+              milestone_name: name.trim(),
+              responsible_person: person.trim() || null,
+              due_date: due || null,
+              notes: notes.trim() || null,
+              linked_org_indicator_ids: affectsImpact ? linkedIds : [],
+              impact_expected_output_note: affectsImpact ? impactNote.trim() || null : null,
+            })
+          }
+        >
+          Save
+        </Button>
+        <Button size="sm" variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
       </div>
     </div>
   );
@@ -208,8 +302,17 @@ export default function DecisionWorkspacePage() {
   const [executionSaving, setExecutionSaving] = useState(false);
   const [newMilestoneName, setNewMilestoneName] = useState("");
   const [editingMilestoneId, setEditingMilestoneId] = useState<number | null>(null);
+  const [editingEmrMilestoneId, setEditingEmrMilestoneId] = useState<string | null>(null);
+  const [editingEmrDraft, setEditingEmrDraft] = useState<{ title: string; owner: string; due_date: string } | null>(null);
+  const [newEmrMilestoneTitle, setNewEmrMilestoneTitle] = useState("");
+  const [newEmrMilestoneOwner, setNewEmrMilestoneOwner] = useState("");
+  const [newEmrMilestoneDue, setNewEmrMilestoneDue] = useState("");
   const [readiness, setReadiness] = useState<ReadinessOut | null>(null);
   const [outcomeReviews, setOutcomeReviews] = useState<OutcomeReviewOut[]>([]);
+  const [impactProfile, setImpactProfile] = useState<ImpactProfileOut | null>(null);
+  const [milestoneCompletePrompt, setMilestoneCompletePrompt] = useState<{ milestone: MilestoneOut } | null>(null);
+  const [milestoneImpactValues, setMilestoneImpactValues] = useState<Record<number, string>>({});
+  const [milestoneImpactSaving, setMilestoneImpactSaving] = useState(false);
   const [chatSessionId, setChatSessionId] = useState<string | null>(null);
   const [chatInitialMessage, setChatInitialMessage] = useState<string | null>(null);
   const [chatMessages, setChatMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
@@ -285,6 +388,11 @@ export default function DecisionWorkspacePage() {
   }
 
   useEffect(() => {
+    if (!decisionId) return;
+    getImpactProfile(decisionId).then(setImpactProfile).catch(() => setImpactProfile(null));
+  }, [decisionId]);
+
+  useEffect(() => {
     load();
   }, [load]);
 
@@ -354,6 +462,20 @@ export default function DecisionWorkspacePage() {
     if (!decisionId) return;
     listDecisionComments(decisionId).then(setComments).catch(() => []);
   }, [decisionId, decision]);
+
+  // Scroll to finalize section when URL hash is #finalize (e.g. "Do this" from activation checklist)
+  useEffect(() => {
+    const scrollToFinalize = () => {
+      if (typeof window === "undefined" || window.location.hash !== "#finalize") return;
+      const el = document.getElementById("finalize");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    };
+    scrollToFinalize();
+    window.addEventListener("hashchange", scrollToFinalize);
+    return () => window.removeEventListener("hashchange", scrollToFinalize);
+  }, [decisionId]);
 
   useEffect(() => {
     if (!decisionId) return;
@@ -481,15 +603,57 @@ export default function DecisionWorkspacePage() {
     }
   }
 
-  async function handleUpdateMilestone(milestoneId: number, body: { milestone_name?: string; responsible_person?: string | null; due_date?: string | null; status?: string; notes?: string | null }) {
+  async function handleUpdateMilestone(milestoneId: number, body: MilestoneUpdateBody) {
     if (!decisionId) return;
     setActionError(null);
     try {
       await updateMilestone(decisionId, milestoneId, body);
       setEditingMilestoneId(null);
+      setMilestoneCompletePrompt(null);
+      setMilestoneImpactValues({});
       loadMilestonesOnly();
     } catch (e: unknown) {
       setActionError(getApiErrorMessage(e, "Failed to update milestone"));
+    }
+  }
+
+  async function handleMarkCompleteWithImpact(m: MilestoneOut) {
+    const linkedIds = m.linked_org_indicator_ids ?? [];
+    if (linkedIds.length === 0) {
+      await handleUpdateMilestone(m.id, { status: "completed" });
+      return;
+    }
+    setMilestoneCompletePrompt({ milestone: m });
+    setMilestoneImpactValues({});
+  }
+
+  async function submitMilestoneImpactAndComplete() {
+    const prompt = milestoneCompletePrompt;
+    if (!prompt || !decisionId) return;
+    const { milestone } = prompt;
+    const linkedIds = milestone.linked_org_indicator_ids ?? [];
+    setMilestoneImpactSaving(true);
+    try {
+      const y = new Date().getFullYear();
+      const mth = new Date().getMonth() + 1;
+      const periodStart = `${y}-${String(mth).padStart(2, "0")}-01`;
+      const periodEnd = `${y}-${String(mth).padStart(2, "0")}-28`;
+      for (const indId of linkedIds) {
+        const val = milestoneImpactValues[indId];
+        if (val != null && val.trim() !== "" && !Number.isNaN(Number(val))) {
+          await postImpactMeasurement({
+            org_impact_indicator_id: indId,
+            period_start: periodStart,
+            period_end: periodEnd,
+            value: Number(val),
+          });
+        }
+      }
+      await handleUpdateMilestone(milestone.id, { status: "completed" });
+    } catch (e: unknown) {
+      setActionError(getApiErrorMessage(e, "Failed to save impact data"));
+    } finally {
+      setMilestoneImpactSaving(false);
     }
   }
 
@@ -720,7 +884,7 @@ export default function DecisionWorkspacePage() {
           </div>
         )}
 
-        <div className="flex flex-wrap gap-2">
+        <div id="finalize" className="flex flex-wrap gap-2 scroll-mt-4">
           {canFinalize && (
             <Button onClick={handleFinalize} disabled={busy}>
               {busy ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Lock className="w-4 h-4 mr-2" />}
@@ -735,13 +899,34 @@ export default function DecisionWorkspacePage() {
           )}
         </div>
 
+        {isDraft && evidence.length === 0 && (
+          <div className="mb-4 rounded-md border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 text-sm text-amber-800 dark:text-amber-200">
+            <strong>At least one evidence link required before finalize.</strong>{" "}
+            Add a URL or upload a file in the{" "}
+            <button
+              type="button"
+              onClick={() => router.replace(`/decisions/${decisionId}?tab=evidence`)}
+              className="font-medium underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-amber-500 rounded"
+            >
+              Evidence
+            </button>{" "}
+            tab.
+          </div>
+        )}
+
         <Tabs
-          value={["overview", "execution", "chat", "history", "timeline"].includes(searchParams.get("tab") ?? "") ? searchParams.get("tab")! : "overview"}
+          value={["overview", "execution", "chat", "history", "timeline", "evidence"].includes(searchParams.get("tab") ?? "") ? searchParams.get("tab")! : "overview"}
           onValueChange={(v) => router.replace(`/decisions/${decisionId}?tab=${v}`)}
         >
           <TabsList className="sticky top-[57px] z-10 bg-background/95 backdrop-blur border-b border-border rounded-b-none w-full justify-start overflow-x-auto">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="execution">Execution</TabsTrigger>
+            <TabsTrigger value="evidence">
+              Evidence
+              {isDraft && evidence.length === 0 && (
+                <span className="ml-1.5 inline-flex h-2 w-2 rounded-full bg-amber-500" aria-hidden />
+              )}
+            </TabsTrigger>
             <TabsTrigger value="chat">Chat</TabsTrigger>
             <TabsTrigger value="history">History</TabsTrigger>
             {decision.enterprise_id != null && (
@@ -820,39 +1005,180 @@ export default function DecisionWorkspacePage() {
                   openId={openInfoId}
                   setOpenId={setOpenInfoId}
                   title={<CardTitle className="text-base">EMR: Milestones</CardTitle>}
-                  content="What it's for: Track key steps to execute this decision (from diagnostic or added by you). Use it: Update status (pending → in progress → done) as work progresses; changes are saved to the artifact."
+                  content="What it's for: Track key steps to execute this decision (from diagnostic or added by you). Use it: Edit titles and owners, add or remove milestones, and update status (pending → in progress → done); changes are saved to the artifact."
                 />
-                <p className="text-xs text-muted-foreground">From artifact; status: pending → in_progress → done.</p>
+                <p className="text-xs text-muted-foreground">Edit, add, or remove milestones below. Status: pending → in progress → done.</p>
               </CardHeader>
               <CardContent className="space-y-2">
-                {emrMilestones.length === 0 ? (
-                  <p className="text-muted-foreground text-sm">No EMR milestones yet. Run a diagnostic to bootstrap.</p>
-                ) : (
-                  <ul className="space-y-2">
-                    {emrMilestones.map((m) => (
-                      <li key={m.id || ""} className="border rounded-md p-2 flex flex-wrap items-center gap-2 text-sm">
-                        <span className="font-medium">{m.title ?? "-"}</span>
-                        <span className="text-muted-foreground">{m.owner ?? ""}</span>
-                        <span className="text-muted-foreground">{m.due_date ? new Date(m.due_date).toLocaleDateString() : ""}</span>
-                        <Select
-                          value={(m.status ?? "pending").toString().toLowerCase()}
-                          onValueChange={(v) => {
-                            const current = (m.status ?? "pending").toString().toLowerCase();
-                            if (v === current) return;
-                            const list = emrMilestones.map((x) => (x.id === m.id ? { ...x, status: v } : x));
-                            patchEmr({ milestones: list });
-                          }}
-                        >
-                          <SelectTrigger className="w-[140px] h-8"> <SelectValue /> </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="in_progress">In progress</SelectItem>
-                            <SelectItem value="done">Done</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </li>
-                    ))}
-                  </ul>
+                {emrMilestones.length === 0 && !newEmrMilestoneTitle && !newEmrMilestoneOwner && !newEmrMilestoneDue && (
+                  <p className="text-muted-foreground text-sm">No EMR milestones yet. Add one below or run a diagnostic to bootstrap.</p>
+                )}
+                <ul className="space-y-2">
+                  {emrMilestones.map((m) => (
+                    <li key={m.id || ""} className="border rounded-md p-2 text-sm">
+                      {editingEmrMilestoneId === (m.id ?? "") ? (
+                        <div className="flex flex-col gap-2">
+                          <Label className="text-xs">Title</Label>
+                          <Input
+                            value={editingEmrDraft?.title ?? m.title ?? ""}
+                            onChange={(e) => setEditingEmrDraft((d) => (d ? { ...d, title: e.target.value } : null))}
+                            placeholder="Milestone title"
+                            className="h-9"
+                          />
+                          <div className="flex gap-2 flex-wrap">
+                            <div className="space-y-1">
+                              <Label className="text-xs">Owner</Label>
+                              <Input
+                                value={editingEmrDraft?.owner ?? m.owner ?? ""}
+                                onChange={(e) => setEditingEmrDraft((d) => (d ? { ...d, owner: e.target.value } : null))}
+                                placeholder="Owner"
+                                className="h-9 w-36"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">Due date</Label>
+                              <Input
+                                type="date"
+                                value={((editingEmrDraft?.due_date ?? m.due_date ?? "")).toString().slice(0, 10)}
+                                onChange={(e) => setEditingEmrDraft((d) => (d ? { ...d, due_date: e.target.value } : null))}
+                                className="h-9 w-36"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                if (!editingEmrDraft) return;
+                                const list = emrMilestones.map((x) =>
+                                  x.id === m.id
+                                    ? { ...x, title: editingEmrDraft.title.trim() || x.title, owner: editingEmrDraft.owner.trim() || x.owner, due_date: editingEmrDraft.due_date.trim() || x.due_date }
+                                    : x
+                                );
+                                patchEmr({ milestones: list });
+                                setEditingEmrMilestoneId(null);
+                                setEditingEmrDraft(null);
+                              }}
+                            >
+                              Save
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => { setEditingEmrMilestoneId(null); setEditingEmrDraft(null); }}>Cancel</Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-medium">{m.title ?? "-"}</span>
+                          <span className="text-muted-foreground">{m.owner ?? ""}</span>
+                          <span className="text-muted-foreground">{m.due_date ? new Date(m.due_date).toLocaleDateString() : ""}</span>
+                          <Select
+                            value={(m.status ?? "pending").toString().toLowerCase()}
+                            onValueChange={(v) => {
+                              const current = (m.status ?? "pending").toString().toLowerCase();
+                              if (v === current) return;
+                              const list = emrMilestones.map((x) => (x.id === m.id ? { ...x, status: v } : x));
+                              patchEmr({ milestones: list });
+                            }}
+                          >
+                            <SelectTrigger className="w-[140px] h-8"> <SelectValue /> </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pending">Pending</SelectItem>
+                              <SelectItem value="in_progress">In progress</SelectItem>
+                              <SelectItem value="done">Done</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {isDraft && (
+                            <>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 shrink-0"
+                                onClick={() => {
+                                  setEditingEmrMilestoneId(m.id ?? null);
+                                  setEditingEmrDraft({ title: m.title ?? "", owner: m.owner ?? "", due_date: (m.due_date ?? "").toString().slice(0, 10) });
+                                }}
+                                aria-label="Edit milestone"
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 shrink-0 text-destructive hover:text-destructive"
+                                onClick={() => {
+                                  if (!confirm("Remove this milestone?")) return;
+                                  patchEmr({ milestones: emrMilestones.filter((x) => x.id !== m.id) });
+                                  setEditingEmrMilestoneId(null);
+                                  setEditingEmrDraft(null);
+                                }}
+                                aria-label="Remove milestone"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+                {/* Add milestone — always visible in same section */}
+                {isDraft && (
+                  <div className="border border-dashed rounded-md p-3 space-y-2 mt-2">
+                    <p className="text-xs font-medium text-muted-foreground">Add milestone</p>
+                    <div className="flex flex-wrap gap-2 items-end">
+                      <div className="space-y-1">
+                        <Label className="text-xs">Title</Label>
+                        <Input
+                          value={newEmrMilestoneTitle}
+                          onChange={(e) => setNewEmrMilestoneTitle(e.target.value)}
+                          placeholder="e.g. Improve cash position"
+                          className="h-9 min-w-[180px]"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Owner</Label>
+                        <Input
+                          value={newEmrMilestoneOwner}
+                          onChange={(e) => setNewEmrMilestoneOwner(e.target.value)}
+                          placeholder="Owner"
+                          className="h-9 w-28"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Due date</Label>
+                        <Input
+                          type="date"
+                          value={newEmrMilestoneDue}
+                          onChange={(e) => setNewEmrMilestoneDue(e.target.value)}
+                          className="h-9 w-36"
+                        />
+                      </div>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          if (!newEmrMilestoneTitle.trim()) return;
+                          const id = `ms-${Date.now()}`;
+                          const newM = {
+                            id,
+                            title: newEmrMilestoneTitle.trim(),
+                            owner: newEmrMilestoneOwner.trim() || undefined,
+                            due_date: newEmrMilestoneDue.trim() || undefined,
+                            status: "pending",
+                          };
+                          patchEmr({ milestones: [...emrMilestones, newM] });
+                          setNewEmrMilestoneTitle("");
+                          setNewEmrMilestoneOwner("");
+                          setNewEmrMilestoneDue("");
+                        }}
+                        disabled={!newEmrMilestoneTitle.trim() || artifactSaving}
+                      >
+                        {artifactSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4 mr-1" />}
+                        Add
+                      </Button>
+                    </div>
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -1181,6 +1507,7 @@ export default function DecisionWorkspacePage() {
                         {editingMilestoneId === m.id ? (
                           <MilestoneEditRow
                             milestone={m}
+                            impactIndicators={impactProfile?.indicators ?? []}
                             onSave={(body) => handleUpdateMilestone(m.id, body)}
                             onCancel={() => setEditingMilestoneId(null)}
                           />
@@ -1188,7 +1515,11 @@ export default function DecisionWorkspacePage() {
                           <>
                             <button
                               type="button"
-                              onClick={() => handleUpdateMilestone(m.id, { status: m.status === "completed" ? "pending" : "completed" })}
+                              onClick={() =>
+                                m.status === "completed"
+                                  ? handleUpdateMilestone(m.id, { status: "pending" })
+                                  : handleMarkCompleteWithImpact(m)
+                              }
                               className="shrink-0"
                               title={m.status === "completed" ? "Mark pending" : "Mark complete"}
                             >
@@ -1208,6 +1539,68 @@ export default function DecisionWorkspacePage() {
                       </li>
                     ))}
                   </ul>
+                )}
+                {milestoneCompletePrompt && (
+                  <Card className="mt-4 border-primary/30">
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <CardTitle className="text-base">Update impact metrics for this milestone</CardTitle>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          handleUpdateMilestone(milestoneCompletePrompt.milestone.id, { status: "completed" });
+                          setMilestoneCompletePrompt(null);
+                          setMilestoneImpactValues({});
+                        }}
+                      >
+                        Skip
+                      </Button>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <p className="text-sm text-muted-foreground">
+                        Log values for the indicators linked to this milestone (optional). Period: current month.
+                      </p>
+                      {(milestoneCompletePrompt.milestone.linked_org_indicator_ids ?? []).map((indId) => {
+                        const ind = impactProfile?.indicators.find((i) => i.id === indId);
+                        const template = ind ? getIndicatorById(ind.indicator_template_id) : undefined;
+                        const label = template?.name ?? ind?.indicator_template_id ?? `Indicator ${indId}`;
+                        return (
+                          <div key={indId} className="flex items-center gap-2">
+                            <Label className="w-48 text-sm shrink-0">{label}</Label>
+                            <Input
+                              type="number"
+                              placeholder="Value"
+                              className="w-28"
+                              value={milestoneImpactValues[indId] ?? ""}
+                              onChange={(e) =>
+                                setMilestoneImpactValues((prev) => ({ ...prev, [indId]: e.target.value }))
+                              }
+                            />
+                          </div>
+                        );
+                      })}
+                      <div className="flex gap-2 pt-2">
+                        <Button
+                          size="sm"
+                          disabled={milestoneImpactSaving}
+                          onClick={submitMilestoneImpactAndComplete}
+                        >
+                          {milestoneImpactSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                          Save & mark complete
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setMilestoneCompletePrompt(null);
+                            setMilestoneImpactValues({});
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
                 )}
               </CardContent>
             </Card>

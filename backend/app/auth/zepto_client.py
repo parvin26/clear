@@ -1,4 +1,5 @@
 """Zepto Mail API client for sending OTP and magic-link emails."""
+import base64
 import logging
 from typing import Optional, Tuple
 
@@ -51,22 +52,50 @@ async def send_email(
     }
     if text_body:
         payload["textbody"] = text_body
+    return await _send_payload(payload, to_email)
+
+
+async def send_email_with_attachment(
+    to_email: str,
+    subject: str,
+    html_body: str,
+    attachment_bytes: bytes,
+    filename: str,
+    *,
+    to_name: Optional[str] = None,
+) -> Tuple[bool, Optional[str]]:
+    """Send email with a single attachment (e.g. PDF). Zepto expects attachments[].content in base64."""
+    if not settings.ZEPTO_MAIL_API_KEY:
+        logger.warning("ZEPTO_MAIL_API_KEY not set; skipping send_email_with_attachment to %s", to_email)
+        return False, "Email not configured (no API key)."
+    payload = {
+        "from": {
+            "address": settings.ZEPTO_MAIL_FROM_EMAIL,
+            "name": settings.ZEPTO_MAIL_FROM_NAME,
+        },
+        "to": [{"email_address": {"address": to_email, "name": to_name or to_email}}],
+        "subject": subject,
+        "htmlbody": html_body,
+        "attachments": [
+            {"filename": filename, "content": base64.b64encode(attachment_bytes).decode("ascii")}
+        ],
+    }
+    return await _send_payload(payload, to_email)
+
+
+async def _send_payload(payload: dict, to_email: str) -> Tuple[bool, Optional[str]]:
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:
             r = await client.post(ZEPTO_EMAIL_URL, json=payload, headers=_zepto_headers())
             if r.is_success:
                 logger.info("Zepto email sent to %s", to_email)
-                print(f"[CLEAR] Verification email sent to {to_email}")
                 return True, None
             err_msg = f"Zepto API {r.status_code}: {r.text[:200] if r.text else 'no body'}"
             logger.warning("Zepto Mail API error: %s", err_msg)
-            print(f"[CLEAR] Zepto send failed: {err_msg}")
             return False, err_msg
     except Exception as e:
         logger.exception("Zepto Mail send failed: %s", e)
-        err_msg = str(e)
-        print(f"[CLEAR] Zepto send error: {err_msg}")
-        return False, err_msg
+        return False, str(e)
 
 
 async def send_otp_email(to_email: str, otp: str) -> Tuple[bool, Optional[str]]:

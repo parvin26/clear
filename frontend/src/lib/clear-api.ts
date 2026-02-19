@@ -80,6 +80,8 @@ export interface MilestoneOut {
   due_date: string | null;
   status: string;
   notes: string | null;
+  linked_org_indicator_ids?: number[] | null;
+  impact_expected_output_note?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -249,6 +251,150 @@ export async function submitIdeaStageSignup(body: { email?: string; short_text?:
   return data;
 }
 
+export async function submitInvestorProfile(body: {
+  onboarding_context?: Record<string, unknown> | null;
+  investor_profile: { sectors: string[]; geographies: string[]; themes: string[]; portfolio_stage: string; primary_needs: string[] };
+}): Promise<{ ok: boolean; message?: string }> {
+  const { data } = await apiClient.post<{ ok: boolean; message?: string }>("/api/intake/investor-profile", body);
+  return data;
+}
+
+// Impact (Phase 3)
+export interface ImpactProfileSeedOut {
+  categories: string[];
+  metric_focus_areas: string[];
+  tracking_existing: boolean;
+  tracking_notes?: string | null;
+  seeking_impact_capital: boolean;
+}
+
+export interface ImpactProfileOut {
+  decision_id: string;
+  impact_categories: string[];
+  primary_sdg_tags: string[];
+  theory_of_change?: { problem?: string; solution?: string; beneficiaries?: string; change_sought?: string } | null;
+  indicators: { id: number; indicator_template_id: string; target_value?: number | null; target_year?: number | null; latest_value?: number | null; latest_period?: string | null }[];
+}
+
+export async function getImpactSeed(decisionId: string): Promise<ImpactProfileSeedOut> {
+  const { data } = await apiClient.get<ImpactProfileSeedOut>("/api/clear/impact/seed", {
+    params: { decision_id: decisionId },
+  });
+  return data;
+}
+
+export async function getImpactProfile(decisionId: string): Promise<ImpactProfileOut> {
+  const { data } = await apiClient.get<ImpactProfileOut>("/api/clear/impact/profile", {
+    params: { decision_id: decisionId },
+  });
+  return data;
+}
+
+export async function putImpactProfile(payload: {
+  decision_id: string;
+  impact_categories: string[];
+  primary_sdg_tags: string[];
+  theory_of_change?: { problem?: string; solution?: string; beneficiaries?: string; change_sought?: string } | null;
+  indicators: { indicator_template_id: string; target_value?: number | null; target_year?: number | null }[];
+}): Promise<ImpactProfileOut> {
+  const { data } = await apiClient.put<ImpactProfileOut>("/api/clear/impact/profile", payload);
+  return data;
+}
+
+export async function postImpactMeasurement(payload: {
+  org_impact_indicator_id: number;
+  period_start: string;
+  period_end: string;
+  value: number;
+  data_source?: string;
+  notes?: string | null;
+}): Promise<{ ok: boolean; id: number }> {
+  const { data } = await apiClient.post<{ ok: boolean; id: number }>("/api/clear/impact/measurement", payload);
+  return data;
+}
+
+/** Phase 4: Download impact report as PDF (blob). */
+export async function downloadImpactReportPdf(decisionId: string, period = "year_to_date"): Promise<Blob> {
+  const { data } = await apiClient.post<Blob>(
+    "/api/clear/impact/report",
+    { decision_id: decisionId, period },
+    { responseType: "blob" }
+  );
+  return data;
+}
+
+/** Phase 4: Email impact report PDF to recipient. */
+export async function emailImpactReport(
+  decisionId: string,
+  recipientEmail: string
+): Promise<{ ok: boolean; message?: string }> {
+  const { data } = await apiClient.post<{ ok: boolean; message?: string }>(
+    "/api/clear/impact/report/email",
+    { decision_id: decisionId, recipient_email: recipientEmail }
+  );
+  return data;
+}
+
+/** Phase 4: Completed milestones with linked indicators (for dashboard reminder). */
+export async function getCompletedMilestonesReminder(decisionId: string): Promise<{
+  count: number;
+  milestone_ids: number[];
+}> {
+  const { data } = await apiClient.get<{ count: number; milestone_ids: number[] }>(
+    "/api/clear/impact/completed-milestones-reminder",
+    { params: { decision_id: decisionId } }
+  );
+  return data;
+}
+
+/** Phase 4: Impact products (accounting hooks). */
+export interface ImpactProductOut {
+  id: number;
+  decision_id: string | null;
+  name: string;
+  sku: string | null;
+  linked_indicator_ids: number[];
+  impact_coefficients: Record<string, number>;
+}
+
+export async function listImpactProducts(decisionId: string): Promise<ImpactProductOut[]> {
+  const { data } = await apiClient.get<ImpactProductOut[]>("/api/clear/impact/products", {
+    params: { decision_id: decisionId },
+  });
+  return data;
+}
+
+export async function createImpactProduct(body: {
+  decision_id: string;
+  name: string;
+  sku?: string | null;
+  linked_indicator_ids?: number[];
+  beneficiaries_per_unit?: number | null;
+}): Promise<ImpactProductOut> {
+  const { data } = await apiClient.post<ImpactProductOut>("/api/clear/impact/products", body);
+  return data;
+}
+
+export async function updateImpactProduct(
+  productId: number,
+  body: { name?: string; sku?: string | null; linked_indicator_ids?: number[]; beneficiaries_per_unit?: number | null }
+): Promise<ImpactProductOut> {
+  const { data } = await apiClient.patch<ImpactProductOut>(`/api/clear/impact/products/${productId}`, body);
+  return data;
+}
+
+export async function postTransactionsPreview(
+  decisionId: string,
+  transactions: { sku: string; quantity?: number; date?: string; amount?: number }[]
+): Promise<{ total_estimated_beneficiaries: number; by_indicator: Record<number, number>; by_period: Record<string, number> }> {
+  const { data } = await apiClient.post(
+    "/api/clear/impact/transactions-preview",
+    transactions,
+    { params: { decision_id: decisionId } }
+  );
+  return data;
+}
+
 export async function submitHumanReviewRequest(body: {
   decision_id: string;
   name?: string;
@@ -329,7 +475,15 @@ export async function listMilestones(decisionId: string): Promise<MilestoneOut[]
 
 export async function createMilestone(
   decisionId: string,
-  body: { milestone_name: string; responsible_person?: string | null; due_date?: string | null; status?: string; notes?: string | null }
+  body: {
+    milestone_name: string;
+    responsible_person?: string | null;
+    due_date?: string | null;
+    status?: string;
+    notes?: string | null;
+    linked_org_indicator_ids?: number[] | null;
+    impact_expected_output_note?: string | null;
+  }
 ): Promise<MilestoneOut> {
   const { data } = await apiClient.post<MilestoneOut>(`/api/clear/decisions/${decisionId}/milestones`, body);
   return data;
@@ -338,7 +492,15 @@ export async function createMilestone(
 export async function updateMilestone(
   decisionId: string,
   milestoneId: number,
-  body: { milestone_name?: string; responsible_person?: string | null; due_date?: string | null; status?: string; notes?: string | null }
+  body: {
+    milestone_name?: string;
+    responsible_person?: string | null;
+    due_date?: string | null;
+    status?: string;
+    notes?: string | null;
+    linked_org_indicator_ids?: number[] | null;
+    impact_expected_output_note?: string | null;
+  }
 ): Promise<MilestoneOut> {
   const { data } = await apiClient.patch<MilestoneOut>(`/api/clear/decisions/${decisionId}/milestones/${milestoneId}`, body);
   return data;

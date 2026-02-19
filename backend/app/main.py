@@ -27,6 +27,8 @@ from app.routes import (
     advisor_routes,
     demo_routes,
     inquiry_routes,
+    intake_routes,
+    impact_routes,
 )
 from app.enterprise.routes import router as enterprise_router
 from app.execution.routes import router as execution_router
@@ -159,6 +161,8 @@ app.include_router(institutional_router)
 app.include_router(auth_router, prefix=settings.API_V1_PREFIX)
 app.include_router(demo_routes.router)
 app.include_router(inquiry_routes.router)
+app.include_router(intake_routes.router)
+app.include_router(impact_routes.router)
 
 
 @app.get("/api/health")

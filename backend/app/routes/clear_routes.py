@@ -830,6 +830,8 @@ def create_milestone(decision_id: UUID, body: MilestoneCreate, db: Session = Dep
         due_date=body.due_date,
         status=body.status,
         notes=body.notes,
+        linked_org_indicator_ids=body.linked_org_indicator_ids if body.linked_org_indicator_ids is not None else [],
+        impact_expected_output_note=body.impact_expected_output_note,
     )
     db.add(m)
     db.commit()

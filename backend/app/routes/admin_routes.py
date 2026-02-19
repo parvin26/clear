@@ -1,6 +1,6 @@
-"""Admin-only routes: monthly snapshots, etc. Gated by ADMIN_API_KEY."""
+"""Admin-only routes: monthly snapshots, impact-intake view. Gated by ADMIN_API_KEY."""
 from datetime import date
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel
@@ -15,7 +15,12 @@ from app.db.models import (
     DecisionVelocitySnapshot,
     CohortEnterprise,
     PortfolioEnterprise,
+    DiagnosticRun,
+    InvestorProfileSubmission,
+    TelemetryEvent,
 )
+from sqlalchemy import func, and_
+from datetime import datetime, timezone, timedelta
 
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
@@ -204,4 +209,178 @@ def run_monthly_snapshots(
         "enterprises_processed": len(enterprise_ids),
         "snapshots_written": counts,
         "errors": errors,
+    }
+
+
+# ----- Impact intake (Phase 3): list social enterprise runs + investor profiles -----
+
+
+@router.get("/impact-intake")
+def get_impact_intake(
+    _: None = Depends(require_admin_key),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """
+    List diagnostic runs with impact_profile (social enterprise) and investor_profile submissions.
+    For internal analytics; requires X-Admin-API-Key (or Admin-Api-Key) header.
+    """
+    # Runs where diagnostic_data has key 'impact_profile'
+    runs_with_impact = (
+        db.query(DiagnosticRun)
+        .filter(DiagnosticRun.diagnostic_data.has_key("impact_profile"))
+        .order_by(DiagnosticRun.created_at.desc())
+        .all()
+    )
+
+    def run_row(r: DiagnosticRun) -> dict[str, Any]:
+        ctx = (r.onboarding_context or {}) or {}
+        impact = (r.diagnostic_data or {}).get("impact_profile") or {}
+        return {
+            "created_at": r.created_at.isoformat() if r.created_at else None,
+            "decision_id": str(r.decision_id) if r.decision_id else None,
+            "organization_name": ctx.get("company_name"),
+            "country": ctx.get("country"),
+            "sector": ctx.get("industry"),
+            "impact_categories": impact.get("categories", []),
+            "metric_focus_areas": impact.get("metric_focus_areas", []),
+            "tracking_existing": impact.get("tracking_existing"),
+            "seeking_impact_capital": impact.get("seeking_impact_capital"),
+        }
+
+    social_enterprise_rows = [run_row(r) for r in runs_with_impact]
+
+    # Aggregations for social enterprise
+    category_counts: dict[str, int] = {}
+    focus_counts: dict[str, int] = {}
+    seeking_count = 0
+    for r in runs_with_impact:
+        impact = (r.diagnostic_data or {}).get("impact_profile") or {}
+        for c in impact.get("categories") or []:
+            category_counts[c] = category_counts.get(c, 0) + 1
+        for f in impact.get("metric_focus_areas") or []:
+            focus_counts[f] = focus_counts.get(f, 0) + 1
+        if impact.get("seeking_impact_capital"):
+            seeking_count += 1
+
+    investors = (
+        db.query(InvestorProfileSubmission)
+        .order_by(InvestorProfileSubmission.created_at.desc())
+        .all()
+    )
+
+    def investor_row(i: InvestorProfileSubmission) -> dict[str, Any]:
+        prof = i.investor_profile or {}
+        return {
+            "created_at": i.created_at.isoformat() if i.created_at else None,
+            "sectors": prof.get("sectors", []),
+            "geographies": prof.get("geographies", []),
+            "themes": prof.get("themes", []),
+            "portfolio_stage": prof.get("portfolio_stage"),
+            "primary_needs": prof.get("primary_needs", []),
+        }
+
+    investor_rows = [investor_row(i) for i in investors]
+
+    # Investor aggregations
+    theme_counts: dict[str, int] = {}
+    need_counts: dict[str, int] = {}
+    stage_counts: dict[str, int] = {}
+    for i in investors:
+        prof = i.investor_profile or {}
+        for t in prof.get("themes") or []:
+            theme_counts[t] = theme_counts.get(t, 0) + 1
+        for n in prof.get("primary_needs") or []:
+            need_counts[n] = need_counts.get(n, 0) + 1
+        stage = prof.get("portfolio_stage") or "unknown"
+        stage_counts[stage] = stage_counts.get(stage, 0) + 1
+
+    return {
+        "social_enterprise": {
+            "count": len(social_enterprise_rows),
+            "rows": social_enterprise_rows,
+            "aggregations": {
+                "impact_categories_frequency": category_counts,
+                "metric_focus_areas_frequency": focus_counts,
+                "seeking_impact_capital_count": seeking_count,
+                "seeking_impact_capital_pct": round(100.0 * seeking_count / len(runs_with_impact), 1) if runs_with_impact else 0,
+            },
+        },
+        "investor": {
+            "count": len(investor_rows),
+            "rows": investor_rows,
+            "aggregations": {
+                "themes_frequency": theme_counts,
+                "primary_needs_frequency": need_counts,
+                "portfolio_stage_counts": stage_counts,
+            },
+        },
+    }
+
+
+@router.get("/funnel")
+def get_diagnostic_funnel(
+    _: None = Depends(require_admin_key),
+    db: Session = Depends(get_db),
+    days: int = 30,
+) -> dict[str, Any]:
+    """
+    Minimal funnel: counts of diagnostic intake events in the last N days.
+    """
+    since = datetime.now(timezone.utc) - timedelta(days=days)
+    started = (
+        db.query(func.count(TelemetryEvent.id))
+        .filter(
+            and_(
+                TelemetryEvent.created_at >= since,
+                TelemetryEvent.event_name == "diagnostic_intake_started",
+            )
+        )
+        .scalar()
+        or 0
+    )
+    completed = (
+        db.query(func.count(TelemetryEvent.id))
+        .filter(
+            and_(
+                TelemetryEvent.created_at >= since,
+                TelemetryEvent.event_name == "diagnostic_intake_completed",
+            )
+        )
+        .scalar()
+        or 0
+    )
+    role_rows = (
+        db.query(TelemetryEvent.properties)
+        .filter(
+            and_(
+                TelemetryEvent.created_at >= since,
+                TelemetryEvent.event_name == "diagnostic_role_selected",
+            )
+        )
+        .all()
+    )
+    by_role: dict[str, int] = {}
+    for (props,) in role_rows:
+        role = (props or {}).get("role") or "unknown"
+        by_role[role] = by_role.get(role, 0) + 1
+    legacy_rows = (
+        db.query(TelemetryEvent.properties)
+        .filter(
+            and_(
+                TelemetryEvent.created_at >= since,
+                TelemetryEvent.event_name == "diagnostic_legacy_wizard_clicked",
+            )
+        )
+        .all()
+    )
+    legacy_clicked: dict[str, int] = {}
+    for (props,) in legacy_rows:
+        label = (props or {}).get("label") or "unknown"
+        legacy_clicked[label] = legacy_clicked.get(label, 0) + 1
+    return {
+        "days": days,
+        "diagnostic_intake_started": started,
+        "diagnostic_role_selected": by_role,
+        "diagnostic_intake_completed": completed,
+        "diagnostic_legacy_wizard_clicked": legacy_clicked,
     }
