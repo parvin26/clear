@@ -2,7 +2,7 @@
 
 import { Label } from "@/components/ui/label";
 import { INTAKE_COUNTRIES, INTAKE_SECTORS, PORTFOLIO_STAGE_OPTIONS, INVESTOR_NEED_OPTIONS } from "@/lib/intake-constants";
-import type { InvestorProfile, ImpactCategoryId, StepId } from "@/lib/intake-types";
+import type { InvestorProfile, InvestorNeed, ImpactCategoryId, StepId } from "@/lib/intake-types";
 import { IMPACT_CATEGORIES } from "@/lib/intake-constants";
 import { Check } from "lucide-react";
 
@@ -32,7 +32,7 @@ export function StepInvestorProfile({ stepId, value, onChange }: StepInvestorPro
   };
 
   const needs = value.primary_needs ?? [];
-  const toggleNeed = (n: string) => {
+  const toggleNeed = (n: InvestorNeed) => {
     const next = needs.includes(n) ? needs.filter((x) => x !== n) : [...needs, n];
     onChange({ ...value, primary_needs: next });
   };
