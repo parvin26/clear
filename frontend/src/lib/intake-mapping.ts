@@ -61,7 +61,7 @@ function founderToDiagnosticData(f: FounderAnswers): DiagnosticDataOut {
   const situationClarifiers = Array.isArray(f.situationClarifiers)
     ? f.situationClarifiers
     : typeof f.situationClarifiers === "string"
-      ? f.situationClarifiers
+      ? (f.situationClarifiers as string)
           .split(/[,;]/)
           .map((s) => s.trim())
           .filter(Boolean)
