@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense, useState, useEffect } from "react";
 import { Shell } from "@/components/layout/Shell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, CheckCircle, Zap } from "lucide-react";
 import Link from "next/link";
@@ -34,7 +34,7 @@ function getDiagnosticPath(challenge: string): { path: string; label: string } {
   }
 }
 
-export default function GetStartedPage() {
+function GetStartedContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -375,3 +375,10 @@ export default function GetStartedPage() {
   );
 }
 
+export default function GetStartedPage() {
+  return (
+    <Suspense fallback={<Shell><div className="min-h-[40vh] flex items-center justify-center px-4"><p className="text-ink-muted">Loading…</p></div></Shell>}>
+      <GetStartedContent />
+    </Suspense>
+  );
+}

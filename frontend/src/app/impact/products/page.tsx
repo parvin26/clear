@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Shell } from "@/components/layout/Shell";
@@ -20,7 +20,7 @@ import {
 import { getIndicatorById } from "@/lib/impact-indicators";
 import { Loader2 } from "lucide-react";
 
-export default function ImpactProductsPage() {
+function ImpactProductsContent() {
   const searchParams = useSearchParams();
   const decisionId = searchParams.get("decision_id");
 
@@ -257,5 +257,13 @@ export default function ImpactProductsPage() {
         </Card>
       </div>
     </Shell>
+  );
+}
+
+export default function ImpactProductsPage() {
+  return (
+    <Suspense fallback={<Shell><div className="min-h-screen flex items-center justify-center"><p className="text-ink-muted">Loading…</p></div></Shell>}>
+      <ImpactProductsContent />
+    </Suspense>
   );
 }

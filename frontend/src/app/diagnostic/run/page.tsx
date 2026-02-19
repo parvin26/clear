@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DiagnosticWizard } from "@/components/diagnostic/DiagnosticWizard";
 import { Shell } from "@/components/layout/Shell";
 import { USE_NEW_DIAGNOSTIC_REDIRECTS } from "@/lib/feature-flags";
 import { trackEvent } from "@/lib/analytics";
 
-export default function DiagnosticRunPage() {
+function DiagnosticRunContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -42,5 +42,13 @@ export default function DiagnosticRunPage() {
     <Shell>
       <DiagnosticWizard />
     </Shell>
+  );
+}
+
+export default function DiagnosticRunPage() {
+  return (
+    <Suspense fallback={<Shell><div className="min-h-[40vh] flex items-center justify-center px-4"><p className="text-ink-muted">Loading…</p></div></Shell>}>
+      <DiagnosticRunContent />
+    </Suspense>
   );
 }

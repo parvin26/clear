@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Shell } from "@/components/layout/Shell";
@@ -24,7 +24,7 @@ function statusFromProgress(pct: number): "on_track" | "at_risk" | "off_track" {
   return "off_track";
 }
 
-export default function ImpactDashboardPage() {
+function ImpactDashboardContent() {
   const searchParams = useSearchParams();
   const decisionId = searchParams.get("decision_id");
 
@@ -442,5 +442,13 @@ export default function ImpactDashboardPage() {
         )}
       </div>
     </Shell>
+  );
+}
+
+export default function ImpactDashboardPage() {
+  return (
+    <Suspense fallback={<Shell><div className="min-h-screen flex items-center justify-center px-6"><p className="text-ink-muted">Loading…</p></div></Shell>}>
+      <ImpactDashboardContent />
+    </Suspense>
   );
 }

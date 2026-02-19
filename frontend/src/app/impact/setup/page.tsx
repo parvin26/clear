@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Shell } from "@/components/layout/Shell";
@@ -21,7 +21,7 @@ const SDG_OPTIONS = Array.from({ length: 17 }, (_, i) => ({
 const STEPS = ["categories", "indicators", "targets", "sdg"] as const;
 type StepId = (typeof STEPS)[number];
 
-export default function ImpactSetupPage() {
+function ImpactSetupContent() {
   const searchParams = useSearchParams();
   const decisionId = searchParams.get("decision_id");
 
@@ -385,5 +385,13 @@ export default function ImpactSetupPage() {
         </div>
       </div>
     </Shell>
+  );
+}
+
+export default function ImpactSetupPage() {
+  return (
+    <Suspense fallback={<Shell><div className="min-h-screen flex items-center justify-center"><p className="text-ink-muted">Loading…</p></div></Shell>}>
+      <ImpactSetupContent />
+    </Suspense>
   );
 }
