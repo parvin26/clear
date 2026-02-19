@@ -28,7 +28,7 @@ import {
   IMPACT_ADDON_STEP_IDS,
   ROLES_WITH_DIAGNOSTIC_RUN,
 } from "@/lib/intake-types";
-import { INTAKE_COUNTRIES, INTAKE_SECTORS } from "@/lib/intake-constants";
+import { INTAKE_COUNTRIES, INTAKE_SECTORS, sdgThemesToImpactCategories } from "@/lib/intake-constants";
 import { runDiagnosticRun, submitInvestorProfile } from "@/lib/clear-api";
 import { trackEvent } from "@/lib/analytics";
 import { Loader2 } from "lucide-react";
@@ -251,19 +251,33 @@ export function DiagnosticIntakePage() {
       try {
         const onboardingContext = identityToOnboardingContext(identity as IntakeIdentity);
         setOnboardingContext(onboardingContext);
+        const sdgThemes = investorProfile.sdg_themes ?? [];
+        const themes =
+          sdgThemes.length > 0
+            ? sdgThemesToImpactCategories(sdgThemes)
+            : (investorProfile.themes ?? []);
         await submitInvestorProfile({
           onboarding_context: getOnboardingContext() as Record<string, unknown> | undefined,
           investor_profile: {
+            regions: investorProfile.regions ?? undefined,
             sectors: investorProfile.sectors ?? [],
             geographies: investorProfile.geographies ?? [],
-            themes: investorProfile.themes ?? [],
+            themes,
+            sdg_themes: sdgThemes.length > 0 ? sdgThemes : undefined,
             portfolio_stage: (investorProfile.portfolio_stage ?? "evaluating_opportunities") as InvestorProfile["portfolio_stage"],
             primary_needs: investorProfile.primary_needs ?? [],
+            other_sector_notes: investorProfile.other_sector_notes ?? undefined,
           },
         });
         setShowInvestorResult(true);
         trackEvent("diagnostic_intake_completed", { role: "impact_investor", intake_version: "conversational_v1", source: searchParams.get("source") ?? undefined });
       } catch (e: unknown) {
+        if (process.env.NODE_ENV === "development") {
+          const err = e as { response?: { status?: number; data?: unknown } };
+          const status = err?.response?.status;
+          const body = err?.response?.data;
+          console.error("[Investor submit] POST /api/intake/investor-profile failed:", { status, body });
+        }
         setError(
           "We couldn't save your investor profile. Please check your connection and try again. If the error persists, contact us at hello@clearcommons.com."
         );
@@ -307,6 +321,11 @@ export function DiagnosticIntakePage() {
         msme: role === "msme_owner" ? {
           challenges: msme.challenges ?? [],
           challengesNotes: msme.challengesNotes,
+          years_operating: msme.years_operating,
+          primary_constraint: msme.primary_constraint,
+          demand_sentiment: msme.demand_sentiment,
+          decision_horizon: msme.decision_horizon,
+          priority_sentence: msme.priority_sentence,
           primaryFocus: msme.primaryFocus,
           primaryFocusNotes: msme.primaryFocusNotes,
           documentNames: msme.documentNames ?? msme.uploadedFiles?.map((f) => f.file.name) ?? [],

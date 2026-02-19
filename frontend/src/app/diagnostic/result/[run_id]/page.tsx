@@ -78,7 +78,12 @@ function DiagnosticResultContent() {
     if (!runId) return;
     getDecision(runId)
       .then(setDecision)
-      .catch(() => setError("Could not load decision record."))
+      .catch((err: unknown) => {
+        const status = (err as { response?: { status?: number } })?.response?.status;
+        if (status === 404) setError("Decision not found. The link may be incorrect or the decision may have been removed.");
+        else if (status && status >= 500) setError("Something went wrong on our side. Please try again in a moment.");
+        else setError("Could not load decision record. Check your connection and try again.");
+      })
       .finally(() => setLoading(false));
   }, [runId]);
 
@@ -98,9 +103,15 @@ function DiagnosticResultContent() {
         <div className="min-h-screen flex flex-col px-6 py-12 bg-background">
           <div className="max-w-lg mx-auto w-full flex-1 flex flex-col justify-center space-y-6">
             <p className="text-ink-muted">{error || "Decision not found."}</p>
-            <Button variant="outline" asChild>
-              <Link href="/diagnostic">Run diagnostic</Link>
-            </Button>
+            <p className="text-sm text-ink-muted">You can run a new diagnostic or open your dashboard to see other decisions.</p>
+            <div className="flex flex-wrap gap-3">
+              <Button asChild>
+                <Link href="/diagnostic">Run diagnostic</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/dashboard">Dashboard</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </Shell>

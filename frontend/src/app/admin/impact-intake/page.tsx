@@ -7,6 +7,7 @@ import {
   METRIC_FOCUS_AREAS,
   PORTFOLIO_STAGE_OPTIONS,
   INVESTOR_NEED_OPTIONS,
+  INVESTOR_SDG_THEMES,
 } from "@/lib/intake-constants";
 
 const CATEGORY_LABELS: Record<string, string> = Object.fromEntries(
@@ -69,6 +70,8 @@ interface ImpactIntakeData {
       themes_frequency: Record<string, number>;
       primary_needs_frequency: Record<string, number>;
       portfolio_stage_counts: Record<string, number>;
+      /** SDG 1–17 counts (additive; only present when backend supports it) */
+      sdg_theme_counts?: Record<string, number>;
     };
   };
 }
@@ -295,6 +298,36 @@ function ImpactIntakeContent() {
             </ul>
           </div>
         </div>
+        {inv.aggregations.sdg_theme_counts !== undefined ? (
+          <div className="mb-4">
+            <h3 className="text-base font-medium mb-2">Investor SDG focus</h3>
+            <div className="overflow-x-auto border border-border rounded max-w-md">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/50">
+                    <th className="text-left p-2">SDG</th>
+                    <th className="text-right p-2">Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...INVESTOR_SDG_THEMES]
+                    .sort((a, b) => a.sdgNumber - b.sdgNumber)
+                    .map((s) => (
+                      <tr key={s.id} className="border-b">
+                        <td className="p-2">SDG {s.sdgNumber} – {s.shortLabel}</td>
+                        <td className="p-2 text-right">{inv.aggregations.sdg_theme_counts?.[s.id] ?? 0}</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+            {Object.keys(inv.aggregations.sdg_theme_counts).length === 0 && (
+              <p className="text-xs text-ink-muted mt-1">No SDG selections have been captured yet.</p>
+            )}
+          </div>
+        ) : (
+          <p className="text-sm text-ink-muted mb-4">No SDG data yet (backend may not support sdg_theme_counts).</p>
+        )}
         <div className="overflow-x-auto border border-border rounded">
           <table className="w-full text-sm">
             <thead>

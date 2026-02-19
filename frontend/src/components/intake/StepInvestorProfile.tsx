@@ -1,10 +1,19 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import { Label } from "@/components/ui/label";
-import { INTAKE_COUNTRIES, INTAKE_SECTORS, PORTFOLIO_STAGE_OPTIONS, INVESTOR_NEED_OPTIONS } from "@/lib/intake-constants";
-import type { InvestorProfile, InvestorNeed, ImpactCategoryId, StepId } from "@/lib/intake-types";
-import { IMPACT_CATEGORIES } from "@/lib/intake-constants";
-import { Check } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  INTAKE_COUNTRIES,
+  INTAKE_REGIONS,
+  INVESTOR_SECTORS,
+  INVESTOR_SDG_THEMES,
+  PORTFOLIO_STAGE_OPTIONS,
+  INVESTOR_NEED_OPTIONS,
+  sdgThemesToImpactCategories,
+} from "@/lib/intake-constants";
+import type { InvestorProfile, InvestorNeed, InvestorThemeId, StepId } from "@/lib/intake-types";
+import { Check, Search } from "lucide-react";
 
 interface StepInvestorProfileProps {
   stepId: StepId;
@@ -13,10 +22,18 @@ interface StepInvestorProfileProps {
 }
 
 export function StepInvestorProfile({ stepId, value, onChange }: StepInvestorProfileProps) {
+  const [countrySearch, setCountrySearch] = useState("");
+
   const sectors = value.sectors ?? [];
   const toggleSector = (s: string) => {
     const next = sectors.includes(s) ? sectors.filter((x) => x !== s) : [...sectors, s];
     onChange({ ...value, sectors: next });
+  };
+
+  const regions = value.regions ?? [];
+  const toggleRegion = (r: string) => {
+    const next = regions.includes(r) ? regions.filter((x) => x !== r) : [...regions, r];
+    onChange({ ...value, regions: next });
   };
 
   const geographies = value.geographies ?? [];
@@ -25,10 +42,19 @@ export function StepInvestorProfile({ stepId, value, onChange }: StepInvestorPro
     onChange({ ...value, geographies: next });
   };
 
-  const themes = value.themes ?? [];
-  const toggleTheme = (t: ImpactCategoryId) => {
-    const next = themes.includes(t) ? themes.filter((x) => x !== t) : [...themes, t];
-    onChange({ ...value, themes: next });
+  const filteredCountries = useMemo(() => {
+    if (!countrySearch.trim()) return INTAKE_COUNTRIES;
+    const q = countrySearch.trim().toLowerCase();
+    return INTAKE_COUNTRIES.filter(
+      (c) => c.label.toLowerCase().includes(q) || c.value.toLowerCase().includes(q)
+    );
+  }, [countrySearch]);
+
+  const sdgThemes = value.sdg_themes ?? [];
+  const toggleSdgTheme = (id: InvestorThemeId) => {
+    const next = sdgThemes.includes(id) ? sdgThemes.filter((x) => x !== id) : [...sdgThemes, id];
+    const themes = sdgThemesToImpactCategories(next);
+    onChange({ ...value, sdg_themes: next, themes });
   };
 
   const needs = value.primary_needs ?? [];
@@ -41,13 +67,32 @@ export function StepInvestorProfile({ stepId, value, onChange }: StepInvestorPro
     return (
       <div className="space-y-8">
         <h2 className="text-xl font-semibold text-ink">Investment thesis</h2>
-        <p className="text-sm text-ink-muted">Which sectors, geographies, and impact themes do you focus on?</p>
+        <p className="text-sm text-ink-muted">Which regions, sectors, geographies, and impact themes do you focus on?</p>
+
+        <div>
+          <Label className="text-ink">Regions</Label>
+          <p className="text-xs text-ink-muted mb-2">Select all that apply</p>
+          <div className="flex flex-wrap gap-2">
+            {INTAKE_REGIONS.map((r) => (
+              <button
+                key={r.value}
+                type="button"
+                onClick={() => toggleRegion(r.value)}
+                className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                  regions.includes(r.value) ? "border-primary bg-primary/10 text-primary" : "border-border hover:bg-muted/50"
+                }`}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div>
           <Label className="text-ink">Sectors</Label>
           <p className="text-xs text-ink-muted mb-2">Select all that apply</p>
           <div className="flex flex-wrap gap-2">
-            {INTAKE_SECTORS.map((s) => (
+            {INVESTOR_SECTORS.map((s) => (
               <button
                 key={s.value}
                 type="button"
@@ -60,44 +105,72 @@ export function StepInvestorProfile({ stepId, value, onChange }: StepInvestorPro
               </button>
             ))}
           </div>
+          {sectors.includes("other") && (
+            <div className="mt-2">
+              <Label htmlFor="investor-other-sector" className="text-ink-muted text-xs">Other sectors (optional)</Label>
+              <Input
+                id="investor-other-sector"
+                placeholder="e.g. specific sub-sectors"
+                value={value.other_sector_notes ?? ""}
+                onChange={(e) => onChange({ ...value, other_sector_notes: e.target.value || undefined })}
+                className="mt-1 max-w-md"
+              />
+            </div>
+          )}
         </div>
 
         <div>
-          <Label className="text-ink">Geographies</Label>
-          <p className="text-xs text-ink-muted mb-2">Select all that apply</p>
-          <div className="max-h-60 overflow-y-auto rounded-lg border border-border bg-white p-2 space-y-1">
-            {INTAKE_COUNTRIES.map((c) => (
-              <label
-                key={c.value}
-                className="flex items-center gap-2 cursor-pointer py-1.5 px-2 rounded hover:bg-muted/50 text-sm"
-              >
-                <input
-                  type="checkbox"
-                  checked={geographies.includes(c.value)}
-                  onChange={() => toggleGeography(c.value)}
-                  className="rounded border-border text-primary focus:ring-primary"
-                />
-                <span>{c.label}</span>
-              </label>
-            ))}
+          <Label className="text-ink">Geographies (countries)</Label>
+          <p className="text-xs text-ink-muted mb-2">Search and select all that apply</p>
+          <div className="relative rounded-lg border border-border bg-white">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" aria-hidden />
+            <Input
+              placeholder="Search countries..."
+              value={countrySearch}
+              onChange={(e) => setCountrySearch(e.target.value)}
+              className="pl-8 border-0 rounded-b-none focus-visible:ring-0"
+            />
+            <div className="max-h-52 overflow-y-auto p-2 space-y-1 border-t border-border">
+              {filteredCountries.length === 0 ? (
+                <p className="text-sm text-ink-muted py-2">No countries match your search.</p>
+              ) : (
+                filteredCountries.map((c) => (
+                  <label
+                    key={c.value}
+                    className="flex items-center gap-2 cursor-pointer py-1.5 px-2 rounded hover:bg-muted/50 text-sm"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={geographies.includes(c.value)}
+                      onChange={() => toggleGeography(c.value)}
+                      className="rounded border-border text-primary focus:ring-primary"
+                    />
+                    <span>{c.label}</span>
+                  </label>
+                ))
+              )}
+            </div>
           </div>
         </div>
 
         <div>
-          <Label className="text-ink">Impact themes</Label>
-          <p className="text-xs text-ink-muted mb-2">Select from the 8 impact categories</p>
-          <div className="grid gap-2">
-            {IMPACT_CATEGORIES.map((c) => (
+          <Label className="text-ink">Impact themes (select the SDGs you focus on)</Label>
+          <p className="text-xs text-ink-muted mb-2">Select all that apply. Selections map to our impact categories for reporting.</p>
+          <div className="grid gap-2 max-h-80 overflow-y-auto">
+            {INVESTOR_SDG_THEMES.map((s) => (
               <button
-                key={c.value}
+                key={s.id}
                 type="button"
-                onClick={() => toggleTheme(c.value)}
-                className={`flex items-center justify-between gap-2 p-3 rounded-lg border text-left transition-colors ${
-                  themes.includes(c.value) ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
+                onClick={() => toggleSdgTheme(s.id)}
+                className={`flex items-start justify-between gap-2 p-3 rounded-lg border text-left transition-colors ${
+                  sdgThemes.includes(s.id) ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
                 }`}
               >
-                <span className="text-sm font-medium">{c.label}</span>
-                {themes.includes(c.value) && <Check className="h-5 w-5 shrink-0 text-primary" aria-hidden />}
+                <span className="text-sm">
+                  <span className="font-medium">SDG {s.sdgNumber} – {s.shortLabel}</span>
+                  <span className="block text-xs text-ink-muted mt-0.5">{s.description}</span>
+                </span>
+                {sdgThemes.includes(s.id) && <Check className="h-5 w-5 shrink-0 text-primary mt-0.5" aria-hidden />}
               </button>
             ))}
           </div>

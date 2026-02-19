@@ -253,7 +253,16 @@ export async function submitIdeaStageSignup(body: { email?: string; short_text?:
 
 export async function submitInvestorProfile(body: {
   onboarding_context?: Record<string, unknown> | null;
-  investor_profile: { sectors: string[]; geographies: string[]; themes: string[]; portfolio_stage: string; primary_needs: string[] };
+  investor_profile: {
+    regions?: string[];
+    sectors: string[];
+    geographies: string[];
+    themes: string[];
+    sdg_themes?: string[];
+    portfolio_stage: string;
+    primary_needs: string[];
+    other_sector_notes?: string;
+  };
 }): Promise<{ ok: boolean; message?: string }> {
   const { data } = await apiClient.post<{ ok: boolean; message?: string }>("/api/intake/investor-profile", body);
   return data;

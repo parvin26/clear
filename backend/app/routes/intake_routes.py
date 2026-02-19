@@ -12,11 +12,14 @@ router = APIRouter(prefix="/api/intake", tags=["Intake"])
 
 class InvestorProfileIn(BaseModel):
     """Payload from conversational intake when role = impact_investor."""
+    regions: list[str] | None = None  # e.g. Africa, Asia, MENA, Latin America, Europe, North America, Global
     sectors: list[str] = []
     geographies: list[str] = []
-    themes: list[str] = []
+    themes: list[str] = []  # ImpactCategoryId[] for aggregation; derived from sdg_themes when present
+    sdg_themes: list[str] | None = None  # SDG 1-17 ids (sdg_1 .. sdg_17)
     portfolio_stage: str = ""
     primary_needs: list[str] = []
+    other_sector_notes: str | None = None  # when sectors includes "other"
 
 
 class InvestorProfileSubmissionIn(BaseModel):

@@ -89,11 +89,22 @@ function founderToDiagnosticData(f: FounderAnswers): DiagnosticDataOut {
 }
 
 function msmeToDiagnosticData(m: MSMEAnswers): DiagnosticDataOut {
+  const parts: string[] = [];
+  if (m.challenges.length > 0) {
+    parts.push(`MSME assessment: ${m.challenges.join(", ")}.`);
+  }
+  const notes = (m.challengesNotes || "").trim();
+  if (notes) parts.push(notes);
+  const priority = (m.priority_sentence || "").trim();
+  if (priority) parts.push(priority);
+  if (m.years_operating) parts.push(`Operating: ${m.years_operating}.`);
+  if (m.primary_constraint) parts.push(`Constraint: ${m.primary_constraint}.`);
+  if (m.demand_sentiment) parts.push(`Demand: ${m.demand_sentiment}.`);
+
   const situationDescription =
-    m.challenges.length > 0
-      ? `MSME assessment: ${m.challenges.join(", ")}. ${(m.challengesNotes || "").trim()}`.trim()
-      : "MSME capability diagnostic.";
-  return {
+    parts.length > 0 ? parts.join(" ").trim() : "MSME capability diagnostic.";
+
+  const out: DiagnosticDataOut = {
     intake_version: "conversational_v1",
     flow: "msme",
     challenges: m.challenges,
@@ -104,4 +115,8 @@ function msmeToDiagnosticData(m: MSMEAnswers): DiagnosticDataOut {
     operatingAndRevenue: "yes",
     situationDescription,
   };
+  if (m.decision_horizon) {
+    out.decisionHorizon = m.decision_horizon;
+  }
+  return out;
 }

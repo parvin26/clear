@@ -378,7 +378,20 @@ export default function DecisionWorkspacePage() {
         setReadiness(r ?? null);
         setOutcomeReviews(Array.isArray(o) ? o : []);
       })
-      .catch(() => setError("Failed to load decision"))
+      .catch((err: unknown) => {
+        const res = (err as { response?: { status?: number; data?: unknown } })?.response;
+        const status = res?.status;
+        if (process.env.NODE_ENV === "development" && (status != null || res?.data != null)) {
+          console.error("[DecisionFlow] Failed to load decision:", { decisionId, status, body: res?.data });
+        }
+        if (status === 404) {
+          setError("Decision not found. It may have been deleted or the link may be incorrect. Run a new diagnostic or open your dashboard.");
+        } else if (status != null && status >= 500) {
+          setError("Something went wrong on our side. Please try again in a moment.");
+        } else {
+          setError("Failed to load decision. Check your connection and try again.");
+        }
+      })
       .finally(() => setLoading(false));
   }, [decisionId]);
 
@@ -409,8 +422,12 @@ export default function DecisionWorkspacePage() {
         })
         .then(() => decisionChatStart(decisionId))
         .then((res) => setChatSessionId(res.session_id))
-        .catch(() => {
-          setActionError("Failed to seed chat");
+        .catch((err: unknown) => {
+          if (process.env.NODE_ENV === "development") {
+            const res = (err as { response?: { status?: number; data?: unknown } })?.response;
+            console.error("[DecisionFlow] Chat seed/start failed:", { decisionId, status: res?.status, body: res?.data });
+          }
+          setActionError("We couldn't start the AI advisor for this decision. Try refreshing the page or opening the workspace again.");
           setChatStarted(false);
         });
     } else {
@@ -419,8 +436,12 @@ export default function DecisionWorkspacePage() {
           setChatSessionId(res.session_id);
           setChatInitialMessage((prev) => prev ?? res.initial_assistant_message);
         })
-        .catch(() => {
-          setActionError("Failed to start chat");
+        .catch((err: unknown) => {
+          if (process.env.NODE_ENV === "development") {
+            const res = (err as { response?: { status?: number; data?: unknown } })?.response;
+            console.error("[DecisionFlow] Chat start failed:", { decisionId, status: res?.status, body: res?.data });
+          }
+          setActionError("We couldn't start the AI advisor. Try refreshing or run a new diagnostic if the problem continues.");
           setChatStarted(false);
         });
     }
@@ -825,11 +846,17 @@ export default function DecisionWorkspacePage() {
   if (error || !decision) {
     return (
       <Shell>
-        <div className="text-center py-12">
+        <div className="text-center py-12 max-w-lg mx-auto">
           <p className="text-destructive">{error || "Decision not found"}</p>
-          <Link href="/decisions">
-            <Button variant="outline" className="mt-4">Back to list</Button>
-          </Link>
+          <p className="text-sm text-ink-muted mt-2">You can run a new diagnostic or open your dashboard.</p>
+          <div className="flex flex-wrap gap-3 justify-center mt-4">
+            <Button asChild>
+              <Link href="/diagnostic">Run diagnostic</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/decisions">Back to list</Link>
+            </Button>
+          </div>
         </div>
       </Shell>
     );

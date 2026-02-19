@@ -25,6 +25,18 @@ from datetime import datetime, timezone, timedelta
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
 
+def _compute_sdg_theme_counts(profiles: list[dict]) -> dict[str, int]:
+    """Count how many profiles include each SDG in sdg_themes. Only counts when sdg_themes is present."""
+    counts: dict[str, int] = {}
+    for prof in profiles:
+        sdg_themes = prof.get("sdg_themes") if isinstance(prof, dict) else None
+        if sdg_themes is not None and isinstance(sdg_themes, list):
+            for sid in sdg_themes:
+                if isinstance(sid, str) and sid:
+                    counts[sid] = counts.get(sid, 0) + 1
+    return counts
+
+
 def require_admin_key(
     x_admin_api_key: Optional[str] = Header(None, alias="X-Admin-API-Key"),
     admin_api_key: Optional[str] = Header(None, alias="Admin-Api-Key"),
@@ -293,6 +305,7 @@ def get_impact_intake(
             need_counts[n] = need_counts.get(n, 0) + 1
         stage = prof.get("portfolio_stage") or "unknown"
         stage_counts[stage] = stage_counts.get(stage, 0) + 1
+    sdg_theme_counts = _compute_sdg_theme_counts([(i.investor_profile or {}) for i in investors])
 
     return {
         "social_enterprise": {
@@ -312,6 +325,7 @@ def get_impact_intake(
                 "themes_frequency": theme_counts,
                 "primary_needs_frequency": need_counts,
                 "portfolio_stage_counts": stage_counts,
+                "sdg_theme_counts": sdg_theme_counts,
             },
         },
     }

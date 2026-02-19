@@ -192,3 +192,56 @@ This addendum documents frontend-only refinements to the conversational diagnost
   - **Get-started page:** Country selector uses the same `INTAKE_COUNTRIES` list for consistency.
   - **StepInvestorProfile (Investment thesis – Geographies):** Multi-select; uses a **scrollable checkbox list** (no long chip grid) so the full country list is usable.
 - **Single-choice fields:** Identity sector and org size are dropdowns. Other single-choice fields with few options (e.g. portfolio stage, primary needs) keep their current UI; impact categories and metric focus remain chip/button grids for multi-select where visual grouping helps.
+
+---
+
+## 11. Addendum: Diagnostic refinement (question sets, investor UX, advisor/workspace errors)
+
+This addendum documents the diagnostic question-set documentation, Impact Investor thesis UX improvements, diagnostic generation mapping, and fixes for “Failed to load decision” and AI advisor errors. All changes are **backward compatible**; no existing APIs were removed or broken.
+
+### 11.1 New documentation
+
+- **`docs/DIAGNOSTIC_QUESTION_SETS.md`**
+  - Lists all steps and questions per persona: MSME, Founder, Social Enterprise, Impact Investor (including Identity & Role).
+  - For each question: step_id, field name in code, storage key (founder/msme/impact_profile/investor_profile).
+  - Proposes a **richer MSME question set** (design only, ~10–12 questions): additional optional fields (e.g. years_operating, primary_constraint, demand_sentiment, decision_horizon, priority_sentence) and how to map them into `diagnostic_data` / `situationDescription` without changing backend contracts.
+  - Documents **expanded impact themes** for investors: SDG-style labels mapping to `ImpactCategoryId` (see §11.2).
+
+- **`docs/DIAGNOSTIC_GENERATION_MAPPING.md`**
+  - **Per persona:** Which `diagnostic_data` fields are sent to `POST /api/clear/diagnostic/run` and how the backend uses them to build decision title/summary, “Why now”, “Key constraints”, “How success looks”, “Timeframe”.
+  - **Social enterprise:** How `impact_profile` is (or isn’t) used today; proposal to incorporate it into narrative without changing backend contracts.
+  - **Flows:** When the user clicks “Ask an AI advisor” or “Open Decision Workspace”, which frontend functions and API endpoints are called, which ids are used (`decision_id` = `run_id` in result URL), and what assumptions hold.
+  - **Investor submit:** Frontend URL `POST /api/intake/investor-profile` vs backend route; `investor_profiles` table; note that if missing-table errors appear, run Alembic migrations.
+
+### 11.2 Impact Investor UX (regions, countries, sectors, themes)
+
+- **New fields (backward compatible):**
+  - **`regions`** (optional): `string[]` — e.g. Africa, Asia, MENA, Latin America, Europe, North America, Global. Multi-select above countries in StepInvestorProfile.
+  - **`other_sector_notes`** (optional): string — shown when “Other” sector is selected; stored in `investor_profile` JSONB.
+
+- **UI changes:**
+  - **Regions:** Multi-select (tag-style buttons) using `INTAKE_REGIONS` in `intake-constants.ts`.
+  - **Geographies (countries):** Searchable list: an input filters the full country list; checkboxes below for multi-select. Still stored as `geographies: string[]` (ISO codes).
+  - **Sectors:** Replaced the small identity-sector list with a **richer taxonomy** (`INVESTOR_SECTORS`): agriculture, clean_energy, education, financial_services, healthcare, housing, manufacturing, retail, tech_digital, water_sanitation, other. Multi-select; when “other” is selected, a small text field captures `other_sector_notes`.
+  - **Impact themes:** UI now shows **expanded labels** (`INVESTOR_THEMES_EXPANDED`) e.g. “SDG 1 – No Poverty (Poverty reduction, Financial inclusion)”. Stored as `ImpactCategoryId[]` for aggregation; mapping documented in DIAGNOSTIC_QUESTION_SETS.md.
+
+- **Backend:** `InvestorProfileIn` (intake_routes.py) accepts optional `regions` and `other_sector_notes`; stored in existing `investor_profiles` JSONB. No new table or migration required.
+
+### 11.3 Decision Workspace and AI advisor error handling
+
+- **Result page (`/diagnostic/result/[run_id]`):**
+  - On `getDecision` failure: distinguish 404 vs 5xx vs network; show a specific message and two actions: “Run diagnostic” and “Dashboard”.
+
+- **Decision Workspace (`/decisions/[id]`):**
+  - On load failure (getDecision or other parallel calls): parse error (status 404, 5xx, or other); set a user-friendly message (e.g. “Decision not found. It may have been deleted or the link may be incorrect. Run a new diagnostic or open your dashboard.”). In **development only**, log to console: `[DecisionFlow] Failed to load decision: { decisionId, status, body }`.
+  - Error state UI: show “Run diagnostic” and “Back to list” buttons.
+
+- **AI advisor (same page, tab=chat):**
+  - On chat/seed or chat/start failure: show a clear message (“We couldn’t start the AI advisor for this decision. Try refreshing the page or opening the workspace again.”) and in dev log `[DecisionFlow] Chat seed/start failed:` or `Chat start failed:` with `decisionId`, status, body.
+
+- **Ids:** The result page uses `run_id` from the URL = `decision_id` returned by the diagnostic run. All links to the workspace and advisor use this same id; no change to how `decision_id` is passed.
+
+### 11.4 Investor submit error diagnostics
+
+- **Logging (dev only):** When `POST /api/intake/investor-profile` fails, the frontend logs to console: `[Investor submit] POST /api/intake/investor-profile failed: { status, body }`. The user still sees the same friendly message; errors are not swallowed.
+- **Endpoint alignment:** Frontend posts to `/api/intake/investor-profile`; backend route is `POST /api/intake/investor-profile`. Table `investor_profiles`; if you see missing-table errors, run Alembic migrations (e.g. the migration that creates `investor_profiles`).

@@ -43,6 +43,16 @@ export interface FounderAnswers {
 export interface MSMEAnswers {
   challenges: string[];
   challengesNotes?: string;
+  /** How long operating (e.g. "<1", "1-3", "3-5", "5+"). Optional. */
+  years_operating?: string;
+  /** Single biggest constraint: time, cash, people, market. Optional. */
+  primary_constraint?: string;
+  /** Demand sentiment: stable, growing, declining, unpredictable. Optional. */
+  demand_sentiment?: string;
+  /** When to see results (align with founder horizon). Optional. */
+  decision_horizon?: string;
+  /** One sentence: what would help most. Optional. */
+  priority_sentence?: string;
   primaryFocus?: string;
   primaryFocusNotes?: string;
   documentNames: string[];
@@ -91,12 +101,24 @@ export type InvestorNeed =
   | "impact_measurement_and_reporting"
   | "exit_and_realization_planning";
 
+/** SDG 1–17 theme ids for investor; stored as sdg_themes, mapped to themes (ImpactCategoryId[]). */
+export type InvestorThemeId =
+  | "sdg_1" | "sdg_2" | "sdg_3" | "sdg_4" | "sdg_5" | "sdg_6" | "sdg_7" | "sdg_8" | "sdg_9"
+  | "sdg_10" | "sdg_11" | "sdg_12" | "sdg_13" | "sdg_14" | "sdg_15" | "sdg_16" | "sdg_17";
+
 export interface InvestorProfile {
+  /** e.g. 'Africa', 'Asia', 'MENA', 'Latin America', 'Europe', 'North America', 'Global' */
+  regions?: string[];
   sectors: string[];
   geographies: string[];
+  /** Derived from sdg_themes for backend/analytics; keep for backward compatibility. */
   themes: ImpactCategoryId[];
+  /** SDG 1–17 selection from UI; mapped to themes. */
+  sdg_themes?: InvestorThemeId[];
   portfolio_stage: PortfolioStage;
   primary_needs: InvestorNeed[];
+  /** When sectors includes 'other', optional free text. */
+  other_sector_notes?: string;
 }
 
 /** Unified intake state. */
@@ -161,7 +183,9 @@ export type StepId =
   | "investor_stage"
   | "investor_needs"
   | "msme_challenges"
+  | "msme_context"
   | "msme_focus"
+  | "msme_horizon"
   | "msme_docs"
   | "submit";
 
@@ -202,7 +226,14 @@ export const INVESTOR_STEP_IDS: StepId[] = [
   "submit",
 ];
 
-export const MSME_STEP_IDS: StepId[] = ["msme_challenges", "msme_focus", "msme_docs", "submit"];
+export const MSME_STEP_IDS: StepId[] = [
+  "msme_challenges",
+  "msme_context",
+  "msme_focus",
+  "msme_horizon",
+  "msme_docs",
+  "submit",
+];
 
 export function getStepSequence(role: Role | null): StepId[] {
   if (!role) return [];
