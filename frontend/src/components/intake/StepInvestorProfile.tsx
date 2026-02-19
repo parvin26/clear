@@ -138,19 +138,22 @@ export function StepInvestorProfile({ stepId, value, onChange }: StepInvestorPro
         <h2 className="text-xl font-semibold text-ink">Primary needs from CLEAR</h2>
         <p className="text-sm text-ink-muted">What would help you most? Select all that apply.</p>
         <div className="grid gap-2">
-          {INVESTOR_NEED_OPTIONS.map((o) => (
-            <button
-              key={o.value}
-              type="button"
-              onClick={() => toggleNeed(o.value)}
-              className={`flex items-center justify-between gap-2 p-3 rounded-lg border text-left transition-colors ${
-                needs.includes(o.value) ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
-              }`}
-            >
-              <span className="text-sm font-medium">{o.label}</span>
-              {needs.includes(o.value) && <Check className="h-5 w-5 shrink-0 text-primary" aria-hidden />}
-            </button>
-          ))}
+          {INVESTOR_NEED_OPTIONS.map((o) => {
+            const need = o.value as InvestorNeed;
+            return (
+              <button
+                key={o.value}
+                type="button"
+                onClick={() => toggleNeed(need)}
+                className={`flex items-center justify-between gap-2 p-3 rounded-lg border text-left transition-colors ${
+                  needs.includes(need) ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
+                }`}
+              >
+                <span className="text-sm font-medium">{o.label}</span>
+                {needs.includes(need) && <Check className="h-5 w-5 shrink-0 text-primary" aria-hidden />}
+              </button>
+            );
+          })}
         </div>
       </div>
     );
