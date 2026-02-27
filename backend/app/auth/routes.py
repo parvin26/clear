@@ -63,7 +63,7 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
 @router.post("/send-magic-link", response_model=SendMagicLinkResponse)
 async def send_magic_link(body: SendMagicLinkRequest, db: Session = Depends(get_db)):
     """Send magic link to email for passwordless sign-in. Does not reveal whether account exists."""
-    await service.send_magic_link(db, body.email)
+    await service.send_magic_link(db, body.email, next_path=body.next)
     return SendMagicLinkResponse(expires_in_minutes=settings.MAGIC_LINK_EXPIRE_MINUTES)
 
 

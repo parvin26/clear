@@ -35,6 +35,7 @@ class LoginRequest(BaseModel):
 
 class SendMagicLinkRequest(BaseModel):
     email: EmailStr
+    next: str | None = None
 
 
 class SendMagicLinkResponse(BaseModel):

@@ -68,7 +68,7 @@ export default function ForEnterprisesPage() {
         <LifecycleStrip steps={LIFECYCLE_STEPS} />
         <RoleArtifacts />
       </RolePageLayout>
-      <NextStepCTA label="Run enterprise diagnostic" primaryHref="/diagnostic?role=enterprise" />
+      <NextStepCTA label="Run enterprise diagnostic" primaryHref="/diagnostic?role=msme_owner" />
     </Shell>
   );
 }

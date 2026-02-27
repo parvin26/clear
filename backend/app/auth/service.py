@@ -1,5 +1,6 @@
 """Auth service: sign-up OTP, register, login, magic link."""
 from datetime import datetime, timezone
+from urllib.parse import urlencode
 
 from sqlalchemy.orm import Session
 
@@ -94,7 +95,20 @@ def tokens_for_user(user: User) -> dict:
     }
 
 
-async def send_magic_link(db: Session, email: str) -> bool:
+def _sanitize_next_path(next_path: str | None) -> str | None:
+    """Allow only local absolute paths for post-auth redirects."""
+    if not next_path:
+        return None
+    trimmed = next_path.strip()
+    if not trimmed:
+        return None
+    lower = trimmed.lower()
+    if trimmed.startswith("//") or lower.startswith("http://") or lower.startswith("https://"):
+        return None
+    return trimmed if trimmed.startswith("/") else f"/{trimmed}"
+
+
+async def send_magic_link(db: Session, email: str, next_path: str | None = None) -> bool:
     """
     Create magic link token, store it, send email. Returns True if email sent.
     We send the link even if user does not exist (no email enumeration).
@@ -102,7 +116,11 @@ async def send_magic_link(db: Session, email: str) -> bool:
     email = email.lower().strip()
     raw_token = create_magic_link_token(db, email)
     base = settings.FRONTEND_URL.rstrip("/")
-    link_url = f"{base}/auth/verify?token={raw_token}&email={email}"
+    query: dict[str, str] = {"token": raw_token, "email": email}
+    safe_next = _sanitize_next_path(next_path)
+    if safe_next:
+        query["next"] = safe_next
+    link_url = f"{base}/auth/verify?{urlencode(query)}"
     return await send_magic_link_email(email, link_url)
 
 

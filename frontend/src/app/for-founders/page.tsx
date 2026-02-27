@@ -56,7 +56,7 @@ export default function ForFoundersPage() {
         <LifecycleStrip steps={LIFECYCLE_STEPS} />
         <RoleArtifacts />
       </RolePageLayout>
-      <NextStepCTA label="Start founder diagnostic" primaryHref="/diagnostic?role=founder" />
+      <NextStepCTA label="Start founder diagnostic" primaryHref="/diagnostic?role=startup_founder" />
     </Shell>
   );
 }

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Mail, Lock, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,10 +17,23 @@ function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 }
 
+function sanitizeNext(next: string | null): string | null {
+  if (!next || typeof next !== "string") return null;
+  const trimmed = next.trim();
+  if (!trimmed || trimmed.startsWith("//") || trimmed.startsWith("http")) return null;
+  if (trimmed.startsWith("/")) return trimmed;
+  return `/${trimmed}`;
+}
+
 type Step = "email" | "otp_password";
 
 export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextUrl = useMemo(
+    () => sanitizeNext(searchParams.get("next") ?? searchParams.get("return")),
+    [searchParams]
+  );
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -95,7 +108,7 @@ export default function SignupPage() {
           name: name.trim() || undefined,
         });
         setAuthToken(res.access_token);
-        router.push("/dashboard");
+        router.push(nextUrl || "/dashboard");
       } catch (err: unknown) {
         const msg =
           (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail || "Registration failed.";
@@ -104,7 +117,7 @@ export default function SignupPage() {
         setSubmitting(false);
       }
     },
-    [email, otp, password, name, router]
+    [email, otp, password, name, router, nextUrl]
   );
 
   const currentYear = new Date().getFullYear();

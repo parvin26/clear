@@ -75,14 +75,14 @@ export function LoginForm() {
     setErrors({});
     setSendingMagicLink(true);
     try {
-      await sendMagicLink(email.trim());
+      await sendMagicLink(email.trim(), nextUrl);
       setMagicLinkSent(true);
     } catch {
       setErrors({ email: "Failed to send link. Try again." });
     } finally {
       setSendingMagicLink(false);
     }
-  }, [email]);
+  }, [email, nextUrl]);
 
   const currentYear = new Date().getFullYear();
 
