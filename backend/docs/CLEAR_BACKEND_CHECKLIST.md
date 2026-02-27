@@ -49,6 +49,13 @@ Governance core is technically enforced before frontend work. This checklist ref
 1. From `backend`: `python tests/test_canonicalization.py`.
 2. Expect: “Canonicalization proof: all assertions passed.”
 
+### Diagnostic concurrency smoke
+
+1. Start backend with agent dependencies configured.
+2. Run: `python3 scripts/run_concurrent_diagnostic_smoke.py`
+3. Optional tuning: set `DIAGNOSTIC_CONCURRENCY` and `DIAGNOSTIC_REQUESTS`.
+4. Expect: all requests return successfully (decision_id or idea-stage), with no deadlocks/timeouts caused by shared DB sessions.
+
 ---
 
 ## 4) Pending / later
