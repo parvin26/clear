@@ -14,6 +14,7 @@ from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Query
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
+from app.auth.dependencies import get_current_user_required
 from app.db.database import get_db
 from app.db.models import Decision, DecisionLedgerEvent, DecisionArtifact, DecisionEvidenceLink, Enterprise, DecisionChatSession, DecisionExecutionMilestone, HumanReviewRequest, OutcomeReview, DiagnosticRun, IdeaStageLead, UsageEvent, ImpactFeedback, DecisionComment, EnterpriseMember, AdvisorReviewRequest
 from app.schemas.clear.artifact import DecisionArtifactSchema
@@ -265,7 +266,11 @@ def human_review_request(
 
 # ----- Enterprises -----
 
-@router.post("/enterprises", response_model=EnterpriseOut)
+@router.post(
+    "/enterprises",
+    response_model=EnterpriseOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def create_enterprise(body: EnterpriseCreate, db: Session = Depends(get_db)):
     """Create enterprise (minimal profile)."""
     ent = Enterprise(
@@ -281,7 +286,11 @@ def create_enterprise(body: EnterpriseCreate, db: Session = Depends(get_db)):
     return ent
 
 
-@router.get("/enterprises", response_model=List[EnterpriseOut])
+@router.get(
+    "/enterprises",
+    response_model=List[EnterpriseOut],
+    dependencies=[Depends(get_current_user_required)],
+)
 def list_enterprises(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
@@ -296,7 +305,11 @@ def list_enterprises(
     return rows
 
 
-@router.get("/enterprises/{enterprise_id}", response_model=EnterpriseOut)
+@router.get(
+    "/enterprises/{enterprise_id}",
+    response_model=EnterpriseOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def get_enterprise(enterprise_id: int, db: Session = Depends(get_db)):
     """Get enterprise by id."""
     ent = db.query(Enterprise).filter(Enterprise.id == enterprise_id).first()
@@ -305,7 +318,10 @@ def get_enterprise(enterprise_id: int, db: Session = Depends(get_db)):
     return ent
 
 
-@router.get("/enterprises/{enterprise_id}/activation")
+@router.get(
+    "/enterprises/{enterprise_id}/activation",
+    dependencies=[Depends(get_current_user_required)],
+)
 def get_enterprise_activation(enterprise_id: int, db: Session = Depends(get_db)):
     """Activation progress for first CLEAR cycle (workspace_created_at, completed_steps, next_step, days_since_start)."""
     ent = db.query(Enterprise).filter(Enterprise.id == enterprise_id).first()
@@ -328,7 +344,10 @@ async def trigger_activation_reminders(
     return result
 
 
-@router.get("/cohorts/enterprises")
+@router.get(
+    "/cohorts/enterprises",
+    dependencies=[Depends(get_current_user_required)],
+)
 def list_cohort_mode_enterprises(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=200),
@@ -348,7 +367,11 @@ def list_cohort_mode_enterprises(
     ]
 
 
-@router.patch("/enterprises/{enterprise_id}", response_model=EnterpriseOut)
+@router.patch(
+    "/enterprises/{enterprise_id}",
+    response_model=EnterpriseOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def update_enterprise(enterprise_id: int, body: EnterpriseUpdate, db: Session = Depends(get_db)):
     """Update enterprise (partial)."""
     ent = db.query(Enterprise).filter(Enterprise.id == enterprise_id).first()
@@ -361,7 +384,10 @@ def update_enterprise(enterprise_id: int, body: EnterpriseUpdate, db: Session = 
     return ent
 
 
-@router.get("/enterprises/{enterprise_id}/health-score")
+@router.get(
+    "/enterprises/{enterprise_id}/health-score",
+    dependencies=[Depends(get_current_user_required)],
+)
 def get_enterprise_health_score(enterprise_id: int, db: Session = Depends(get_db)):
     """Enterprise Health Score: execution discipline, governance, learning (0-100). Read-only."""
     ent = db.query(Enterprise).filter(Enterprise.id == enterprise_id).first()
@@ -370,7 +396,10 @@ def get_enterprise_health_score(enterprise_id: int, db: Session = Depends(get_db
     return compute_health_score(db, enterprise_id)
 
 
-@router.post("/enterprises/{enterprise_id}/health-score/snapshot")
+@router.post(
+    "/enterprises/{enterprise_id}/health-score/snapshot",
+    dependencies=[Depends(get_current_user_required)],
+)
 def create_health_score_snapshot(enterprise_id: int, db: Session = Depends(get_db)):
     """Store current health score as monthly snapshot (for trend). Idempotent per month."""
     from app.db.models import EnterpriseHealthSnapshot
@@ -408,7 +437,10 @@ def create_health_score_snapshot(enterprise_id: int, db: Session = Depends(get_d
     return {"snapshot_date": snapshot_date.isoformat(), "score": result["total_score"], "updated": False}
 
 
-@router.get("/enterprises/{enterprise_id}/readiness-index")
+@router.get(
+    "/enterprises/{enterprise_id}/readiness-index",
+    dependencies=[Depends(get_current_user_required)],
+)
 def get_enterprise_readiness_index(enterprise_id: int, db: Session = Depends(get_db)):
     """Execution Capital Readiness Index (ECRI): 0-100 with components and trend. Single signal for capital partners."""
     ent = db.query(Enterprise).filter(Enterprise.id == enterprise_id).first()
@@ -418,7 +450,10 @@ def get_enterprise_readiness_index(enterprise_id: int, db: Session = Depends(get
     return compute_readiness_index_for_enterprise(db, enterprise_id)
 
 
-@router.post("/enterprises/{enterprise_id}/readiness-index/snapshot")
+@router.post(
+    "/enterprises/{enterprise_id}/readiness-index/snapshot",
+    dependencies=[Depends(get_current_user_required)],
+)
 def create_readiness_index_snapshot(enterprise_id: int, db: Session = Depends(get_db)):
     """Store current ECRI as snapshot (for trend). Call after key events or on schedule."""
     ent = db.query(Enterprise).filter(Enterprise.id == enterprise_id).first()
@@ -441,7 +476,11 @@ def create_readiness_index_snapshot(enterprise_id: int, db: Session = Depends(ge
 
 # ----- Decisions -----
 
-@router.post("/decisions", response_model=DecisionOut)
+@router.post(
+    "/decisions",
+    response_model=DecisionOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def create_decision_endpoint(body: CreateDecisionRequest, db: Session = Depends(get_db)):
     """Create a new decision (optional draft artifact)."""
     try:
@@ -458,7 +497,11 @@ def create_decision_endpoint(body: CreateDecisionRequest, db: Session = Depends(
     return _decision_to_out(decision, latest, db)
 
 
-@router.post("/decisions/bootstrap-from-analysis", response_model=DecisionOut)
+@router.post(
+    "/decisions/bootstrap-from-analysis",
+    response_model=DecisionOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def bootstrap_draft_from_analysis(
     domain: str = Query(..., description="cfo | cmo | coo | cto"),
     analysis_id: int = Query(...),
@@ -498,7 +541,11 @@ def _decision_to_out(d: Decision, latest_art: Optional[DecisionArtifact], db: Se
     )
 
 
-@router.get("/decisions", response_model=List[DecisionListItem])
+@router.get(
+    "/decisions",
+    response_model=List[DecisionListItem],
+    dependencies=[Depends(get_current_user_required)],
+)
 def list_decisions(
     enterprise_id: Optional[int] = Query(None),
     status: Optional[str] = Query(None),
@@ -532,7 +579,10 @@ def get_decision(decision_id: UUID, db: Session = Depends(get_db)):
     return _decision_to_out(d, latest, db)
 
 
-@router.get("/decision-velocity")
+@router.get(
+    "/decision-velocity",
+    dependencies=[Depends(get_current_user_required)],
+)
 def get_decision_velocity(
     enterprise_id: Optional[int] = Query(None, description="Filter by enterprise; omit for all decisions"),
     db: Session = Depends(get_db),
@@ -542,7 +592,10 @@ def get_decision_velocity(
     return result
 
 
-@router.get("/enterprises/{enterprise_id}/decision-velocity")
+@router.get(
+    "/enterprises/{enterprise_id}/decision-velocity",
+    dependencies=[Depends(get_current_user_required)],
+)
 def get_enterprise_decision_velocity(enterprise_id: int, db: Session = Depends(get_db)):
     """Decision velocity for a single enterprise (portfolio view)."""
     ent = db.query(Enterprise).filter(Enterprise.id == enterprise_id).first()
@@ -554,7 +607,11 @@ def get_enterprise_decision_velocity(enterprise_id: int, db: Session = Depends(g
 
 # ----- Portfolio (org = portfolio), timeline, members, comments, feedback -----
 
-@router.get("/orgs/{portfolio_id}/portfolio", response_model=List[PortfolioEnrichedItem])
+@router.get(
+    "/orgs/{portfolio_id}/portfolio",
+    response_model=List[PortfolioEnrichedItem],
+    dependencies=[Depends(get_current_user_required)],
+)
 def get_org_portfolio(
     request: Request,
     portfolio_id: int,
@@ -591,7 +648,11 @@ def get_org_portfolio(
     return items
 
 
-@router.get("/enterprises/{enterprise_id}/timeline", response_model=List[TimelineItem])
+@router.get(
+    "/enterprises/{enterprise_id}/timeline",
+    response_model=List[TimelineItem],
+    dependencies=[Depends(get_current_user_required)],
+)
 def get_enterprise_timeline_route(enterprise_id: int, db: Session = Depends(get_db)):
     """Timeline of decisions for this enterprise (ordered by created_at desc)."""
     ent = db.query(Enterprise).filter(Enterprise.id == enterprise_id).first()
@@ -600,7 +661,11 @@ def get_enterprise_timeline_route(enterprise_id: int, db: Session = Depends(get_
     return get_enterprise_timeline(db, enterprise_id)
 
 
-@router.post("/enterprises/{enterprise_id}/members", response_model=InviteOut)
+@router.post(
+    "/enterprises/{enterprise_id}/members",
+    response_model=InviteOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def invite_enterprise_member(
     enterprise_id: int,
     body: EnterpriseMemberCreate,
@@ -616,7 +681,11 @@ def invite_enterprise_member(
     return InviteOut(**result)
 
 
-@router.get("/enterprises/{enterprise_id}/members", response_model=List[EnterpriseMemberOut])
+@router.get(
+    "/enterprises/{enterprise_id}/members",
+    response_model=List[EnterpriseMemberOut],
+    dependencies=[Depends(get_current_user_required)],
+)
 def list_enterprise_members(enterprise_id: int, db: Session = Depends(get_db)):
     """List members for an enterprise (no token in response)."""
     ent = db.query(Enterprise).filter(Enterprise.id == enterprise_id).first()
@@ -646,7 +715,11 @@ def get_viewing_role(decision_id: UUID, token: Optional[str] = Query(None), db: 
     return {"role": info["role"], "email": info["email"]}
 
 
-@router.post("/decisions/{decision_id}/advisor-invite", response_model=InviteOut)
+@router.post(
+    "/decisions/{decision_id}/advisor-invite",
+    response_model=InviteOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def invite_advisor_to_decision(
     decision_id: UUID,
     body: dict,  # { name?, email, role? } e.g. { "name": "Jane", "email": "j@example.com", "role": "CFO" }
@@ -691,7 +764,11 @@ def invite_advisor_to_decision(
     )
 
 
-@router.post("/decisions/{decision_id}/comments", response_model=DecisionCommentOut)
+@router.post(
+    "/decisions/{decision_id}/comments",
+    response_model=DecisionCommentOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def create_decision_comment(decision_id: UUID, body: DecisionCommentCreate, db: Session = Depends(get_db)):
     """Add a comment (advisor or founder)."""
     d = db.query(Decision).filter(Decision.decision_id == decision_id).first()
@@ -716,7 +793,11 @@ def create_decision_comment(decision_id: UUID, body: DecisionCommentCreate, db: 
     )
 
 
-@router.get("/decisions/{decision_id}/comments", response_model=List[DecisionCommentOut])
+@router.get(
+    "/decisions/{decision_id}/comments",
+    response_model=List[DecisionCommentOut],
+    dependencies=[Depends(get_current_user_required)],
+)
 def list_decision_comments(decision_id: UUID, db: Session = Depends(get_db)):
     """List comments for a decision (oldest first)."""
     d = db.query(Decision).filter(Decision.decision_id == decision_id).first()
@@ -737,7 +818,10 @@ def list_decision_comments(decision_id: UUID, db: Session = Depends(get_db)):
     ]
 
 
-@router.get("/decisions/{decision_id}/suggested-resources")
+@router.get(
+    "/decisions/{decision_id}/suggested-resources",
+    dependencies=[Depends(get_current_user_required)],
+)
 def get_suggested_resources(decision_id: UUID, db: Session = Depends(get_db)):
     """Suggested resources (knowledge snippets) for this decision by primary_domain and onboarding."""
     from app.diagnostic.decision_chat import _build_decision_chat_context
@@ -771,7 +855,10 @@ def get_suggested_resources(decision_id: UUID, db: Session = Depends(get_db)):
     return {"resources": [{"title": s.get("title"), "content": s.get("content"), "source_type": s.get("source_type")} for s in snippets]}
 
 
-@router.post("/impact-feedback")
+@router.post(
+    "/impact-feedback",
+    dependencies=[Depends(get_current_user_required)],
+)
 def create_impact_feedback(body: ImpactFeedbackCreate, db: Session = Depends(get_db)):
     """Record in-product feedback (framing help or cycle impact)."""
     try:
@@ -792,7 +879,11 @@ def create_impact_feedback(body: ImpactFeedbackCreate, db: Session = Depends(get
     return {"id": fid.id, "message": "Thank you for your feedback."}
 
 
-@router.patch("/decisions/{decision_id}/execution", response_model=DecisionOut)
+@router.patch(
+    "/decisions/{decision_id}/execution",
+    response_model=DecisionOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def update_decision_execution(decision_id: UUID, body: ExecutionUpdateRequest, db: Session = Depends(get_db)):
     """Update execution metadata: responsible_owner, expected_outcome, outcome_review_reminder, outcome_review_notes."""
     d = db.query(Decision).filter(Decision.decision_id == decision_id).first()
@@ -807,7 +898,11 @@ def update_decision_execution(decision_id: UUID, body: ExecutionUpdateRequest, d
     return _decision_to_out(d, latest, db)
 
 
-@router.get("/decisions/{decision_id}/milestones", response_model=List[MilestoneOut])
+@router.get(
+    "/decisions/{decision_id}/milestones",
+    response_model=List[MilestoneOut],
+    dependencies=[Depends(get_current_user_required)],
+)
 def list_milestones(decision_id: UUID, db: Session = Depends(get_db)):
     """List execution milestones for a decision (ordered by due_date)."""
     d = db.query(Decision).filter(Decision.decision_id == decision_id).first()
@@ -817,7 +912,11 @@ def list_milestones(decision_id: UUID, db: Session = Depends(get_db)):
     return rows
 
 
-@router.post("/decisions/{decision_id}/milestones", response_model=MilestoneOut)
+@router.post(
+    "/decisions/{decision_id}/milestones",
+    response_model=MilestoneOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def create_milestone(decision_id: UUID, body: MilestoneCreate, db: Session = Depends(get_db)):
     """Create an execution milestone."""
     d = db.query(Decision).filter(Decision.decision_id == decision_id).first()
@@ -839,7 +938,11 @@ def create_milestone(decision_id: UUID, body: MilestoneCreate, db: Session = Dep
     return m
 
 
-@router.patch("/decisions/{decision_id}/milestones/{milestone_id}", response_model=MilestoneOut)
+@router.patch(
+    "/decisions/{decision_id}/milestones/{milestone_id}",
+    response_model=MilestoneOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def update_milestone(decision_id: UUID, milestone_id: int, body: MilestoneUpdate, db: Session = Depends(get_db)):
     """Update a milestone (e.g. mark completed, edit due_date, notes)."""
     m = db.query(DecisionExecutionMilestone).filter(
@@ -856,7 +959,10 @@ def update_milestone(decision_id: UUID, milestone_id: int, body: MilestoneUpdate
     return m
 
 
-@router.delete("/decisions/{decision_id}/milestones/{milestone_id}")
+@router.delete(
+    "/decisions/{decision_id}/milestones/{milestone_id}",
+    dependencies=[Depends(get_current_user_required)],
+)
 def delete_milestone(decision_id: UUID, milestone_id: int, db: Session = Depends(get_db)):
     """Delete an execution milestone."""
     m = db.query(DecisionExecutionMilestone).filter(
@@ -870,7 +976,11 @@ def delete_milestone(decision_id: UUID, milestone_id: int, db: Session = Depends
     return {"ok": True}
 
 
-@router.post("/decisions/{decision_id}/execution/commit", response_model=DecisionOut)
+@router.post(
+    "/decisions/{decision_id}/execution/commit",
+    response_model=DecisionOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def commit_execution_plan(
     decision_id: UUID,
     body: ExecutionCommitRequest,
@@ -911,7 +1021,11 @@ def commit_execution_plan(
     return _decision_to_out(d, latest, db)
 
 
-@router.post("/decisions/{decision_id}/artifact", response_model=DecisionOut)
+@router.post(
+    "/decisions/{decision_id}/artifact",
+    response_model=DecisionOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def add_artifact_version(
     decision_id: UUID,
     body: DecisionArtifactSchema,
@@ -938,7 +1052,11 @@ def add_artifact_version(
     return _decision_to_out(d, latest, db)
 
 
-@router.patch("/decisions/{decision_id}/artifact", response_model=DecisionOut)
+@router.patch(
+    "/decisions/{decision_id}/artifact",
+    response_model=DecisionOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def patch_artifact_partial(
     decision_id: UUID,
     body: ArtifactPartialUpdate,
@@ -973,7 +1091,10 @@ def patch_artifact_partial(
     return _decision_to_out(d, latest, db)
 
 
-@router.get("/decisions/{decision_id}/completeness")
+@router.get(
+    "/decisions/{decision_id}/completeness",
+    dependencies=[Depends(get_current_user_required)],
+)
 def get_completeness(decision_id: UUID, db: Session = Depends(get_db)):
     """Return governance completeness errors for current artifact (empty => ready to finalize)."""
     d = db.query(Decision).filter(Decision.decision_id == decision_id).first()
@@ -986,7 +1107,11 @@ def get_completeness(decision_id: UUID, db: Session = Depends(get_db)):
     return {"ready": len(errors) == 0, "errors": errors}
 
 
-@router.post("/decisions/{decision_id}/finalize", response_model=DecisionOut)
+@router.post(
+    "/decisions/{decision_id}/finalize",
+    response_model=DecisionOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def finalize_decision_endpoint(decision_id: UUID, body: FinalizeRequest, db: Session = Depends(get_db)):
     """Transition to finalized. Governance completeness validator must pass; otherwise 400."""
     try:
@@ -997,7 +1122,11 @@ def finalize_decision_endpoint(decision_id: UUID, body: FinalizeRequest, db: Ses
     return _decision_to_out(decision, latest, db)
 
 
-@router.post("/decisions/{decision_id}/sign-off", response_model=DecisionOut)
+@router.post(
+    "/decisions/{decision_id}/sign-off",
+    response_model=DecisionOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def sign_off_decision_endpoint(decision_id: UUID, body: SignOffRequest, db: Session = Depends(get_db)):
     """Mandatory acknowledgement: finalized -> signed. Writes sign_off event to ledger."""
     try:
@@ -1008,7 +1137,11 @@ def sign_off_decision_endpoint(decision_id: UUID, body: SignOffRequest, db: Sess
     return _decision_to_out(decision, latest, db)
 
 
-@router.post("/decisions/{decision_id}/status", response_model=DecisionOut)
+@router.post(
+    "/decisions/{decision_id}/status",
+    response_model=DecisionOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def transition_status_endpoint(decision_id: UUID, body: StatusTransitionRequest, db: Session = Depends(get_db)):
     """Rule-controlled status transition (signed->implemented, etc.). Use /finalize and /sign-off for draft->finalized->signed."""
     try:
@@ -1021,7 +1154,11 @@ def transition_status_endpoint(decision_id: UUID, body: StatusTransitionRequest,
 
 # ----- Ledger (read-only from API) -----
 
-@router.get("/decisions/{decision_id}/ledger", response_model=List[LedgerEventOut])
+@router.get(
+    "/decisions/{decision_id}/ledger",
+    response_model=List[LedgerEventOut],
+    dependencies=[Depends(get_current_user_required)],
+)
 def list_ledger_events(decision_id: UUID, db: Session = Depends(get_db)):
     """List ledger events for a decision (append-only; no writes from this endpoint)."""
     events = db.query(DecisionLedgerEvent).filter(DecisionLedgerEvent.decision_id == decision_id).order_by(DecisionLedgerEvent.created_at).all()
@@ -1030,7 +1167,11 @@ def list_ledger_events(decision_id: UUID, db: Session = Depends(get_db)):
 
 # ----- Evidence -----
 
-@router.post("/decisions/{decision_id}/evidence", response_model=EvidenceLinkOut)
+@router.post(
+    "/decisions/{decision_id}/evidence",
+    response_model=EvidenceLinkOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def add_evidence_link(decision_id: UUID, body: EvidenceLinkCreate, db: Session = Depends(get_db)):
     """Link evidence to decision (analysis, rag_snippet, document, metric_snapshot)."""
     d = db.query(Decision).filter(Decision.decision_id == decision_id).first()
@@ -1053,7 +1194,11 @@ def add_evidence_link(decision_id: UUID, body: EvidenceLinkCreate, db: Session =
     return link
 
 
-@router.get("/decisions/{decision_id}/evidence", response_model=List[EvidenceLinkOut])
+@router.get(
+    "/decisions/{decision_id}/evidence",
+    response_model=List[EvidenceLinkOut],
+    dependencies=[Depends(get_current_user_required)],
+)
 def list_evidence_links(decision_id: UUID, db: Session = Depends(get_db)):
     """List evidence links for a decision."""
     links = db.query(DecisionEvidenceLink).filter(DecisionEvidenceLink.decision_id == decision_id).all()
@@ -1064,7 +1209,11 @@ def _ensure_upload_dir() -> None:
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 
-@router.post("/decisions/{decision_id}/evidence/upload", response_model=EvidenceLinkOut)
+@router.post(
+    "/decisions/{decision_id}/evidence/upload",
+    response_model=EvidenceLinkOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def upload_evidence_file(
     decision_id: UUID,
     file: UploadFile = File(...),
@@ -1157,7 +1306,11 @@ def _build_last_cycle_summary(
     }
 
 
-@router.post("/decisions/{decision_id}/outcome-review", response_model=OutcomeReviewOut)
+@router.post(
+    "/decisions/{decision_id}/outcome-review",
+    response_model=OutcomeReviewOut,
+    dependencies=[Depends(get_current_user_required)],
+)
 def create_outcome_review(decision_id: UUID, body: OutcomeReviewCreate, db: Session = Depends(get_db)):
     """Create an outcome review for this decision."""
     d = db.query(Decision).filter(Decision.decision_id == decision_id).first()
@@ -1256,7 +1409,11 @@ def create_outcome_review(decision_id: UUID, body: OutcomeReviewCreate, db: Sess
     )
 
 
-@router.get("/decisions/{decision_id}/outcome-reviews", response_model=List[OutcomeReviewOut])
+@router.get(
+    "/decisions/{decision_id}/outcome-reviews",
+    response_model=List[OutcomeReviewOut],
+    dependencies=[Depends(get_current_user_required)],
+)
 def list_outcome_reviews(decision_id: UUID, db: Session = Depends(get_db)):
     """List outcome reviews for this decision (most recent first)."""
     d = db.query(Decision).filter(Decision.decision_id == decision_id).first()
@@ -1282,7 +1439,10 @@ def list_outcome_reviews(decision_id: UUID, db: Session = Depends(get_db)):
     ]
 
 
-@router.get("/decisions/{decision_id}/readiness")
+@router.get(
+    "/decisions/{decision_id}/readiness",
+    dependencies=[Depends(get_current_user_required)],
+)
 def get_readiness(decision_id: UUID, db: Session = Depends(get_db)):
     """Capital readiness band for this decision (Nascent | Emerging | Institutionalizing)."""
     d = db.query(Decision).filter(Decision.decision_id == decision_id).first()
@@ -1293,7 +1453,10 @@ def get_readiness(decision_id: UUID, db: Session = Depends(get_db)):
 
 # ----- Chat (seed for diagnostic flow) -----
 
-@router.post("/decisions/{decision_id}/chat/seed")
+@router.post(
+    "/decisions/{decision_id}/chat/seed",
+    dependencies=[Depends(get_current_user_required)],
+)
 def decision_chat_seed(decision_id: UUID, db: Session = Depends(get_db)):
     """Return initial assistant message for decision context (e.g. when from_diagnostic=1). Call once; UI stores in state and sets seeded flag."""
     from app.diagnostic.decision_chat import generate_first_assistant_message
@@ -1307,7 +1470,10 @@ def decision_chat_seed(decision_id: UUID, db: Session = Depends(get_db)):
 
 # ----- Chat session tagging -----
 
-@router.get("/decisions/{decision_id}/chat-context")
+@router.get(
+    "/decisions/{decision_id}/chat-context",
+    dependencies=[Depends(get_current_user_required)],
+)
 def get_decision_chat_context(decision_id: UUID, db: Session = Depends(get_db)):
     """Return chat_context for the decision (for UI context chip: decision, must-do milestones, constraints)."""
     from app.diagnostic.decision_chat import build_chat_context_for_advisor
@@ -1319,7 +1485,10 @@ def get_decision_chat_context(decision_id: UUID, db: Session = Depends(get_db)):
     return {"chat_context": chat_context}
 
 
-@router.post("/decisions/{decision_id}/chat/start")
+@router.post(
+    "/decisions/{decision_id}/chat/start",
+    dependencies=[Depends(get_current_user_required)],
+)
 def decision_chat_start(decision_id: UUID, db: Session = Depends(get_db)):
     """Start or resume decision-scoped chat. Returns session_id, initial assistant message, and chat_context (for context chip)."""
     from uuid import uuid4
@@ -1350,7 +1519,10 @@ def decision_chat_start(decision_id: UUID, db: Session = Depends(get_db)):
     return {"session_id": session_id, "initial_assistant_message": initial_message, "chat_context": chat_context, "trace_id": trace_id}
 
 
-@router.post("/decisions/{decision_id}/chat/message")
+@router.post(
+    "/decisions/{decision_id}/chat/message",
+    dependencies=[Depends(get_current_user_required)],
+)
 def decision_chat_message(decision_id: UUID, body: ChatMessageRequest, db: Session = Depends(get_db)):
     """Send a message in decision-scoped chat; returns assistant reply (stateless, context from artifact)."""
     from app.diagnostic.decision_chat import generate_assistant_reply
@@ -1373,7 +1545,10 @@ def decision_chat_message(decision_id: UUID, body: ChatMessageRequest, db: Sessi
     return {"assistant_message": assistant_message, "trace_id": trace_id}
 
 
-@router.put("/decisions/{decision_id}/chat-session")
+@router.put(
+    "/decisions/{decision_id}/chat-session",
+    dependencies=[Depends(get_current_user_required)],
+)
 def tag_chat_session(
     decision_id: UUID,
     session_id: str = Query(...),
@@ -1398,7 +1573,10 @@ def tag_chat_session(
     return {"decision_id": str(decision_id), "session_id": session_id, "agent_domain": agent_domain}
 
 
-@router.get("/decisions/{decision_id}/chat-sessions")
+@router.get(
+    "/decisions/{decision_id}/chat-sessions",
+    dependencies=[Depends(get_current_user_required)],
+)
 def list_chat_sessions(decision_id: UUID, db: Session = Depends(get_db)):
     """List chat sessions tagged to this decision."""
     rows = db.query(DecisionChatSession).filter(DecisionChatSession.decision_id == decision_id).all()
@@ -1417,7 +1595,11 @@ def _parse_date(v: Any):
     return None
 
 
-@router.post("/decisions/{decision_id}/tasks/events", response_model=dict)
+@router.post(
+    "/decisions/{decision_id}/tasks/events",
+    response_model=dict,
+    dependencies=[Depends(get_current_user_required)],
+)
 def create_task_event(
     decision_id: UUID,
     body: dict,
@@ -1443,7 +1625,10 @@ def create_task_event(
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.get("/decisions/{decision_id}/tasks/derived")
+@router.get(
+    "/decisions/{decision_id}/tasks/derived",
+    dependencies=[Depends(get_current_user_required)],
+)
 def list_tasks_derived(decision_id: UUID, db: Session = Depends(get_db)):
     """Task list derived from TASK_CREATED + TASK_UPDATED events (no mutable task table)."""
     d = db.query(Decision).filter(Decision.decision_id == decision_id).first()
@@ -1452,7 +1637,10 @@ def list_tasks_derived(decision_id: UUID, db: Session = Depends(get_db)):
     return derived_tasks(db, decision_id)
 
 
-@router.post("/decisions/{decision_id}/tasks/{task_key}/events")
+@router.post(
+    "/decisions/{decision_id}/tasks/{task_key}/events",
+    dependencies=[Depends(get_current_user_required)],
+)
 def post_task_update_event(
     decision_id: UUID,
     task_key: UUID,
@@ -1475,7 +1663,10 @@ def post_task_update_event(
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.post("/decisions/{decision_id}/tasks/{task_key}/milestones")
+@router.post(
+    "/decisions/{decision_id}/tasks/{task_key}/milestones",
+    dependencies=[Depends(get_current_user_required)],
+)
 def post_milestone_event(
     decision_id: UUID,
     task_key: UUID,
@@ -1501,7 +1692,10 @@ def post_milestone_event(
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.post("/decisions/{decision_id}/outcomes/events")
+@router.post(
+    "/decisions/{decision_id}/outcomes/events",
+    dependencies=[Depends(get_current_user_required)],
+)
 def post_outcome_event(
     decision_id: UUID,
     body: dict,
@@ -1524,7 +1718,10 @@ def post_outcome_event(
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.get("/decisions/{decision_id}/timeline")
+@router.get(
+    "/decisions/{decision_id}/timeline",
+    dependencies=[Depends(get_current_user_required)],
+)
 def get_decision_timeline(decision_id: UUID, limit: int = 200, db: Session = Depends(get_db)):
     """Ordered execution/outcome events for a decision (derived from ledger)."""
     d = db.query(Decision).filter(Decision.decision_id == decision_id).first()
@@ -1533,7 +1730,10 @@ def get_decision_timeline(decision_id: UUID, limit: int = 200, db: Session = Dep
     return derived_timeline(db, decision_id, limit=limit)
 
 
-@router.get("/decisions/{decision_id}/outcomes/derived")
+@router.get(
+    "/decisions/{decision_id}/outcomes/derived",
+    dependencies=[Depends(get_current_user_required)],
+)
 def list_outcomes_derived(decision_id: UUID, db: Session = Depends(get_db)):
     """Outcomes derived from OUTCOME_RECORDED events (no mutable outcome table)."""
     d = db.query(Decision).filter(Decision.decision_id == decision_id).first()

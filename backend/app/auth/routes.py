@@ -1,6 +1,5 @@
 """Auth API routes: sign-up OTP, register, login, magic link."""
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
@@ -16,10 +15,10 @@ from app.auth.schemas import (
     TokenResponse,
 )
 from app.auth import service
+from app.auth.dependencies import get_current_user_optional
 from app.config import settings
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-optional_bearer = HTTPBearer(auto_error=False)
 
 
 @router.post("/send-signup-otp", response_model=SendSignupOtpResponse)
@@ -75,24 +74,6 @@ def verify_magic_link(token: str, email: str, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=400, detail="Invalid or expired link.")
     return TokenResponse(**service.tokens_for_user(user))
-
-
-def get_current_user_optional(
-    credentials: HTTPAuthorizationCredentials | None = Depends(optional_bearer),
-    db: Session = Depends(get_db),
-):
-    """Dependency: optional current user from Bearer token."""
-    if not credentials:
-        return None
-    from app.auth.tokens import decode_token
-    payload = decode_token(credentials.credentials)
-    if not payload or payload.get("type") != "access":
-        return None
-    try:
-        user_id = int(payload["sub"])
-    except (KeyError, TypeError, ValueError):
-        return None
-    return service.get_user_by_id(db, user_id)
 
 
 @router.get("/me")

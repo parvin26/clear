@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
+from app.auth.dependencies import require_institutional_user
 from app.db.database import get_db
 from app.db.models import Institution, Portfolio, PortfolioEnterprise, Enterprise, Cohort
 from app.institutional.service import (
@@ -22,7 +23,11 @@ from app.institutional.cohort_service import (
 from app.institutional.exports import export_decision, export_enterprise
 from app.institutional.schemas import InstitutionOut, PortfolioOut, CohortCreate, CohortOut, CohortEnterpriseAdd
 
-router = APIRouter(prefix="/api/institutional", tags=["Institutional (Phase 4)"])
+router = APIRouter(
+    prefix="/api/institutional",
+    tags=["Institutional (Phase 4)"],
+    dependencies=[Depends(require_institutional_user)],
+)
 
 
 @router.get("/portfolios", response_model=list)
