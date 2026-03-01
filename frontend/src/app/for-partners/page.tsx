@@ -45,7 +45,7 @@ export default function ForPartnersPage() {
         />
         <PartnerForm />
       </RolePageLayout>
-      <NextStepCTA label="Join partner ecosystem" primaryHref="/start" />
+      <NextStepCTA label="Start Diagnostic" primaryHref="/diagnostic" />
     </Shell>
   );
 }

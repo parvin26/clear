@@ -38,9 +38,9 @@ export function BeforeAfter() {
             Stop guessing. Start knowing.
           </h2>
           <p className="text-[16px] text-white/70 font-normal leading-relaxed">
-            Most businesses operate on invisible logic and informal agreements.
+            Most SME owners don&apos;t have a COO, CFO or Chief of Staff to pressure-test decisions.
             <br className="hidden md:block" />
-            CLEAR makes decisions explicit, owned, and reviewable.
+            CLEAR gives you that thinking structure. Starting with a diagnostic that finds the real bottleneck.
           </p>
         </div>
 
@@ -54,10 +54,11 @@ export function BeforeAfter() {
                 <h3 className="text-2xl font-bold text-white/70">Before CLEAR</h3>
               </div>
               <ul className="space-y-5">
-                <ListItem negative>Decisions buried in chat threads</ListItem>
-                <ListItem negative>Context locked in founder&apos;s head</ListItem>
-                <ListItem negative>Outcomes tracked loosely or not at all</ListItem>
-                <ListItem negative>Recurring fires treated as new emergencies</ListItem>
+                <ListItem negative>The real problem is unclear or assumed</ListItem>
+                <ListItem negative>Decisions live in the founder&apos;s head</ListItem>
+                <ListItem negative>Advice received but not tied to execution</ListItem>
+                <ListItem negative>The same issues recur every quarter</ListItem>
+                <ListItem negative>No record of what was decided or why</ListItem>
               </ul>
             </div>
 
@@ -75,10 +76,11 @@ export function BeforeAfter() {
                 <h3 className="text-2xl font-bold text-white">With CLEAR</h3>
               </div>
               <ul className="space-y-5">
-                <ListItem>Single source of truth for all decisions</ListItem>
-                <ListItem>Context documented and accessible</ListItem>
-                <ListItem>Outcomes linked to specific owners</ListItem>
-                <ListItem>Operating memory improves with every cycle</ListItem>
+                <ListItem>Structured diagnostic surfaces the real constraint</ListItem>
+                <ListItem>One clear decision: written, reasoned, and owned</ListItem>
+                <ListItem>Execution tied to the decision that drove it</ListItem>
+                <ListItem>Reviews create a repeatable improvement cycle</ListItem>
+                <ListItem>Every decision recorded and auditable</ListItem>
               </ul>
             </div>
           </div>
@@ -89,7 +91,7 @@ export function BeforeAfter() {
             href="#flow"
             className="inline-flex items-center gap-2 text-[#1D4ED8] text-[14px] font-medium hover:text-[#1E40AF] transition-colors group"
           >
-            See how the system works{" "}
+            See how it works{" "}
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>

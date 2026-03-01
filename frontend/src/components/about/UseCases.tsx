@@ -19,11 +19,11 @@ const ROLES: Record<
     label: "Founders",
     quote: (
       <>
-        I need to get these <span className="font-bold">decisions</span> out of my head without losing control.
+        I need these decisions out of my head. With a clear owner and a plan attached.
       </>
     ),
     delivers:
-      "One place per decision, from first question to final call, with a single record, workspace, and optional advisor support.",
+      "Structured diagnostic to find the real bottleneck. Decision record with options, tradeoffs and rationale. Execution board with milestones and owners. Review cycle to capture what worked. Controlled sharing when you choose to bring in investors.",
     flow: [
       "Tell CLEAR who you are",
       "8‑step diagnostic",
@@ -55,11 +55,11 @@ const ROLES: Record<
     label: "Investors",
     quote: (
       <>
-        I need to know if this team is <span className="font-bold">execution‑ready</span>.
+        I need execution visibility. Not just financials and quarterly updates.
       </>
     ),
     delivers:
-      "Light‑touch portfolio visibility into execution readiness and governance maturity, powered by decision data, not long decks.",
+      "See structured decision records across portfolio (when shared). Track execution progress against commitments. Review outcome records at close of each cycle. Audit trail of decisions and changes. No chasing updates.",
     flow: [
       "View portfolios",
       "Scan readiness signals",

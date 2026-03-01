@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Mic } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export function HeroSection() {
   return (
@@ -16,10 +16,12 @@ export function HeroSection() {
           <div className="max-w-4xl relative">
             <div>
               <h1 className="text-4xl md:text-5xl lg:text-[2.5rem] font-extrabold text-slate-900 leading-[1.1] tracking-tight mb-8">
-                Turn messy business problems <br className="hidden lg:block" />
-                into a{" "}
+                Find what&apos;s actually holding
+                <br className="hidden lg:block" />
+                your business back.
+                <br className="hidden lg:block" />
                 <span className="text-blue-600 relative inline-block">
-                  disciplined plan
+                  (And what to do next.)
                   <svg
                     className="absolute w-full h-3 -bottom-3 left-0 text-[#FFCA0A] -z-10"
                     viewBox="0 0 100 10"
@@ -34,49 +36,33 @@ export function HeroSection() {
                     />
                   </svg>
                 </span>
-                .
               </h1>
 
-              <p className="text-lg md:text-xl text-slate-600 mb-10 leading-relaxed max-w-lg">
-                A repeatable way to diagnose, plan, and track execution, for
-                founders and the people who back them.
-              </p>
-
-              <p className="text-sm text-slate-500 mb-10 flex items-center gap-2 flex-wrap">
-                <span>Speak your business problem. CLEAR converts it into a structured decision.</span>
-                <Link
-                  href="/diagnostic"
-                  className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-700 font-medium"
-                  aria-label="Start diagnostic with voice intake"
-                >
-                  <Mic className="h-4 w-4" aria-hidden />
-                  Try voice intake
-                </Link>
+              <p className="text-lg md:text-xl text-slate-600 mb-6 leading-relaxed max-w-lg">
+                CLEAR is a structured diagnostic and execution system for owner-led businesses.
+                In 10 minutes, you get a bottleneck diagnosis, a recommended decision and an
+                execution plan: written down, owned and trackable.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  href="/start"
+                  href="/diagnostic"
                   className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-full transition-all shadow-lg hover:shadow-blue-200 transform hover:-translate-y-0.5 text-center flex items-center justify-center gap-2 group"
                 >
-                  Get started in 10 minutes
+                  Start Diagnostic
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
                   href="/how-it-works"
                   className="bg-white hover:bg-slate-50 text-slate-700 font-semibold py-4 px-8 rounded-full border border-slate-200 transition-colors text-center hover:shadow-sm"
                 >
-                  See how it works
+                  See a sample decision record
                 </Link>
               </div>
 
-              <div className="mt-6 flex items-center gap-2 text-sm text-slate-500 font-medium">
-                <p>
-                  Built for{" "}
-                  <span className="text-slate-900 font-bold">founders</span> and{" "}
-                  <span className="text-slate-900 font-bold">capital providers</span>
-                </p>
-              </div>
+              <p className="mt-6 text-sm text-slate-500">
+                Not generic advice. You get written outputs you can share, review and revisit.
+              </p>
             </div>
           </div>
 

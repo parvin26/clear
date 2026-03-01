@@ -103,7 +103,7 @@ export default function PricingPage() {
         </section>
       </div>
 
-      <NextStepCTA primaryLabel="Start diagnostic" primaryHref="/diagnostic" heading="Next step" />
+      <NextStepCTA primaryHref="/diagnostic" heading="Next step" />
     </Shell>
   );
 }

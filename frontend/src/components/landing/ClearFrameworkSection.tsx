@@ -3,28 +3,28 @@
 const frameworkItems = [
   {
     letter: "C",
-    label: "C: Clarify the situation",
-    body: "Understand what is really happening in the business, using your own words, without jargon or judgment.",
+    label: "C: Clarify",
+    body: "Define the real problem before choosing a solution.",
   },
   {
     letter: "L",
-    label: "L: Locate the real capability gaps",
-    body: "Translate symptoms like cash pressure or team chaos into specific capability gaps, not vague “work harder” advice.",
+    label: "L: Locate",
+    body: "Identify the highest-leverage constraint.",
   },
   {
     letter: "E",
-    label: "E: Enable the right capability",
-    body: "Turn your top gaps into a focused execution plan with milestones, metrics, and the lightest effective support.",
+    label: "E: Enable",
+    body: "Commit to one decision with owners and a plan.",
   },
   {
     letter: "A",
-    label: "A: Anchor the capability",
-    body: "Use structured reviews so what you learn in each cycle becomes part of how the business operates.",
+    label: "A: Anchor",
+    body: "Execute with structured milestones and check-ins.",
   },
   {
     letter: "R",
-    label: "R: Release dependency",
-    body: "As capability strengthens, CLEAR steps back. Dependency is treated as a failure condition, not a business model.",
+    label: "R: Renew",
+    body: "Review outcomes. Feed learning into the next cycle.",
   },
 ];
 
@@ -34,10 +34,10 @@ export function ClearFrameworkSection() {
       <div className="container mx-auto max-w-7xl px-6">
         <div className="text-center mb-14">
           <h2 className="text-2xl md:text-3xl font-semibold text-ink mb-4">
-            The CLEAR capability framework
+            The CLEAR Framework
           </h2>
           <p className="text-ink-muted max-w-2xl mx-auto">
-            Capability is not a job title. It is how your business makes decisions, executes, and learns under stress.
+            The cycle your team follows inside the system. Every decision, same discipline.
           </p>
         </div>
         <div className="space-y-6 md:space-y-0 md:grid md:grid-cols-5 md:gap-6">

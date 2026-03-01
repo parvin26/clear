@@ -208,7 +208,7 @@ export default function CaseStudiesPage() {
         </div>
       </div>
 
-      <NextStepCTA primaryLabel="Start your own diagnostic" primaryHref="/diagnostic" heading="Next step" />
+      <NextStepCTA primaryHref="/diagnostic" heading="Next step" />
     </Shell>
   );
 }

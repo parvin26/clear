@@ -2,20 +2,20 @@
 
 const ITEMS = [
   {
-    title: "Audit trail",
-    desc: "Every edit and decision is time-stamped.",
+    title: "Finalisation & Sign-off",
+    desc: "Decisions can be locked and signed off by the relevant stakeholders.",
   },
   {
-    title: "Decision records",
-    desc: "Immutable history of what was decided.",
+    title: "Full Audit Trail",
+    desc: "Every change, input and review is recorded. Nothing gets rewritten after the fact.",
   },
   {
-    title: "Controlled sharing",
-    desc: "Granular permissions for every artifact.",
+    title: "Evidence-Linked Milestones",
+    desc: "Progress claims are attached to real activity, not self-reported status updates.",
   },
   {
-    title: "Data sovereignty",
-    desc: "Your strategic data stays yours.",
+    title: "Controlled Sharing",
+    desc: "You choose what partners and investors can see. Access is revocable at any time.",
   },
 ];
 
@@ -25,8 +25,11 @@ export function TrustSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8 text-left">
           <h2 className="text-xl font-bold text-[#1F2A37]">
-            How we protect your decisions
+            Built for auditability and controlled sharing.
           </h2>
+          <p className="text-[#1F2A37]/65 text-sm mt-2 max-w-2xl">
+            CLEAR treats every decision as a governed record. Not a note in a chat thread.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

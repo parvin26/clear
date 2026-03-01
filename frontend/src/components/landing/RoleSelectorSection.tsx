@@ -5,24 +5,24 @@ import { ArrowRight } from "lucide-react";
 
 const ROLES = [
   {
-    label: "Enterprise",
+    label: "Owner-Led SMEs",
     title: "I run a business and I need better control.",
-    desc: "CLEAR helps you structure key decisions, track execution, and show capital readiness.",
-    action: "For enterprise",
-    href: "/for-enterprises",
+    desc: "Run your business with written decisions, clear owners and structured reviews without everything living in your head or in chat threads.",
+    action: "Start a diagnostic",
+    href: "/diagnostic",
   },
   {
-    label: "Founder",
+    label: "Founders",
     title: "I'm a founder and need to prioritize.",
-    desc: "CLEAR helps you get decisions out of your head into a system your team can follow.",
-    action: "For founders",
-    href: "/for-founders",
+    desc: "Make fewer, sharper decisions. Turn your biggest strategic call into a decision record with options, tradeoffs and an execution plan your team can follow.",
+    action: "Build your first decision record",
+    href: "/diagnostic",
   },
   {
-    label: "Capital Partner",
+    label: "Capital Partners",
     title: "I invest in or support many businesses.",
-    desc: "CLEAR gives you portfolio-level visibility into governance and execution readiness.",
-    action: "For partners",
+    desc: "See execution signals beyond financials. When enterprises choose to share, you get structured decision records and progress visibility. Not just reports.",
+    action: "Explore the capital view",
     href: "/for-partners",
   },
 ];
@@ -32,7 +32,7 @@ export function RoleSelectorSection() {
     <section className="bg-white py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-3xl font-bold text-[#1F2A37] text-center mb-12">
-          Who are you?
+          Who it&apos;s for
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {ROLES.map((role, i) => (

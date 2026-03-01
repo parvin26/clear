@@ -182,7 +182,7 @@ export function Topbar() {
                 <Link href="/login">Log in</Link>
               </Button>
               <Button size="sm" className="bg-primary hover:bg-primary/90" asChild>
-                <Link href="/start">Get started</Link>
+                <Link href="/diagnostic">Start Diagnostic</Link>
               </Button>
             </div>
 
@@ -211,11 +211,11 @@ export function Topbar() {
                 <div className="pt-4 border-t border-border mt-2 flex flex-col gap-2">
                   <Link href="/login" className="px-4 py-3 rounded-lg text-sm text-ink-muted hover:text-ink hover:bg-muted" onClick={() => setMobileMenuOpen(false)}>Log in</Link>
                   <Link
-                    href="/start"
+                    href="/diagnostic"
                     onClick={() => setMobileMenuOpen(false)}
                     className="block w-full py-3 px-4 rounded-lg text-center text-sm font-semibold bg-primary text-white hover:bg-primary/90"
                   >
-                    Get started
+                    Start Diagnostic
                   </Link>
                 </div>
               </nav>
@@ -252,10 +252,10 @@ export function Topbar() {
               Pricing
             </Link>
             <Link
-              href="/start"
-              className={cn("text-sm transition-colors", pathname === "/start" ? "text-ink" : "text-ink-muted hover:text-ink")}
+              href="/diagnostic"
+              className={cn("text-sm transition-colors", pathname === "/diagnostic" ? "text-ink" : "text-ink-muted hover:text-ink")}
             >
-              Get started
+              Start Diagnostic
             </Link>
           </nav>
 
@@ -264,7 +264,7 @@ export function Topbar() {
               <Link href="/login">Log in</Link>
             </Button>
             <Button size="sm" className="bg-primary hover:bg-primary/90" asChild>
-              <Link href="/start">Get started</Link>
+              <Link href="/diagnostic">Start Diagnostic</Link>
             </Button>
           </div>
 
@@ -309,19 +309,19 @@ export function Topbar() {
               <Link href="/pricing" className="px-4 py-3 rounded-lg text-sm text-ink-muted hover:text-ink hover:bg-muted" onClick={() => setMobileMenuOpen(false)}>
                 Pricing
               </Link>
-              <Link href="/start" className="px-4 py-3 rounded-lg text-sm text-ink-muted hover:text-ink hover:bg-muted" onClick={() => setMobileMenuOpen(false)}>
-                Get started
+              <Link href="/diagnostic" className="px-4 py-3 rounded-lg text-sm text-ink-muted hover:text-ink hover:bg-muted" onClick={() => setMobileMenuOpen(false)}>
+                Start Diagnostic
               </Link>
               <div className="pt-4 border-t border-border mt-2 flex flex-col gap-2">
                 <Link href="/login" className="px-4 py-3 rounded-lg text-sm text-ink-muted hover:text-ink hover:bg-muted" onClick={() => setMobileMenuOpen(false)}>
                   Log in
                 </Link>
                 <Link
-                  href="/start"
+                  href="/diagnostic"
                   onClick={() => setMobileMenuOpen(false)}
                   className="block w-full py-3 px-4 rounded-lg text-center text-sm font-semibold bg-primary text-white hover:bg-primary/90"
                 >
-                  Get started
+                  Start Diagnostic
                 </Link>
               </div>
             </nav>

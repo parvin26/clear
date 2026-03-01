@@ -8,7 +8,7 @@ const marketingFooterRequiredLinks = [
   { href: "/pricing", label: "Pricing" },
   { href: "/for-partners", label: "For partners" },
   { href: "/for-institutions", label: "Institutions" },
-  { href: "/start", label: "Get started" },
+  { href: "/diagnostic", label: "Start Diagnostic" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -82,7 +82,8 @@ function MarketingFooter() {
             <div className="text-xl font-bold tracking-tight text-white">CLEAR Commons</div>
             <div className="space-y-4">
               <p className="text-white/60 text-sm leading-relaxed max-w-[260px]">
-                Giving founders and capital providers a repeatable way to diagnose issues, agree a plan, and track execution.
+                A structured diagnostic and execution system for owner-led businesses,
+                founders and the capital partners who back them.
               </p>
               <p className="text-white/40 text-xs font-medium">Part of the Be Noor ecosystem</p>
             </div>
@@ -138,8 +139,8 @@ function MarketingFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/start" className="text-white/75 hover:text-white text-[14px] transition-colors">
-                  Get started
+                <Link href="/diagnostic" className="text-white/75 hover:text-white text-[14px] transition-colors">
+                  Start Diagnostic
                 </Link>
               </li>
               <li>
@@ -185,7 +186,7 @@ function MarketingFooter() {
             <Link href="/governance" className="hover:text-white/60 transition-colors">Governance</Link>
             <Link href="/pricing" className="hover:text-white/60 transition-colors">Pricing</Link>
             <Link href="/for-partners" className="hover:text-white/60 transition-colors">For partners</Link>
-            <Link href="/start" className="hover:text-white/60 transition-colors">Get started</Link>
+            <Link href="/diagnostic" className="hover:text-white/60 transition-colors">Start Diagnostic</Link>
             <Link href="/contact" className="hover:text-white/60 transition-colors">Contact</Link>
           </div>
         </div>
