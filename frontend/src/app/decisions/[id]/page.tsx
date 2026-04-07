@@ -366,7 +366,8 @@ export default function DecisionWorkspacePage() {
       getDecision(decisionId),
       listLedgerEvents(decisionId),
       listEvidenceLinks(decisionId),
-      listMilestones(decisionId),
+      // Do not block the whole workspace if milestones fails (e.g. server 500); user can still view decision.
+      listMilestones(decisionId).catch(() => []),
       getReadiness(decisionId).catch(() => null),
       listOutcomeReviews(decisionId).catch(() => []),
     ])

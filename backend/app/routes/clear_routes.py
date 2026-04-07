@@ -29,7 +29,7 @@ from app.schemas.clear.ledger import (
     ExecutionUpdateRequest,
     DerivedDecisionStatus,
 )
-from app.schemas.clear.milestone import MilestoneCreate, MilestoneUpdate, MilestoneOut
+from app.schemas.clear.milestone import MilestoneCreate, MilestoneUpdate, MilestoneOut, milestone_orm_to_out
 from app.schemas.clear.evidence import EvidenceLinkCreate, EvidenceLinkOut
 from app.governance.execution_ledger_service import (
     append_task_created,
@@ -814,7 +814,7 @@ def list_milestones(decision_id: UUID, db: Session = Depends(get_db)):
     if not d:
         raise HTTPException(status_code=404, detail="Decision not found")
     rows = db.query(DecisionExecutionMilestone).filter(DecisionExecutionMilestone.decision_id == decision_id).order_by(DecisionExecutionMilestone.due_date.asc(), DecisionExecutionMilestone.created_at.asc()).all()
-    return rows
+    return [milestone_orm_to_out(m) for m in rows]
 
 
 @router.post("/decisions/{decision_id}/milestones", response_model=MilestoneOut)
@@ -836,7 +836,7 @@ def create_milestone(decision_id: UUID, body: MilestoneCreate, db: Session = Dep
     db.add(m)
     db.commit()
     db.refresh(m)
-    return m
+    return milestone_orm_to_out(m)
 
 
 @router.patch("/decisions/{decision_id}/milestones/{milestone_id}", response_model=MilestoneOut)
@@ -853,7 +853,7 @@ def update_milestone(decision_id: UUID, milestone_id: int, body: MilestoneUpdate
         setattr(m, k, v)
     db.commit()
     db.refresh(m)
-    return m
+    return milestone_orm_to_out(m)
 
 
 @router.delete("/decisions/{decision_id}/milestones/{milestone_id}")

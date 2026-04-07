@@ -1,6 +1,6 @@
 """Execution milestone schemas for decision workspace."""
 from datetime import date, datetime
-from typing import List, Optional
+from typing import Any, List, Optional
 from uuid import UUID
 from pydantic import BaseModel, Field
 
@@ -43,3 +43,39 @@ class MilestoneOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+def milestone_orm_to_out(m: Any) -> MilestoneOut:
+    """
+    Build MilestoneOut from DecisionExecutionMilestone ORM.
+    Coerces linked_org_indicator_ids JSONB so malformed DB values cannot break response validation (500).
+    """
+    raw = getattr(m, "linked_org_indicator_ids", None)
+    linked: list[int] = []
+    if isinstance(raw, list):
+        for x in raw:
+            try:
+                linked.append(int(x))
+            except (TypeError, ValueError):
+                continue
+    elif raw is not None and not isinstance(raw, list):
+        # Legacy or bad JSON: avoid Pydantic validation error on response
+        linked = []
+
+    st = getattr(m, "status", None) or "pending"
+    if not isinstance(st, str):
+        st = "pending"
+
+    return MilestoneOut(
+        id=m.id,
+        decision_id=m.decision_id,
+        milestone_name=m.milestone_name or "",
+        responsible_person=m.responsible_person,
+        due_date=m.due_date,
+        status=st,
+        notes=m.notes,
+        linked_org_indicator_ids=linked,
+        impact_expected_output_note=m.impact_expected_output_note,
+        created_at=m.created_at,
+        updated_at=m.updated_at,
+    )
