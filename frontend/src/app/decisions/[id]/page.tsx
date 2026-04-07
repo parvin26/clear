@@ -1151,7 +1151,7 @@ export default function DecisionWorkspacePage() {
                     </li>
                   ))}
                 </ul>
-                {/* Add milestone — always visible in same section */}
+                {/* Add milestone - always visible in same section */}
                 {isDraft && (
                   <div className="border border-dashed rounded-md p-3 space-y-2 mt-2">
                     <p className="text-xs font-medium text-muted-foreground">Add milestone</p>
