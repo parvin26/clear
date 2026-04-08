@@ -815,10 +815,10 @@ export async function login(body: { email: string; password: string }): Promise<
   return data;
 }
 
-export async function sendMagicLink(email: string): Promise<{ message: string; expires_in_minutes: number }> {
+export async function sendMagicLink(email: string, next?: string | null): Promise<{ message: string; expires_in_minutes: number }> {
   const { data } = await apiClient.post<{ message: string; expires_in_minutes: number }>(
     "/api/auth/send-magic-link",
-    { email }
+    { email, next: next ?? undefined }
   );
   return data;
 }

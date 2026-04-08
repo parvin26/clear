@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
+from app.auth.dependencies import get_current_user_required
 from app.db.database import get_db
 from app.enterprise.schemas import (
     EnterpriseCreate,
@@ -15,7 +16,11 @@ from app.enterprise.schemas import (
 from app.enterprise.service import enterprise_service
 from app.enterprise.decision_context_service import store_context, get_context, get_context_history
 
-router = APIRouter(prefix="/api", tags=["Enterprise (Phase 2)"])
+router = APIRouter(
+    prefix="/api",
+    tags=["Enterprise (Phase 2)"],
+    dependencies=[Depends(get_current_user_required)],
+)
 
 
 @router.post("/enterprises", response_model=EnterpriseOut)

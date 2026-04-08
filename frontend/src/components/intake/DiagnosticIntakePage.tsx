@@ -42,6 +42,26 @@ const INITIAL_IDENTITY: Partial<IntakeIdentity> = {
   sector: "",
 };
 
+const ROLE_QUERY_ALIASES: Record<string, Role> = {
+  startup_founder: "startup_founder",
+  founder: "startup_founder",
+  raising: "startup_founder",
+  msme_owner: "msme_owner",
+  enterprise: "msme_owner",
+  msme: "msme_owner",
+  sme: "msme_owner",
+  social_enterprise_leader: "social_enterprise_leader",
+  social_enterprise: "social_enterprise_leader",
+  impact_investor: "impact_investor",
+  investor: "impact_investor",
+};
+
+function normalizeRoleQueryParam(value: string | null): Role | null {
+  if (!value) return null;
+  const normalized = ROLE_QUERY_ALIASES[value.trim().toLowerCase()];
+  return normalized ?? null;
+}
+
 function loadSession(): Partial<{
   identity: Partial<IntakeIdentity>;
   role: Role | null;
@@ -111,13 +131,24 @@ export function DiagnosticIntakePage() {
     if (s.msme && Object.keys(s.msme).length > 0) setMsme((prev) => ({ ...prev, ...s.msme }));
     if (s.impact_profile && Object.keys(s.impact_profile).length > 0) setImpactProfile((prev) => ({ ...prev, ...s.impact_profile }));
     if (s.investor_profile && Object.keys(s.investor_profile).length > 0) setInvestorProfile((prev) => ({ ...prev, ...s.investor_profile }));
-    if (roleParam && ["startup_founder", "msme_owner", "social_enterprise_leader", "impact_investor"].includes(roleParam)) {
-      setRole(roleParam as Role);
+
+    const queryRole = normalizeRoleQueryParam(roleParam);
+    if (queryRole) {
+      setRole(queryRole);
       if (typeof s.stepIndex === "number" && s.stepIndex >= 0) setStepIndex(s.stepIndex);
-    } else {
-      setStepIndex(0);
-      setRole(null);
+      return;
     }
+
+    if (s.role) {
+      setRole(s.role);
+      if (typeof s.stepIndex === "number" && s.stepIndex >= 0) {
+        setStepIndex(s.stepIndex);
+      }
+      return;
+    }
+
+    setStepIndex(0);
+    setRole(null);
   }, [roleParam]);
 
   useEffect(() => {

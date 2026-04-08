@@ -21,7 +21,7 @@ const PLANS = [
     description: "Startup diagnostic, decision execution planning, capital readiness tools.",
     features: ["Startup diagnostic", "Decision execution planning", "Capital readiness tools"],
     cta: "Choose founder plan",
-    ctaHref: "/diagnostic?role=founder",
+    ctaHref: "/diagnostic?role=startup_founder",
   },
   {
     name: "Capital Partner",

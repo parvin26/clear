@@ -4,7 +4,7 @@ Run multi-agent diagnostic: map payloads -> call agents (with timeout) -> synthe
 import asyncio
 import logging
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any
+from typing import Any, Callable
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -26,11 +26,29 @@ from app.schemas.cto.cto_input import CTOInputSchema
 from app.tools.financial_tools import compute_financial_summary
 from app.tools.tech_tools import calculate_all_tools
 from app.rag.vectorstore import search_finance_docs, search_ops_docs, search_tech_docs
+from app.db.database import SessionLocal
 
 logger = logging.getLogger(__name__)
 
 AGENT_TIMEOUT = 55.0  # seconds per agent
 EXECUTOR = ThreadPoolExecutor(max_workers=4)
+
+
+def _run_with_isolated_session(
+    runner: Callable[[dict, Session, dict | None], dict],
+    payload: dict,
+    onboarding_context: dict | None = None,
+) -> dict:
+    """
+    Execute a sync agent runner with its own short-lived DB session.
+
+    This avoids sharing one SQLAlchemy Session across multiple worker threads.
+    """
+    worker_db = SessionLocal()
+    try:
+        return runner(payload, worker_db, onboarding_context=onboarding_context)
+    finally:
+        worker_db.close()
 
 
 def _run_cfo(payload: dict, db: Session, onboarding_context: dict | None = None) -> dict:
@@ -70,22 +88,28 @@ def _run_cto(payload: dict, db: Session, onboarding_context: dict | None = None)
     return run_ai_cto_agent(input_dict, tools_results, rag_context, onboarding_context=onboarding_context)
 
 
-async def _run_coo(payload: dict, db: Session, onboarding_context: dict | None = None) -> dict:
+async def _run_coo(payload: dict, onboarding_context: dict | None = None) -> dict:
     """Async COO agent call."""
     from app.config import settings
     coo_input = COOInput(**payload)
     docs = None
-    if settings.RAG_ENABLED:
-        try:
-            rag_results = search_ops_docs(
-                db, "SME operations best practices for inventory and throughput", top_k=settings.RAG_TOP_K
-            )
-            if rag_results:
-                docs = [f"{doc.title}: {doc.content[:400]}" for doc in rag_results]
-        except Exception as exc:
-            logger.warning("COO RAG failed: %s", exc)
-    response = await run_ai_coo_agent(coo_input, docs=docs, onboarding_context=onboarding_context)
-    return response
+    worker_db = SessionLocal()
+    try:
+        if settings.RAG_ENABLED:
+            try:
+                rag_results = search_ops_docs(
+                    worker_db,
+                    "SME operations best practices for inventory and throughput",
+                    top_k=settings.RAG_TOP_K,
+                )
+                if rag_results:
+                    docs = [f"{doc.title}: {doc.content[:400]}" for doc in rag_results]
+            except Exception as exc:
+                logger.warning("COO RAG failed: %s", exc)
+        response = await run_ai_coo_agent(coo_input, docs=docs, onboarding_context=onboarding_context)
+        return response
+    finally:
+        worker_db.close()
 
 
 def _synthesis_to_draft_artifact(
@@ -183,21 +207,45 @@ async def run_diagnostic_run(
         try:
             if domain == "cfo":
                 out = await asyncio.wait_for(
-                    loop.run_in_executor(EXECUTOR, lambda: _run_cfo(payloads["cfo"], db, onboarding_context)),
+                    loop.run_in_executor(
+                        EXECUTOR,
+                        lambda: _run_with_isolated_session(
+                            _run_cfo,
+                            payloads["cfo"],
+                            onboarding_context=onboarding_context,
+                        ),
+                    ),
                     timeout=AGENT_TIMEOUT,
                 )
             elif domain == "cmo":
                 out = await asyncio.wait_for(
-                    loop.run_in_executor(EXECUTOR, lambda: _run_cmo(payloads["cmo"], db, onboarding_context)),
+                    loop.run_in_executor(
+                        EXECUTOR,
+                        lambda: _run_with_isolated_session(
+                            _run_cmo,
+                            payloads["cmo"],
+                            onboarding_context=onboarding_context,
+                        ),
+                    ),
                     timeout=AGENT_TIMEOUT,
                 )
             elif domain == "cto":
                 out = await asyncio.wait_for(
-                    loop.run_in_executor(EXECUTOR, lambda: _run_cto(payloads["cto"], db, onboarding_context)),
+                    loop.run_in_executor(
+                        EXECUTOR,
+                        lambda: _run_with_isolated_session(
+                            _run_cto,
+                            payloads["cto"],
+                            onboarding_context=onboarding_context,
+                        ),
+                    ),
                     timeout=AGENT_TIMEOUT,
                 )
             else:
-                out = await asyncio.wait_for(_run_coo(payloads["coo"], db, onboarding_context), timeout=AGENT_TIMEOUT)
+                out = await asyncio.wait_for(
+                    _run_coo(payloads["coo"], onboarding_context),
+                    timeout=AGENT_TIMEOUT,
+                )
             return domain, out
         except asyncio.TimeoutError:
             logger.warning("Agent %s timed out", domain)

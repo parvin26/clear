@@ -2,12 +2,17 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends
 
+from app.auth.dependencies import get_current_user_required
 from app.db.database import get_db
 from sqlalchemy.orm import Session
 from app.outcomes.schemas import OutcomeCreate, OutcomeOut
 from app.outcomes.service import outcomes_service
 
-router = APIRouter(prefix="/api", tags=["Outcomes (Phase 2)"])
+router = APIRouter(
+    prefix="/api",
+    tags=["Outcomes (Phase 2)"],
+    dependencies=[Depends(get_current_user_required)],
+)
 
 
 @router.post("/decisions/{decision_id}/outcomes", response_model=OutcomeOut)

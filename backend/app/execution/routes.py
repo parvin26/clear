@@ -2,12 +2,17 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 
+from app.auth.dependencies import get_current_user_required
 from app.db.database import get_db
 from sqlalchemy.orm import Session
 from app.execution.schemas import TaskCreate, TaskUpdate, TaskOut, MilestoneCreate, MilestoneOut
 from app.execution.service import execution_service
 
-router = APIRouter(prefix="/api", tags=["Execution (Phase 2)"])
+router = APIRouter(
+    prefix="/api",
+    tags=["Execution (Phase 2)"],
+    dependencies=[Depends(get_current_user_required)],
+)
 
 
 @router.post("/decisions/{decision_id}/tasks", response_model=TaskOut)
